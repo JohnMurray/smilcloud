@@ -10,4 +10,4 @@ public class Player extends Activity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.main);
     }
-}
+} 
