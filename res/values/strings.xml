@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="hello">Hello World, Player!</string>
-    <string name="app_name">SMIL Team 2</string>
+	<string name="app_name">smilcloud</string>
+    <string name="library_menu">My Library</string>
+    <string name="exit_player_menu">Exit</string>
 </resources>
