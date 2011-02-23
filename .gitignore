@@ -1,6 +1,4 @@
 bin/
+progaurd.cfg
 .project
 .metadata/
-default.properties
-gen/
-proguard.cfg
