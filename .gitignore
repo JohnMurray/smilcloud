@@ -4,3 +4,4 @@ proguard.cfg
 .metadata/
 gen/
 default.properties
+AndroidManifest.xml
