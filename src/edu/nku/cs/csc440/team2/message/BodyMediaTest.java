@@ -9,7 +9,6 @@ import edu.nku.cs.csc440.team2.message.Media;
 import edu.nku.cs.csc440.team2.message.Body;
 import edu.nku.cs.csc440.team2.message.Audio;
 import edu.nku.cs.csc440.team2.message.Video;
-import java.awt.Dimension;
 import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Before;
@@ -185,7 +184,7 @@ public class BodyMediaTest {
     @Test
     public void regionCheck() {
         System.out.println("* MediaTest: test method 6 - regionCheck()");
-        Region r = new Region(new Dimension(100, 100), "#98FB98", new Dimension(10, 10), "sliced");
+        Region r = new Region(new SmilDimension(100, 100), "#98FB98", new SmilDimension(10, 10), "sliced");
         t2.setRegion(r);
         assertEquals(r, t2.getRegion());
         i2.setRegion(r);

@@ -5,7 +5,7 @@ package edu.nku.cs.csc440.team2.message;
  * @author Shane Crandall
  * @version 0
  */
-public abstract class Body implements Comparable {
+public abstract class Body implements Comparable<Body> {
 
     String id;
     private int repeat = 1;
@@ -67,8 +67,7 @@ public abstract class Body implements Comparable {
         }
     }
 
-    public int compareTo(Object o) {
-        Body b = (Body) o;
+    public int compareTo(Body b) {
         if (getId().charAt(0) < b.getId().charAt(0)) {
             return -1;
         } else if (getId().charAt(0) > b.getId().charAt(0)) {

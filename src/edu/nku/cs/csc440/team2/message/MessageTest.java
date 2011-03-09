@@ -12,7 +12,6 @@ import edu.nku.cs.csc440.team2.message.Video;
 import edu.nku.cs.csc440.team2.message.Timing;
 import java.io.FileNotFoundException;
 import java.util.LinkedList;
-import java.awt.Dimension;
 import java.io.File;
 import org.junit.After;
 import org.junit.AfterClass;
@@ -101,7 +100,7 @@ public class MessageTest {
 
     @BeforeClass
     public static void setUpClass() {
-        m1 = new Message("good_id", new Dimension(123, 456), "pink");
+        m1 = new Message("good_id", new SmilDimension(123, 456), "pink");
         m2 = new Message("", null, "#9ACD32");
         m3 = new Message("bad id");
         System.out.println("* MessageTest: test setUpClass - create timing containers");
@@ -166,11 +165,11 @@ public class MessageTest {
     @Test
     public void getRootLayoutCheck() {
         System.out.println("* MessageTest: test method 3 - getRootLayoutCheck()");
-        assertEquals(new Dimension(123, 456), m1.getRootLayout().getDimensions());
+        assertEquals(new SmilDimension(123, 456), m1.getRootLayout().getDimensions());
         assertEquals("pink", m1.getRootLayout().getBackgroundColor());
-        assertEquals(new Dimension(480, 320), m2.getRootLayout().getDimensions());
+        assertEquals(new SmilDimension(480, 320), m2.getRootLayout().getDimensions());
         assertEquals("#9ACD32", m2.getRootLayout().getBackgroundColor());
-        assertEquals(new Dimension(480, 320), m3.getRootLayout().getDimensions());
+        assertEquals(new SmilDimension(480, 320), m3.getRootLayout().getDimensions());
         assertEquals("transparent", m3.getRootLayout().getBackgroundColor());
     }
 
@@ -265,7 +264,7 @@ public class MessageTest {
         System.out.println("* \trepeat getIdCheck()");
         assertEquals("good_id", m4.getId());
         System.out.println("* \trepeat getRootLayoutCheck()");
-        assertEquals(new Dimension(123, 456), m4.getRootLayout().getDimensions());
+        assertEquals(new SmilDimension(123, 456), m4.getRootLayout().getDimensions());
         assertEquals("pink", m4.getRootLayout().getBackgroundColor());
         System.out.println("* \trepeat getDownloadPriorityCheck()");
         assertEquals("[v4, v1, a2, a3]", m4.getDownloadPriority().toString());

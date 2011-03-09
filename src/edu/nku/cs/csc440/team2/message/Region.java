@@ -1,13 +1,11 @@
 package edu.nku.cs.csc440.team2.message;
 
-import java.awt.Dimension;
-
 /**
  *
  * @author Shane Crandall
  * @version 0
  */
-public class Region extends RootLayout implements Comparable {
+public class Region extends RootLayout implements Comparable<Region> {
 
     public final static String HIDDEN = "hidden";
     public final static String FILL = "fill";
@@ -15,7 +13,7 @@ public class Region extends RootLayout implements Comparable {
     public final static String SLICE = "slice";
     private final static char R = 'r';
     private static int count = 0;
-    private Dimension origin = new Dimension(0, 0);
+    private SmilDimension origin = new SmilDimension(0, 0);
     private int zIndex = 0;
     private String fit = HIDDEN;
 
@@ -24,19 +22,19 @@ public class Region extends RootLayout implements Comparable {
         id = R + String.valueOf(++count);
     }
 
-    public Region(Dimension dimensions) {
+    public Region(SmilDimension dimensions) {
         super(dimensions);
         id = R + String.valueOf(++count);
     }
 
-    public Region(Dimension dimensions, String backgroundColor, Dimension origin, String fit) {
+    public Region(SmilDimension dimensions, String backgroundColor, SmilDimension origin, String fit) {
         super(dimensions, backgroundColor);
         setOrigin(origin);
         setFit(fit);
         id = R + String.valueOf(++count);
     }
 
-    Region(Dimension dimensions, String backgroundColor, Dimension origin, String fit, String id, int zIndex) {
+    Region(SmilDimension dimensions, String backgroundColor, SmilDimension origin, String fit, String id, int zIndex) {
         super(dimensions, backgroundColor);
         this.origin = origin;
         this.fit = fit;
@@ -59,11 +57,11 @@ public class Region extends RootLayout implements Comparable {
         }
     }
 
-    public Dimension getOrigin() {
+    public SmilDimension getOrigin() {
         return origin;
     }
 
-    public void setOrigin(Dimension origin) {
+    public void setOrigin(SmilDimension origin) {
         if (origin != null) {
             this.origin = origin;
         }
@@ -83,16 +81,15 @@ public class Region extends RootLayout implements Comparable {
         StringBuilder xml = new StringBuilder("<region");
         xml.append(format("id", id));
         xml.append(super.toXml());
-        xml.append(format("left", origin.width));
-        xml.append(format("top", origin.height));
+        xml.append(format("left", origin.getWidth()));
+        xml.append(format("top", origin.getHeight()));
         xml.append(format("z-index", zIndex));
         xml.append(format("fit", fit));
         xml.append("/>\n");
         return xml.toString();
     }
 
-    public int compareTo(Object o) {
-        Region region = (Region) o;
+    public int compareTo(Region region) {
         if (Integer.valueOf(id.substring(1)) < Integer.valueOf(region.getId().substring(1))) {
             return -1;
         } else if (Integer.valueOf(id.substring(1)) > Integer.valueOf(region.getId().substring(1))) {
