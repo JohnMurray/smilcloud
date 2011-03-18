@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <classpath>
-	<classpathentry kind="src" path="src"/>
+	<classpathentry excluding="edu/nku/cs/csc440/team2/message/BodyMediaTest.java|edu/nku/cs/csc440/team2/message/CdataValidatorTest.java|edu/nku/cs/csc440/team2/message/ComparableTest.java|edu/nku/cs/csc440/team2/message/LayoutTest.java|edu/nku/cs/csc440/team2/message/MessageTest.java|edu/nku/cs/csc440/team2/message/TimingTest.java" kind="src" path="src"/>
 	<classpathentry kind="src" path="gen"/>
 	<classpathentry kind="con" path="com.android.ide.eclipse.adt.ANDROID_FRAMEWORK"/>
 	<classpathentry kind="output" path="bin"/>
