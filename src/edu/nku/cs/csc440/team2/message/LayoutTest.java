@@ -2,7 +2,6 @@ package edu.nku.cs.csc440.team2.message;
 
 import edu.nku.cs.csc440.team2.message.RootLayout;
 import edu.nku.cs.csc440.team2.message.Region;
-import java.awt.Dimension;
 import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Before;
@@ -29,12 +28,12 @@ public class LayoutTest {
         new Region();
         r2 = new Region();
         r3 = new Region(null);
-        r4 = new Region(new Dimension(100, 100), "dark red", new Dimension(25, 25), "filled");
+        r4 = new Region(new SmilDimension(100, 100), "dark red", new SmilDimension(25, 25), "filled");
 
         System.out.println("* RootLayoutTest: test setUpClass - constructors");
         l1 = new RootLayout();
         l2 = new RootLayout(null);
-        l3 = new RootLayout(new Dimension(100, 100), "#9ACD32");
+        l3 = new RootLayout(new SmilDimension(100, 100), "#9ACD32");
     }
 
     @AfterClass
@@ -59,8 +58,8 @@ public class LayoutTest {
     @Test
     public void dimensionsCheck() {
         System.out.println("* LayoutTest: test method 2 - dimensionsCheck()");
-        assertEquals(new Dimension(480, 320), r2.getDimensions());
-        assertEquals(new Dimension(100, 100), l3.getDimensions());
+        assertEquals(new SmilDimension(480, 320), r2.getDimensions());
+        assertEquals(new SmilDimension(100, 100), l3.getDimensions());
     }
 
     @Test
@@ -74,10 +73,10 @@ public class LayoutTest {
     @Test
     public void originCheck() {
         System.out.println("* RegionTest: test method 4 - originCheck()");
-        assertEquals(new Dimension(0, 0), r2.getOrigin());
-        r2.setOrigin(new Dimension(16, 17));
+        assertEquals(new SmilDimension(0, 0), r2.getOrigin());
+        r2.setOrigin(new SmilDimension(16, 17));
         r2.setOrigin(null);
-        assertEquals(new Dimension(16, 17), r2.getOrigin());
+        assertEquals(new SmilDimension(16, 17), r2.getOrigin());
     }
 
     @Test

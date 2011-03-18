@@ -1,6 +1,5 @@
 package edu.nku.cs.csc440.team2.message;
 
-import java.awt.Dimension;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -42,7 +41,7 @@ public class Message {
         ROOT_LAYOUT = new RootLayout();
     }
 
-    public Message(String id, Dimension dimensions, String backgroundColor) {
+    public Message(String id, SmilDimension dimensions, String backgroundColor) {
         ID = new CdataValidator().validate(id, "");
         ROOT_LAYOUT = new RootLayout(dimensions, backgroundColor);
     }
@@ -63,13 +62,13 @@ public class Message {
         String backgroundColor = rootLayout.getAttributes().item(0).getNodeValue();
         int height = Integer.valueOf(rootLayout.getAttributes().item(1).getNodeValue());
         int width = Integer.valueOf(rootLayout.getAttributes().item(2).getNodeValue());
-        ROOT_LAYOUT = new RootLayout(new Dimension(width, height), backgroundColor);
+        ROOT_LAYOUT = new RootLayout(new SmilDimension(width, height), backgroundColor);
 
         // <region background-color="" fit="" height="" id="" left="" top="" width="" z-index=""/>
         NodeList regionList = doc.getElementsByTagName("region");
         NamedNodeMap nnm = regionList.item(regionList.getLength() - 1).getAttributes();
         int j = Integer.valueOf(nnm.item(3).getNodeValue().substring(1)) - 1;
-        regions = new Region[1];
+        regions = new Region[j];
 
         for (int i = 0; i < regionList.getLength(); i++) {
             NamedNodeMap regionAttrs = regionList.item(i).getAttributes();
@@ -85,7 +84,7 @@ public class Message {
             if (index >= regions.length) {
                 regions = Arrays.copyOf(regions, index + 1);
             }
-            regions[index] = new Region(new Dimension(width, height), backgroundColor, new Dimension(left, top), fit, id, zIndex);
+            regions[index] = new Region(new SmilDimension(width, height), backgroundColor, new SmilDimension(left, top), fit, id, zIndex);
         }
 
         parse(doc.getElementsByTagName("body").item(0), bodyImpSeq);

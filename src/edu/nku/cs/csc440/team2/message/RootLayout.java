@@ -1,7 +1,5 @@
 package edu.nku.cs.csc440.team2.message;
 
-import java.awt.Dimension;
-
 /**
  *
  * @author Shane Crandall
@@ -12,16 +10,16 @@ public class RootLayout {
     public final static String TRANSPARENT = "transparent";
     String id = null;
     private String backgroundColor = TRANSPARENT;
-    private Dimension dimensions = new Dimension(480, 320);
+    private SmilDimension dimensions = new SmilDimension(480, 320);
 
     RootLayout() {
     }
 
-    RootLayout(Dimension dimensions) {
+    RootLayout(SmilDimension dimensions) {
         setDimensions(dimensions);
     }
 
-    RootLayout(Dimension dimensions, String backgroundColor) {
+    RootLayout(SmilDimension dimensions, String backgroundColor) {
         setDimensions(dimensions);
         if (new CdataValidator().validate(backgroundColor, "#") != null) {
             this.backgroundColor = backgroundColor;
@@ -32,11 +30,11 @@ public class RootLayout {
         return backgroundColor;
     }
 
-    public Dimension getDimensions() {
+    public SmilDimension getDimensions() {
         return dimensions;
     }
 
-    private void setDimensions(Dimension dimensions) {
+    private void setDimensions(SmilDimension dimensions) {
         if (dimensions != null) {
             this.dimensions = dimensions;
         }
@@ -53,8 +51,8 @@ public class RootLayout {
         if (id == null) {
             xml.append("<root-layout");
         }
-        xml.append(format("width", dimensions.width));
-        xml.append(format("height", dimensions.height));
+        xml.append(format("width", dimensions.getWidth()));
+        xml.append(format("height", dimensions.getHeight()));
         xml.append(format("background-color", backgroundColor));
         if (id == null) {
             xml.append("/>\n");
