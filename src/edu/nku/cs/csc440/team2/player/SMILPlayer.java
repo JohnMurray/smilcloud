@@ -21,6 +21,7 @@ import android.widget.RelativeLayout;
 import android.widget.SeekBar;
 import android.widget.TextView;
 
+import edu.nku.cs.csc440.team2.SMILCloud;
 import edu.nku.cs.csc460.team2.R;
 
 /**
@@ -81,6 +82,14 @@ public class SMILPlayer extends Activity {
         
         //TODO:add overlaying View w/ action to show player controls on click
         this.addControls();
+        
+        
+        /*
+         * test code here
+         */
+        SMILCloud smilCloud = ((SMILCloud)getApplicationContext());
+        smilCloud.queueDocumentToPlay("testing id string");
+        Log.i("Main Application", smilCloud.getQueuedDocumentForPlayback());
         
     }
     
