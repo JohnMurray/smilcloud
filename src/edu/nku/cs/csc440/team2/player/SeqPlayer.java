@@ -1,10 +1,7 @@
 package edu.nku.cs.csc440.team2.player;
 
-import java.util.ArrayList;
-
-public class SeqPlayer extends Player implements PlayerContainer 
+public class SeqPlayer extends ContainerPlayer implements PlayerContainer 
 {
-	private ArrayList<Player> components = new ArrayList<Player>();
 	
 	public void addComponent(Player p)
 	{
@@ -16,33 +13,15 @@ public class SeqPlayer extends Player implements PlayerContainer
 		
 	}
 	
-	public void pause()
-	{
-		
-	}
-	
-	public void stop()
-	{
-		
-	}
-	
+	//TODO: EXTRA -- implement seek forward sometime
 	public void seekForward()
 	{
 		
 	}
 	
+	//TODO: EXTRA -- implement seek backward sometime
 	public void seekBackward()
 	{
 		
-	}
-	
-	public int getDuration()
-	{
-		return 0;
-	}
-	
-	public boolean isPaused()
-	{
-		return false;
 	}
 }

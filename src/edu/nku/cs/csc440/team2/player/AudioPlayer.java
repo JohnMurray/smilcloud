@@ -1,6 +1,6 @@
 package edu.nku.cs.csc440.team2.player;
 
-public class AudioPlayer extends Player 
+public class AudioPlayer extends SingleInstancePlayer 
 {
 
 	public void play()
@@ -9,11 +9,6 @@ public class AudioPlayer extends Player
 	}
 	
 	public void pause()
-	{
-		
-	}
-	
-	public void stop()
 	{
 		
 	}
@@ -28,14 +23,14 @@ public class AudioPlayer extends Player
 		
 	}
 	
-	public int getDuration()
+	public void render()
 	{
-		return 0;
+		
 	}
 	
-	public boolean isPaused()
+	public void unRender()
 	{
-		return false;
+		
 	}
 	
 }

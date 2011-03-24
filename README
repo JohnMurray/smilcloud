@@ -1,1 +1,16 @@
-#README
+Mobile SMIL
+
+Team Members:
+-----------------------------
+  - John Murray
+  - Jon Schrage
+  - Shane Crandall
+  - William Knauer
+  - Pochara Prapatanan
+
+
+Project Description
+-----------------------------
+Create an Android application that can create SMIL multi-media messages, share
+created messages, recieve shared messages, playback messages, delete created
+messages, and store message on a cloud service. (Amazon EC2 in this case)
