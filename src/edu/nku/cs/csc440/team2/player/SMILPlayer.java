@@ -65,6 +65,8 @@ public class SMILPlayer extends Activity {
          * This isn't really testing information, we will be using this code only
          * slightly modified when using Shane's code.
          */
+        //TODO: write new testing code using the PriceLine (negotiator) class. 
+        /*
         int [] indexes = {1, 2, 3};
         ArrayList<ArrayList<Object>> zees = LayerBuilder.buildZIndexes(indexes, this);
         for( ArrayList<Object> tuple : zees)
@@ -79,8 +81,8 @@ public class SMILPlayer extends Activity {
         	}
         	this.zIndexes.add((RelativeLayout)tuple.get(0));
         }
+        */
         
-        //TODO:add overlaying View w/ action to show player controls on click
         this.addControls();
         
         
@@ -136,9 +138,6 @@ public class SMILPlayer extends Activity {
 			}
 		});
     	/*
-    	 * TODO: I really DON'T like this part, but I haven't found a better
-    	 * way to do this yet, change this at some point
-    	 * 
     	 * Note: might be able to do this better by specifying the onTouch handlers in XML
     	 * 
     	 * Get the references to all the controls we will be using in the Player
@@ -332,9 +331,7 @@ public class SMILPlayer extends Activity {
      * 
      * Used to build the z-index ViewGroup layers
      */
-    //TODO: alter code to use Shane's Region objects to generate more accurate Views with correct
-    //		origins (not just 0,0 all the time) 
-    private static class LayerBuilder
+    /*private static class LayerBuilder
     {
     	/**
     	 * @author john 
@@ -344,7 +341,7 @@ public class SMILPlayer extends Activity {
     	 * 
     	 * Factory function for building the RelativeLayouts for placing objects
     	 * into and what not. 
-    	 */
+    	 *
     	public static ArrayList<ArrayList<Object>> buildZIndexes(int [] indexes, SMILPlayer context)
     	{
     		ArrayList<ArrayList<Object>> list = new ArrayList<ArrayList<Object>>();
@@ -370,37 +367,5 @@ public class SMILPlayer extends Activity {
     		}
     		return list;
     	}
-    }
-    
-    
-    
-    
-    /**
-     * @author john
-     * 
-     * Build the SMIL player object's from Shane's parsed objects and what not		
-     */
-    private class SMILPlayerBuilder
-    {
-    	/**
-    	 * @author john
-    	 * @return SeqPlayer
-    	 * @param Shane's parsed object (?)
-    	 */
-    	public SMILPlayerBuilder() //Shane's parsed object
-    	{
-    		
-    	}
-    	
-    	/**
-    	 * @author john
-    	 * @return SeqPlayer
-    	 * 
-    	 * Generate a static SMIL object for testing purposes
-    	 */
-    	public Player genTestStub()
-    	{
-    		return null;
-    	}
-    }
+    }*/
 }
