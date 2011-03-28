@@ -12,6 +12,9 @@ package edu.nku.cs.csc440.team2.player;
  * SeqPlayer.
  */
 public abstract class Player {
+	
+	public static final float PLAYBACK_INTERVAL = 0.1f;
+	
 	/*
 	 * Used in the subscriber pattern to receive notifications/
 	 * commands from in case of a buffer issued by either an
@@ -42,14 +45,8 @@ public abstract class Player {
 	 * Can be used along with duration to determine when the
 	 * media object should be removed from the canvas. 
 	 */
-	protected double timePlayed;
+	protected double timePlayed = 0;
 	
-	
-	/*
-	 * The layout object from which the specified SMILRegion can
-	 * be obtained from. 
-	 */
-	protected SMILLayout layout;
 	
 
 	/**

@@ -31,8 +31,7 @@ import edu.nku.cs.csc460.team2.R;
  */
 public class SMILPlayer extends Activity {
     
-	private final int CONTROL_ID = 99999;
-	private ArrayList<RelativeLayout> zIndexes = new ArrayList<RelativeLayout>(); 
+	private final int CONTROL_ID = 99999; 
 	private RelativeLayout root;
 	private boolean hasBeenTouched = false;
 	//private ScheduledThreadPoolExecutor scheduledThreadPoolExecutor = new ScheduledThreadPoolExecutor(2);
@@ -53,43 +52,48 @@ public class SMILPlayer extends Activity {
         this.root = (RelativeLayout)findViewById(R.id.player_root_layout);
         
         
-        //TESTING STUFF BELOW HERE (FOR THIS METHOD)
-        //add some stuff to the root layout
-        RelativeLayout text = new RelativeLayout(this);
-        TextView tv1 = new TextView(this);
-        tv1.setText("ahhHH!!!!ksdjf");
-        text.addView(tv1);
-        this.root.addView(text);
-        
-        /**
-         * This isn't really testing information, we will be using this code only
-         * slightly modified when using Shane's code.
-         */
-        //TODO: write new testing code using the PriceLine (negotiator) class. 
         /*
-        int [] indexes = {1, 2, 3};
-        ArrayList<ArrayList<Object>> zees = LayerBuilder.buildZIndexes(indexes, this);
-        for( ArrayList<Object> tuple : zees)
-        {
-        	if( tuple.size() == 2)
-        	{
-        		this.root.addView((RelativeLayout)tuple.get(0), (RelativeLayout.LayoutParams)tuple.get(1));
-        	}
-        	else
-        	{
-        		this.root.addView((RelativeLayout)tuple.get(0));
-        	}
-        	this.zIndexes.add((RelativeLayout)tuple.get(0));
-        }
-        */
+         * Define the layout that will act as the container to hold
+         * the video. This will be passed in, along with the context
+         * and the SMIL message during translation. 
+         */
+        RelativeLayout videoContainer = new RelativeLayout(this);
+        RelativeLayout.LayoutParams lp = new RelativeLayout.LayoutParams(
+        		RelativeLayout.LayoutParams.MATCH_PARENT,
+        		RelativeLayout.LayoutParams.MATCH_PARENT);
+        lp.setMargins(0, 0, 0, 0);
+        videoContainer.setLayoutParams(lp);
+        this.root.addView(videoContainer);
         
+        /*
+         * Check to see if there is  SMIL message that is queued to play
+         * and if there is, then request to get the message and media
+         * from the provider.
+         * 
+         * If there is nothing to play, then don't do anything... we
+         * are done for now I suppose... just leave the screen black
+         * and hope that they can figure out what they are doing.
+         */
+        SMILCloud smilCloud = ((SMILCloud)getApplicationContext());
+        String playbackID = smilCloud.getQueuedDocumentForPlayback();
+        if( !(playbackID == null) && !playbackID.isEmpty() )
+        {
+        	//TODO: write code to get message and initialize structures
+        }     
+        
+        
+        /*
+         * Well, I lied. We are not entirely done yet... We need
+         * to add some controls to the player so that the use has
+         * at least a little control over things. 
+         */
         this.addControls();
         
         
         /*
          * test code here
          */
-        SMILCloud smilCloud = ((SMILCloud)getApplicationContext());
+        
         smilCloud.queueDocumentToPlay("testing id string");
         Log.i("Main Application", smilCloud.getQueuedDocumentForPlayback());
         
@@ -322,50 +326,4 @@ public class SMILPlayer extends Activity {
     {
     	//TODO: write code to launch Library Sub-Activity
     }
-    
-    
-    
-    
-    /**
-     * @author john
-     * 
-     * Used to build the z-index ViewGroup layers
-     */
-    /*private static class LayerBuilder
-    {
-    	/**
-    	 * @author john 
-    	 * @param indexes
-    	 * @param context
-    	 * @return ArrayList<ArrayList<Object>>
-    	 * 
-    	 * Factory function for building the RelativeLayouts for placing objects
-    	 * into and what not. 
-    	 *
-    	public static ArrayList<ArrayList<Object>> buildZIndexes(int [] indexes, SMILPlayer context)
-    	{
-    		ArrayList<ArrayList<Object>> list = new ArrayList<ArrayList<Object>>();
-    		//build layers (z-indicies)
-    		for(int i : indexes)
-    		{
-    			RelativeLayout tempView = new RelativeLayout(context);
-    			//TODO: replace width and height with actual values from shane's code objects
-    			RelativeLayout.LayoutParams lp = new RelativeLayout.LayoutParams(
-    					RelativeLayout.LayoutParams.FILL_PARENT,
-    					RelativeLayout.LayoutParams.WRAP_CONTENT);
-    			tempView.setId(i);
-    			
-    			//TODO: remove the following code chunk, testing only
-    			TextView tv = new TextView(context);
-    			tv.setText("testing code testing code");
-    			tempView.addView(tv);
-    			
-    			ArrayList<Object> tempArrayList = new ArrayList<Object>();
-    			tempArrayList.add(tempView);
-    			tempArrayList.add(lp);
-    			list.add(tempArrayList);
-    		}
-    		return list;
-    	}
-    }*/
 }

@@ -1,6 +1,8 @@
 package edu.nku.cs.csc440.team2.player;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.Enumeration;
 import java.util.Hashtable;
 import java.util.LinkedList;
@@ -24,14 +26,16 @@ public class PriceLine
 	private Hashtable<String, RegionData> regions = new Hashtable<String, RegionData>(20, .75f);
 	private SeqPlayer root;
 	private ArrayList<RelativeLayout> layouts;
+	private RelativeLayout rootViewGroup;
 
 	/**
 	 * instantiate the translator with the messenger classes
 	 */
-	public PriceLine(Context context, Message m)
+	public PriceLine(Message m, Context context, RelativeLayout rvg)
 	{
 		this.context = context;
 		this.message = m;
+		this.rootViewGroup = rvg;
 	}
 	
 	/**
@@ -41,8 +45,11 @@ public class PriceLine
 	public void negotiateBigDeal()
 	{
 		this.makePrivateDeal(this.message.getBody(), this.root);
+		
 		this.generateViewGroupsAndDemandACheaperRate();
-		this.sortRootSequenceAndEatRawDealForBreakfast();
+		this.renderViewGroupsAndDemandAGoodDeal();
+		
+		this.sortRootSequenceAndEatRawDealForBreakfast(this.root);
 	}
 	
 	/**
@@ -95,29 +102,43 @@ public class PriceLine
 				if( b instanceof Text )
 				{
 					/*
-					 * Get everything we need from this object
+					 * Get everything we need from the Text object
+					 * and add it to the container instance
 					 */
-					TextPlayer text = new TextPlayer(null, ((Text) b).getSrc());
+					TextPlayer text = new TextPlayer(null, ((Text) b).getSrc(), 
+							b.getBegin(), b.getEnd() - b.getBegin());
 					parent.addComponent(text);
 				}
 				else if( b instanceof Image )
 				{
 					/*
-					 * Get everything we need from this object
+					 * Get everything we need from the Image object
+					 * and add it to the container instance
 					 */
+					ImagePlayer image = new ImagePlayer(((Image) b).getSrc(),
+							b.getBegin(), b.getEnd() - b.getBegin());
+					parent.addComponent(image);
 					
 				}
 				else if( b instanceof Audio )
 				{
 					/*
-					 * Get everything we need from this object
+					 * Get everything we need from the Audio object
+					 * and add it to the container instance
 					 */
+					AudioPlayer audio = new AudioPlayer(((Audio) b).getSrc(),
+							b.getBegin(), b.getEnd() - b.getBegin());
+					parent.addComponent(audio);
 				}
 				else if( b instanceof Video )
 				{
 					/*
-					 * Get everything we need from this object
+					 * Get everything we need from and Video object
+					 * and add it to the container instance
 					 */
+					VideoPlayer video = new VideoPlayer(((Video) b).getSrc(),
+							b.getBegin(), b.getEnd() - b.getBegin());
+					parent.addComponent(video);
 				}
 			}
 		}
@@ -151,16 +172,18 @@ public class PriceLine
 			
 			
 			/*
-			 * Add the newly build ViewGroup to the Hashtable with the zIndex
-			 * as the ID
-			 * 
-			 * TODO:determine if the z-index will work as a unique ID or not...
-			 * 
-			 * If it is not, then we will need a way to link the of the SMIL
-			 * Region to the RelativeLayout (hashtable perhaps), otherwise we
-			 * can just keep what we have. 
+			 * Add the newly built ViewGroup to the Hashtable with the zIndex
+			 * as the ID 
 			 */
-			layouts.add(regionData.zIndex, temp);
+			this.layouts.add(regionData.zIndex, temp);
+		}
+	}
+	
+	private void renderViewGroupsAndDemandAGoodDeal()
+	{
+		for(int i = 0; i < this.layouts.size(); i++)
+		{
+			this.rootViewGroup.addView(this.layouts.get(i));
 		}
 	}
 	
@@ -169,15 +192,22 @@ public class PriceLine
 	 * by the ID (String value) and I need to sort them by the playback start-
 	 * time... so we need to do some sorting here. (and eat raw deals of course)
 	 */
-	public void sortRootSequenceAndEatRawDealForBreakfast()
+	public void sortRootSequenceAndEatRawDealForBreakfast(SeqPlayer cp)
 	{
-		//TODO: write code to sort root Sequence by playback time
-	}
-	
-	
-	public Hashtable<String, RegionData> getRegionsAndAGoodDeal()
-	{
-		return this.regions;
+		Collections.sort(cp.components, new Comparator<Player>()
+			{
+				public int compare(Player a, Player b)
+				{
+					return ((Double)a.duration).compareTo((Double)b.duration);
+				}
+			});
+		for( Player p : cp.components )
+		{
+			if( p instanceof SeqPlayer )
+			{
+				sortRootSequenceAndEatRawDealForBreakfast((SeqPlayer)p);
+			}
+		}
 	}
 	
 	
