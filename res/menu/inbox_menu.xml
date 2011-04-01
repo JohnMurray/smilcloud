@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+	<item android:id="@+id/share_message"
+          android:icon="@drawable/inbox_create"
+          android:title="@string/create_message" />
+    <item android:id="@+id/exit_player"
+    	  android:icon="@drawable/exit_player"
+    	  android:title="@string/exit_player_menu" />
+</menu>

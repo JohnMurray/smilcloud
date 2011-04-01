@@ -33,14 +33,43 @@ public abstract class SingleInstancePlayer extends Player
 		this.timePlayed += Player.PLAYBACK_INTERVAL;
 	}
 	
+	/*
+	 * Add an Arbiter object as the class's subject in the subscriber
+	 * pattern.
+	 */
 	protected void bindArbiter(Arbiter a)
 	{
 		this.subject = a;
 	}
 	
+	/*
+	 * Bind the layout to a view
+	 */
 	protected void bindView(RelativeLayout rl)
 	{
 		this.layout = rl;
+	}
+	
+	/**
+	 * Start/continue playing the media element.
+	 */
+	@Override
+	public void play() {
+		//do nothing
+		if( this.hasStartedPlayback )
+		{
+			this.incrementPlaybackTime();
+			if( this.timePlayed + this.start > this.duration )
+			{
+				this.unRender();
+			}
+		}
+		else
+		{
+			this.render();
+			this.hasStartedPlayback = true;
+			this.incrementPlaybackTime();
+		}
 	}
 
 }

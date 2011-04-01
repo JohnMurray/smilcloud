@@ -195,12 +195,12 @@ public class PriceLine
 	public void sortRootSequenceAndEatRawDealForBreakfast(SeqPlayer cp)
 	{
 		Collections.sort(cp.components, new Comparator<Player>()
+		{
+			public int compare(Player a, Player b)
 			{
-				public int compare(Player a, Player b)
-				{
-					return ((Double)a.duration).compareTo((Double)b.duration);
-				}
-			});
+				return ((Double)a.duration).compareTo((Double)b.duration);
+			}
+		});
 		for( Player p : cp.components )
 		{
 			if( p instanceof SeqPlayer )

@@ -9,6 +9,8 @@ import edu.nku.cs.csc440.team2.mediaCloud.MessageLite;
 import org.apache.http.NameValuePair;
 import org.apache.http.message.BasicNameValuePair;
 import android.os.Environment;
+import android.util.Log;
+
 import com.thoughtworks.xstream.XStream;
 
 
@@ -19,6 +21,7 @@ public class MessageProvider {
 	// List of Messages
 	public MessageLite[] getAllMessage(int userId) {
 
+		MessageLite [] allMessageLite = null;
 		try {
 			String xml = RequestHelper
 					.makeHttpGetRequest("http://nkucloud.dyndns.org:8080/mediacloud/getMessageList.jsp?user="
@@ -26,16 +29,14 @@ public class MessageProvider {
 			
 			XStream xstream = new XStream();
 			
-			MessageLite[] allMessageLite = (MessageLite[]) xstream.fromXML(xml);
-
-			return allMessageLite;
+			allMessageLite = (MessageLite[]) xstream.fromXML(xml);
 
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 
-		return null;
+		return allMessageLite;
 	}
 
 	/**
@@ -87,7 +88,7 @@ public class MessageProvider {
 	 */
 	public void sendMessage(int senderId, int recipientId, String messageTitle ,Message msg) {
 
-		String xml = msg.toXml();
+		String xml = "";//msg.toXml();
 
 		String url = "http://nkucloud.dyndns.org:8080/mediacloud/sendMessage.jsp";
 		

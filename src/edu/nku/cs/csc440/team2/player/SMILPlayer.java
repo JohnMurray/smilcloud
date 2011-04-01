@@ -1,10 +1,21 @@
 package edu.nku.cs.csc440.team2.player;
 
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.concurrent.Callable;
 
+import javax.xml.parsers.ParserConfigurationException;
+
+import org.xml.sax.SAXException;
+
 import android.app.Activity;
 import android.os.Bundle;
+import android.os.Environment;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -22,6 +33,7 @@ import android.widget.SeekBar;
 import android.widget.TextView;
 
 import edu.nku.cs.csc440.team2.SMILCloud;
+import edu.nku.cs.csc440.team2.message.Message;
 import edu.nku.cs.csc460.team2.R;
 
 /**
@@ -46,7 +58,10 @@ public class SMILPlayer extends Activity {
      */
     @Override
     public void onCreate(Bundle savedInstanceState) {
-    	//create the main instance and get the root View
+    	
+    	/*
+    	 * create the main instance and get the root View
+    	 */
         super.onCreate(savedInstanceState);
         setContentView(R.layout.player_main);
         this.root = (RelativeLayout)findViewById(R.id.player_root_layout);
@@ -91,12 +106,31 @@ public class SMILPlayer extends Activity {
         
         
         /*
-         * test code here
+         * TEST CODE:
+         * 		to load a smil message locally and play it. This only uses
+         * 		the TestMedia instance now, no actual text, video, etc. 
          */
-        
-        smilCloud.queueDocumentToPlay("testing id string");
-        Log.i("Main Application", smilCloud.getQueuedDocumentForPlayback());
-        
+		File f = new File(Environment.getExternalStorageDirectory()
+				+ "/message_without_background_color.smil");
+		
+		Message message = null;
+		try 
+		{
+			message = new Message(f);
+		} 
+		catch (Exception e) 
+		{
+			e.printStackTrace();
+		}
+		
+		PriceLine pl = new PriceLine(message, this, videoContainer);
+		pl.negotiateBigDeal();
+		SeqPlayer seqRoot = (SeqPlayer)pl.getDocumentAndNameYourOwnPrice();
+		Log.w("hello", "there");
+		
+		
+		
+		
     }
     
     /**

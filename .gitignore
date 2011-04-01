@@ -1,7 +1,5 @@
 .classpath
 bin/
 proguard.cfg
-.project
 .metadata/
 gen/
-default.properties
