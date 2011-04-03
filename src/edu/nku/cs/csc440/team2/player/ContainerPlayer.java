@@ -15,6 +15,16 @@ public abstract class ContainerPlayer extends Player {
 		}
 	}
 
+	
+	public void addComponent(Player p)
+	{
+		this.components.add(p);
+	}
+	
+	public ArrayList<Player> getComponents()
+	{
+		return this.components;
+	}
 
 	public double getDuration()
 	{
@@ -35,14 +45,5 @@ public abstract class ContainerPlayer extends Player {
 		}
 		return sum;
 	}
-	
-	/**
-	 * Do not need to define a render for ContainerPlayer classes
-	 */
-	protected void render() {}
-	/**
-	 * Do not need to define a unRender for ContainerPlayer classes
-	 */
-	protected void unRender() {}
 
 }

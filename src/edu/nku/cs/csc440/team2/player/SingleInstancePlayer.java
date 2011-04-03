@@ -10,6 +10,7 @@ public abstract class SingleInstancePlayer extends Player
 	 * be obtained from. 
 	 */
 	protected RelativeLayout layout;
+	public String layoutId;
 	
 	/*
 	 * Flag to determine (quickly) if playback has started without
@@ -31,15 +32,6 @@ public abstract class SingleInstancePlayer extends Player
 	protected void incrementPlaybackTime()
 	{
 		this.timePlayed += Player.PLAYBACK_INTERVAL;
-	}
-	
-	/*
-	 * Add an Arbiter object as the class's subject in the subscriber
-	 * pattern.
-	 */
-	protected void bindArbiter(Arbiter a)
-	{
-		this.subject = a;
 	}
 	
 	/*
@@ -71,5 +63,16 @@ public abstract class SingleInstancePlayer extends Player
 			this.incrementPlaybackTime();
 		}
 	}
+	
+	
+	/**
+	 * Draw the media object to the screen.
+	 */
+	protected abstract void render();
+	
+	/**
+	 * Remove the media object from the screen.
+	 */
+	protected abstract void unRender();
 
 }

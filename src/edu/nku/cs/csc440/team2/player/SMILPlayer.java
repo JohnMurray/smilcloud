@@ -111,7 +111,7 @@ public class SMILPlayer extends Activity {
          * 		the TestMedia instance now, no actual text, video, etc. 
          */
 		File f = new File(Environment.getExternalStorageDirectory()
-				+ "/message_without_background_color.smil");
+				+ "/message.smil");
 		
 		Message message = null;
 		try 

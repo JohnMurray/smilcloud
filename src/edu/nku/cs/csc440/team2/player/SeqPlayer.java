@@ -1,12 +1,7 @@
 package edu.nku.cs.csc440.team2.player;
 
-public class SeqPlayer extends ContainerPlayer implements PlayerContainer 
+public class SeqPlayer extends ContainerPlayer
 {
-	
-	public void addComponent(Player p)
-	{
-		this.components.add(p);
-	}
 	
 	public void play()
 	{
