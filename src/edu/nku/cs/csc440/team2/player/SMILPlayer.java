@@ -1,10 +1,12 @@
 package edu.nku.cs.csc440.team2.player;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.concurrent.Callable;
 
 import android.app.Activity;
 import android.os.Bundle;
+import android.os.Environment;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -22,6 +24,7 @@ import android.widget.SeekBar;
 import android.widget.TextView;
 
 import edu.nku.cs.csc440.team2.SMILCloud;
+import edu.nku.cs.csc440.team2.provider.MediaProvider;
 import edu.nku.cs.csc460.team2.R;
 
 /**
@@ -46,6 +49,15 @@ public class SMILPlayer extends Activity {
      */
     @Override
     public void onCreate(Bundle savedInstanceState) {
+    	
+    	
+		MediaProvider mp = new MediaProvider();
+    	
+    	File f = new File(Environment.getExternalStorageDirectory() + "/test2.png");
+    	
+    	mp.saveMedia(f.getPath(), "image", 1);
+    	
+    	
     	//create the main instance and get the root View
         super.onCreate(savedInstanceState);
         setContentView(R.layout.player_main);

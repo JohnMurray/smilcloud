@@ -87,7 +87,7 @@ public class MessageProvider {
 	 */
 	public void sendMessage(int senderId, int recipientId, String messageTitle ,Message msg) {
 
-		String xml = msg.toXml();
+		String xml = "";//msg.toXml();
 
 		String url = "http://nkucloud.dyndns.org:8080/mediacloud/sendMessage.jsp";
 		
