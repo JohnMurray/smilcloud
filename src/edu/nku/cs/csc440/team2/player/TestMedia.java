@@ -34,7 +34,7 @@ public class TestMedia extends SingleInstancePlayer {
 	}
 
 	@Override
-	protected void render() {
+	public void render() {
 		//add to parent view
 		this.rl = new RelativeLayout(this.layout.getContext());
 		RelativeLayout.LayoutParams lp = new RelativeLayout.LayoutParams(50, 50);
@@ -53,9 +53,15 @@ public class TestMedia extends SingleInstancePlayer {
 	}
 
 	@Override
-	protected void unRender() {
+	public void unRender() {
 		//remove from parent view
 		this.layout.removeAllViews();
+	}
+	
+	
+	public void prepare()
+	{
+		
 	}
 
 }

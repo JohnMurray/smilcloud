@@ -38,12 +38,16 @@ public abstract class ContainerPlayer extends Player {
 	
 	public double getTimePlayed()
 	{
-		double sum = 0;
+		return this.timePlayed;
+	}
+	
+	
+	public void prepare()
+	{
 		for( Player p : this.components )
 		{
-			sum += p.getTimePlayed();
+			p.prepare();
 		}
-		return sum;
 	}
 
 }

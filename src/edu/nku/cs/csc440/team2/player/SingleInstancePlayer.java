@@ -13,12 +13,6 @@ public abstract class SingleInstancePlayer extends Player
 	public String layoutId;
 	
 	/*
-	 * Flag to determine (quickly) if playback has started without
-	 * having to calculate time and what not.
-	 */
-	protected boolean hasStartedPlayback;
-	
-	/*
 	 * URL to the resource that will be loaded during the Media
 	 * object's preparation. This will result in a call to the 
 	 * provider services. 
@@ -48,7 +42,7 @@ public abstract class SingleInstancePlayer extends Player
 	@Override
 	public void play() {
 		//do nothing
-		if( this.hasStartedPlayback )
+		if( this.isPlaying )
 		{
 			this.incrementPlaybackTime();
 			if( this.timePlayed + this.start > this.duration )
@@ -59,7 +53,7 @@ public abstract class SingleInstancePlayer extends Player
 		else
 		{
 			this.render();
-			this.hasStartedPlayback = true;
+			this.isPlaying = true;
 			this.incrementPlaybackTime();
 		}
 	}
@@ -68,11 +62,11 @@ public abstract class SingleInstancePlayer extends Player
 	/**
 	 * Draw the media object to the screen.
 	 */
-	protected abstract void render();
+	public abstract void render();
 	
 	/**
 	 * Remove the media object from the screen.
 	 */
-	protected abstract void unRender();
+	public abstract void unRender();
 
 }

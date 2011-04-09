@@ -41,6 +41,8 @@ public class PriceLine
 		this.context = context;
 		this.message = m;
 		this.rootViewGroup = rvg;
+		
+		this.root.bindArbiter(this.subject);
 	}
 	
 	/**

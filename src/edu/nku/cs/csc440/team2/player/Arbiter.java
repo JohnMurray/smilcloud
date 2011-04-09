@@ -6,9 +6,9 @@ import java.util.Stack;
 public class Arbiter 
 {
 
-	private ArrayList<Player> subscribers;
-	private Player rootSeq;
-	private Stack<Boolean> waitForBuffer;
+	private ArrayList<Player> subscribers = new ArrayList<Player>();
+	private SeqPlayer rootSeq;
+	private Stack<Boolean> waitForBuffer = new Stack<Boolean>();
 	
 	public void register(Player p)
 	{
@@ -40,6 +40,11 @@ public class Arbiter
 		this.waitForBuffer.push(true);
 	}
 	
+	public void notifyBufferingWithoutPause() 
+	{
+		this.waitForBuffer.push(true);
+	}
+	
 	public void notifyDoneBuffering()
 	{
 		this.waitForBuffer.pop();
@@ -49,4 +54,21 @@ public class Arbiter
 		}
 	}
 	
+	public void notifyDoneBufferingWithoutRestart()
+	{
+		if( ! this.waitForBuffer.empty() )
+		{
+			this.waitForBuffer.pop();
+		}
+	}
+	
+	public boolean isBufferQueueEmpty()
+	{
+		return this.waitForBuffer.empty();
+	}
+
+	public void setRootSeq(SeqPlayer seq)
+	{
+		this.rootSeq = seq;
+	}
 }

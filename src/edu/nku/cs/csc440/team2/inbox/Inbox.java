@@ -80,6 +80,11 @@ public class Inbox extends Activity
 		delAction.setTitle("Delete");
 		delAction.setIcon(getResources().getDrawable(R.drawable.inbox_delete));
 		
+		final ActionItem edtAction = new ActionItem();
+		
+		edtAction.setTitle("Edit");
+		edtAction.setIcon(getResources().getDrawable(R.drawable.inbox_edit));
+		
 		/*
 		 * Set an onClick listener for the quick action. For each action, define
 		 * a separate action
@@ -106,6 +111,9 @@ public class Inbox extends Activity
 					}
 				});
 
+				/*
+				 * Define a click listener for playing
+				 */
 				plyAction.setOnClickListener(new OnClickListener() {
 					@Override
 					public void onClick(View v) {
@@ -115,6 +123,9 @@ public class Inbox extends Activity
 					}
 				});
 				
+				/*
+				 * Define a click listener for deletion
+				 */
 				delAction.setOnClickListener(new OnClickListener() {
 					@Override
 					public void onClick(View v) {
@@ -124,8 +135,21 @@ public class Inbox extends Activity
 					}
 				});
 				
-				mQuickAction.addActionItem(shrAction);
+				/*
+				 * Define a click listener for deletion
+				 */
+				edtAction.setOnClickListener(new OnClickListener() {
+					@Override
+					public void onClick(View v) {
+						Toast.makeText(Inbox.this, "Edit " + text, Toast.LENGTH_SHORT).show();
+						
+						mQuickAction.dismiss();
+					}
+				});
+				
 				mQuickAction.addActionItem(plyAction);
+				mQuickAction.addActionItem(shrAction);
+				mQuickAction.addActionItem(edtAction);
 				mQuickAction.addActionItem(delAction);
 				
 				mQuickAction.setAnimStyle(QuickAction.ANIM_AUTO);
@@ -157,7 +181,7 @@ public class Inbox extends Activity
     {
     	switch(item.getItemId())
     	{
-    	case R.id.go_to_library:
+    	case R.id.create_message:
     		return true;
     	case R.id.exit_player:
     		finish();
