@@ -1,6 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 	<string name="app_name">smilcloud</string>
+	
+    <!-- menu stuff -->
     <string name="library_menu">My Library</string>
     <string name="exit_player_menu">Exit</string>
+    <string name="create_message">Create New Video</string>
+    
+    <string name="hello">Hello World, NewQA!</string>
+    <string name="inbox_title">smilCloud Inbox</string>
 </resources>

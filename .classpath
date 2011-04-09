@@ -3,6 +3,7 @@
 	<classpathentry excluding="edu/nku/cs/csc440/team2/message/BodyMediaTest.java|edu/nku/cs/csc440/team2/message/CdataValidatorTest.java|edu/nku/cs/csc440/team2/message/ComparableTest.java|edu/nku/cs/csc440/team2/message/LayoutTest.java|edu/nku/cs/csc440/team2/message/MessageTest.java|edu/nku/cs/csc440/team2/message/TimingTest.java" kind="src" path="src"/>
 	<classpathentry kind="src" path="gen"/>
 	<classpathentry kind="con" path="com.android.ide.eclipse.adt.ANDROID_FRAMEWORK"/>
+<<<<<<< HEAD
 	<classpathentry kind="lib" path="lib/xstream-1.3.1.jar"/>
 	<classpathentry kind="lib" path="lib/xpp3_min-1.1.4c.jar"/>
 	<classpathentry kind="lib" path="lib/apache-mime4j-0.6.1.jar"/>
@@ -10,5 +11,9 @@
 	<classpathentry kind="lib" path="lib/httpclient-cache-4.1.1.jar"/>
 	<classpathentry kind="lib" path="lib/httpcore-4.1.jar"/>
 	<classpathentry kind="lib" path="lib/httpmime-4.1.1.jar"/>
+=======
+	<classpathentry kind="lib" path="lib/xpp3_min-1.1.4c.jar"/>
+	<classpathentry kind="lib" path="lib/xstream-1.3.1.jar"/>
+>>>>>>> 25627634f6712d91369cbae50ef67500aaed9ec6
 	<classpathentry kind="output" path="bin"/>
 </classpath>

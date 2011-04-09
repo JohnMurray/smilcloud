@@ -1,7 +1,9 @@
 package edu.nku.cs.csc440.team2.player;
 
 import java.io.File;
+
 import java.util.ArrayList;
+
 import java.util.concurrent.Callable;
 
 import android.app.Activity;
@@ -21,10 +23,9 @@ import android.view.animation.AnimationUtils;
 import android.widget.ImageButton;
 import android.widget.RelativeLayout;
 import android.widget.SeekBar;
-import android.widget.TextView;
-
 import edu.nku.cs.csc440.team2.SMILCloud;
 import edu.nku.cs.csc440.team2.provider.MediaProvider;
+import edu.nku.cs.csc440.team2.message.Message;
 import edu.nku.cs.csc460.team2.R;
 
 /**
@@ -35,7 +36,8 @@ import edu.nku.cs.csc460.team2.R;
 public class SMILPlayer extends Activity {
     
 	private final int CONTROL_ID = 99999; 
-	private RelativeLayout root;
+	private RelativeLayout rootView;
+	private SeqPlayer root;
 	private boolean hasBeenTouched = false;
 	//private ScheduledThreadPoolExecutor scheduledThreadPoolExecutor = new ScheduledThreadPoolExecutor(2);
 	//private ScheduledFuture<Void> scheduledFuture = null;
@@ -51,31 +53,22 @@ public class SMILPlayer extends Activity {
     public void onCreate(Bundle savedInstanceState) {
     	
     	
-		MediaProvider mp = new MediaProvider();
+		//MediaProvider mp = new MediaProvider();
     	
-    	File f = new File(Environment.getExternalStorageDirectory() + "/test2.png");
+    	//File f = new File(Environment.getExternalStorageDirectory() + "/test2.png");
     	
-    	mp.saveMedia(f.getPath(), "image", 1);
+    	//mp.saveMedia(f.getPath(), "image", 1);
     	
     	
     	//create the main instance and get the root View
+    	/*
+    	 * create the main instance and get the root View
+    	 */
         super.onCreate(savedInstanceState);
         setContentView(R.layout.player_main);
-        this.root = (RelativeLayout)findViewById(R.id.player_root_layout);
+        this.rootView = (RelativeLayout)findViewById(R.id.player_root_layout);
         
-        
-        /*
-         * Define the layout that will act as the container to hold
-         * the video. This will be passed in, along with the context
-         * and the SMIL message during translation. 
-         */
-        RelativeLayout videoContainer = new RelativeLayout(this);
-        RelativeLayout.LayoutParams lp = new RelativeLayout.LayoutParams(
-        		RelativeLayout.LayoutParams.MATCH_PARENT,
-        		RelativeLayout.LayoutParams.MATCH_PARENT);
-        lp.setMargins(0, 0, 0, 0);
-        videoContainer.setLayoutParams(lp);
-        this.root.addView(videoContainer);
+        RelativeLayout videoContainer = this.loadVideoContainer();
         
         /*
          * Check to see if there is  SMIL message that is queued to play
@@ -88,7 +81,7 @@ public class SMILPlayer extends Activity {
          */
         SMILCloud smilCloud = ((SMILCloud)getApplicationContext());
         String playbackID = smilCloud.getQueuedDocumentForPlayback();
-        if( !(playbackID == null) && !playbackID.isEmpty() )
+        if( !(playbackID == null) && playbackID.length() != 0 )
         {
         	//TODO: write code to get message and initialize structures
         }     
@@ -102,13 +95,83 @@ public class SMILPlayer extends Activity {
         this.addControls();
         
         
+        
+        
         /*
-         * test code here
+         * TEST CODE:
+         * 		to load a smil message locally and play it. This only uses
+         * 		the TestMedia instance now, no actual text, video, etc. 
          */
-        
-        smilCloud.queueDocumentToPlay("testing id string");
-        Log.i("Main Application", smilCloud.getQueuedDocumentForPlayback());
-        
+		File f = new File(Environment.getExternalStorageDirectory()
+				+ "/image_only_message.smil");
+		
+		Message message = null;
+		try 
+		{
+			message = new Message(f);
+		} 
+		catch (Exception e) 
+		{
+			e.printStackTrace();
+		}
+		
+		PriceLine pl = new PriceLine(message, this, videoContainer);
+		pl.negotiateBigDeal();
+		this.root = (SeqPlayer)pl.getDocumentAndNameYourOwnPrice();
+		this.preparePlayer();
+		Log.w("hello", "there");
+		
+		this.startPlayback();
+		
+    }
+    
+    
+    
+    private void startPlayback()
+    {
+    	this.root.play();
+    	try {
+			Thread.sleep(100);
+		} catch (InterruptedException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+    }
+    
+    
+    /**
+     * Prepare the media, and sit in a busy wait until the
+     * preparation of the data-structure is done... we might
+     * want to display some type of wait-thing on the UI thread,
+     * but I guess that will come later.
+     * 
+     * TODO: add waiting bar/loader thing to the UI while preparing
+     */
+    private void preparePlayer()
+    {
+    	this.root.prepare();
+    	Arbiter subject = this.root.getSubject();
+    	subject.setRootSeq(this.root);
+    	while( ! subject.isBufferQueueEmpty() );
+    }
+    
+    
+    
+    /**
+     * Define the layout that will act as the container to hold
+     * the video. This will be passed in, along with the context
+     * and the SMIL message during translation. 
+     */
+    private RelativeLayout loadVideoContainer()
+    {
+    	RelativeLayout videoContainer = new RelativeLayout(this);
+        RelativeLayout.LayoutParams lp = new RelativeLayout.LayoutParams(
+        		RelativeLayout.LayoutParams.MATCH_PARENT,
+        		RelativeLayout.LayoutParams.MATCH_PARENT);
+        lp.setMargins(0, 0, 0, 0);
+        videoContainer.setLayoutParams(lp);
+        this.rootView.addView(videoContainer);
+        return videoContainer;
     }
     
     /**
@@ -255,7 +318,7 @@ public class SMILPlayer extends Activity {
     	 * Apply the (totally pimp'd out) controls to the page
     	 */
     	ctrl_overlay.setId(CONTROL_ID);
-    	this.root.addView(ctrl_overlay);
+    	this.rootView.addView(ctrl_overlay);
     }
     
     /**
@@ -304,6 +367,9 @@ public class SMILPlayer extends Activity {
     	}
     }
     
+    /**
+     * Inflate the options menu from XML
+     */
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         MenuInflater inflater = getMenuInflater();
@@ -311,6 +377,9 @@ public class SMILPlayer extends Activity {
         return true;
     }
     
+    /**
+     * Define an action to perform on menu-item select
+     */
     @Override
     public boolean onOptionsItemSelected(MenuItem item) 
     {

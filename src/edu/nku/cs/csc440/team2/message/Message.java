@@ -55,31 +55,31 @@ public class Message {
 
         // <smil id="">
         Node smil = doc.getElementsByTagName("smil").item(0);
-        ID = smil.getAttributes().item(0).getNodeValue();
+        ID = smil.getAttributes().getNamedItem("id").getNodeValue();
 
         // <root-layout background-color="" height="" width=""/>
         Node rootLayout = doc.getElementsByTagName("root-layout").item(0);
-        String backgroundColor = rootLayout.getAttributes().item(0).getNodeValue();
-        int height = Integer.valueOf(rootLayout.getAttributes().item(1).getNodeValue());
-        int width = Integer.valueOf(rootLayout.getAttributes().item(2).getNodeValue());
+        String backgroundColor = rootLayout.getAttributes().getNamedItem("background-color").getNodeValue();
+        int height = Integer.valueOf(rootLayout.getAttributes().getNamedItem("height").getNodeValue());
+        int width = Integer.valueOf(rootLayout.getAttributes().getNamedItem("width").getNodeValue());
         ROOT_LAYOUT = new RootLayout(new SmilDimension(width, height), backgroundColor);
 
         // <region background-color="" fit="" height="" id="" left="" top="" width="" z-index=""/>
         NodeList regionList = doc.getElementsByTagName("region");
         NamedNodeMap nnm = regionList.item(regionList.getLength() - 1).getAttributes();
-        int j = Integer.valueOf(nnm.item(3).getNodeValue().substring(1)) - 1;
+        int j = Integer.valueOf(nnm.getNamedItem("id").getNodeValue().substring(1)) - 1;
         regions = new Region[j];
 
         for (int i = 0; i < regionList.getLength(); i++) {
             NamedNodeMap regionAttrs = regionList.item(i).getAttributes();
-            backgroundColor = regionAttrs.item(0).getNodeValue();
-            String fit = regionAttrs.item(1).getNodeValue();
-            height = Integer.valueOf(regionAttrs.item(2).getNodeValue());
-            String id = regionAttrs.item(3).getNodeValue();
-            int left = Integer.valueOf(regionAttrs.item(4).getNodeValue());
-            int top = Integer.valueOf(regionAttrs.item(5).getNodeValue());
-            width = Integer.valueOf(regionAttrs.item(6).getNodeValue());
-            int zIndex = Integer.valueOf(regionAttrs.item(7).getNodeValue());
+            backgroundColor = regionAttrs.getNamedItem("background-color").getNodeValue();
+            String fit = regionAttrs.getNamedItem("fit").getNodeValue();
+            height = Integer.valueOf(regionAttrs.getNamedItem("height").getNodeValue());
+            String id = regionAttrs.getNamedItem("id").getNodeValue();
+            int left = Integer.valueOf(regionAttrs.getNamedItem("left").getNodeValue());
+            int top = Integer.valueOf(regionAttrs.getNamedItem("top").getNodeValue());
+            width = Integer.valueOf(regionAttrs.getNamedItem("width").getNodeValue());
+            int zIndex = Integer.valueOf(regionAttrs.getNamedItem("z-index").getNodeValue());
             int index = Integer.valueOf(id.substring(1)) - 1;
             if (index >= regions.length) {
                 regions = Arrays.copyOf(regions, index + 1);
@@ -99,19 +99,19 @@ public class Message {
                     double begin, end;
                     String fill, id, regionId, src;
                     Region region;
-                    int repeat, index = 0;
+                    int repeat;
                     NamedNodeMap childAttrs = children.item(i).getAttributes();
 
                     if (nodeName.equals("text") || nodeName.equals("img")) {
                         // <tag begin="" end="" fill="" id="" region="" repeat="" src=""/>
-                        begin = Double.valueOf(childAttrs.item(index++).getNodeValue());
-                        end = Double.valueOf(childAttrs.item(index++).getNodeValue());
-                        fill = childAttrs.item(index++).getNodeValue();
-                        id = childAttrs.item(index++).getNodeValue();
-                        regionId = childAttrs.item(index++).getNodeValue();
+                        begin = Double.valueOf(childAttrs.getNamedItem("begin").getNodeValue());
+                        end = Double.valueOf(childAttrs.getNamedItem("end").getNodeValue());
+                        fill = childAttrs.getNamedItem("fill").getNodeValue();
+                        id = childAttrs.getNamedItem("id").getNodeValue();
+                        regionId = childAttrs.getNamedItem("region").getNodeValue();
                         region = regions[Integer.valueOf(regionId.substring(1)) - 1];
-                        repeat = Integer.valueOf(childAttrs.item(index++).getNodeValue());
-                        src = childAttrs.item(index++).getNodeValue();
+                        repeat = Integer.valueOf(childAttrs.getNamedItem("repeat").getNodeValue());
+                        src = childAttrs.getNamedItem("src").getNodeValue();
 
                         TextImage textImage;
                         if (nodeName.equals("text")) {
@@ -128,21 +128,21 @@ public class Message {
                         double clipBegin, clipEnd;
                         fill = null;
                         region = null;
-                        begin = Double.valueOf(childAttrs.item(index++).getNodeValue());
-                        clipBegin = Double.valueOf(childAttrs.item(index++).getNodeValue());
-                        clipEnd = Double.valueOf(childAttrs.item(index++).getNodeValue());
-                        end = Double.valueOf(childAttrs.item(index++).getNodeValue());
+                        begin = Double.valueOf(childAttrs.getNamedItem("begin").getNodeValue());
+                        clipBegin = Double.valueOf(childAttrs.getNamedItem("clip-begin").getNodeValue());
+                        clipEnd = Double.valueOf(childAttrs.getNamedItem("clip-end").getNodeValue());
+                        end = Double.valueOf(childAttrs.getNamedItem("end").getNodeValue());
 
                         if (nodeName.equals("video")) {
-                            fill = childAttrs.item(index++).getNodeValue();
+                            fill = childAttrs.getNamedItem("fill").getNodeValue();
                         }
-                        id = childAttrs.item(index++).getNodeValue();
+                        id = childAttrs.getNamedItem("id").getNodeValue();
                         if (nodeName.equals("video")) {
-                            regionId = childAttrs.item(index++).getNodeValue();
+                            regionId = childAttrs.getNamedItem("region").getNodeValue();
                             region = regions[Integer.valueOf(regionId.substring(1)) - 1];
                         }
-                        repeat = Integer.valueOf(childAttrs.item(index++).getNodeValue());
-                        src = childAttrs.item(index++).getNodeValue();
+                        repeat = Integer.valueOf(childAttrs.getNamedItem("repeat").getNodeValue());
+                        src = childAttrs.getNamedItem("src").getNodeValue();
 
                         AudioVideo audioVideo;
                         if (nodeName.equals("audio")) {
@@ -156,14 +156,14 @@ public class Message {
                         downloadPriority.add(id);
                     } else if (nodeName.equals("seq") || nodeName.equals("par")) {
                         // <tag begin="" end="" id="" repeat=""> OR <tag begin="" id="" repeat="">
-                        begin = Double.valueOf(childAttrs.item(index++).getNodeValue());
+                        begin = Double.valueOf(childAttrs.getNamedItem("begin").getNodeValue());
                         if (childAttrs.getLength() == 4) {
-                            end = Double.valueOf(childAttrs.item(index++).getNodeValue());
+                            end = Double.valueOf(childAttrs.getNamedItem("end").getNodeValue());
                         } else {
                             end = -1.0;
                         }
-                        id = childAttrs.item(index++).getNodeValue();
-                        repeat = Integer.valueOf(childAttrs.item(index++).getNodeValue());
+                        id = childAttrs.getNamedItem("id").getNodeValue();
+                        repeat = Integer.valueOf(childAttrs.getNamedItem("repeat").getNodeValue());
 
                         Timing timing;
                         if (nodeName.equals("seq")) {

@@ -4,6 +4,5 @@
     android:layout_height="match_parent"
     android:id="@+id/player_root_layout"
     android:gravity="top"
-    android:background="@color/red"
     >
 </RelativeLayout>

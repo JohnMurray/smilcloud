@@ -24,11 +24,16 @@ public class PriceLine
 	private Context context;
 	private Message message;
 	private Hashtable<String, RegionData> regions = new Hashtable<String, RegionData>(20, .75f);
-	private SeqPlayer root;
-	private ArrayList<RelativeLayout> layouts;
+	private SeqPlayer root = new SeqPlayer();
+	private ArrayList<Pair<String, Pair<Integer, RelativeLayout>>> layouts;
 	private RelativeLayout rootViewGroup;
+	private Arbiter subject = new Arbiter();
 
 	/**
+	 * @param m
+	 * @param context
+	 * @param rvg
+	 * 
 	 * instantiate the translator with the messenger classes
 	 */
 	public PriceLine(Message m, Context context, RelativeLayout rvg)
@@ -36,6 +41,8 @@ public class PriceLine
 		this.context = context;
 		this.message = m;
 		this.rootViewGroup = rvg;
+		
+		this.root.bindArbiter(this.subject);
 	}
 	
 	/**
@@ -48,19 +55,22 @@ public class PriceLine
 		
 		this.generateViewGroupsAndDemandACheaperRate();
 		this.renderViewGroupsAndDemandAGoodDeal();
+		this.attachViewGroupsAndStareFullPriceInTheEye(this.root);
 		
-		this.sortRootSequenceAndEatRawDealForBreakfast(this.root);
+		this.sortSequenceAndEatRawDealForBreakfast(this.root);
 	}
 	
 	/**
 	 * 
 	 * @param body
+	 * @param parent
 	 * 
-	 * Helper method for negotiateBigDeal method.
-	 * 
-	 * TODO: Refactor method to create decorated Player structure as well.
+	 * Helper method for negotiateBigDeal method. Builds a hash of Region
+	 * objects that will later be translated into RelativeView (Android-
+	 * specific) objects and the player package's internal reperesentation
+	 * of the media objects.
 	 */
-	private void makePrivateDeal(LinkedList<Body> body, PlayerContainer parent)
+	private void makePrivateDeal(LinkedList<Body> body, ContainerPlayer parent)
 	{
 		/*
 		 * Assuming that the Body contains every element and we
@@ -76,38 +86,32 @@ public class PriceLine
 			if( b instanceof Parallel )
 			{
 				ParPlayer par = new ParPlayer();
+				par.bindArbiter(this.subject);
 				parent.addComponent(par);
 				makePrivateDeal(((Parallel) b).getBody(), par);
 			}
 			else if( b instanceof Sequence )
 			{
 				SeqPlayer seq = new SeqPlayer();
+				seq.bindArbiter(this.subject);
 				parent.addComponent(seq);
 				makePrivateDeal(((Sequence) b).getBody(), seq);
 			}
+			/*
+			 * Otherwise, we just need to build the object and add it to the
+			 * parent container and stop the recusrive calling. 
+			 */
 			else if( b instanceof Media )
 			{
-				/*
-				 * Add region information from the SMIL Document. This will
-				 * be used later to generate ViewGroup (Relative Layout)
-				 * informaiton
-				 */
-				this.regions.put( b.getId(),
-						(new RegionData( ((Media) b).getRegion().getZindex(), 
-								((Media) b).getRegion().getDimensions(),
-								((Media) b).getRegion().getOrigin())
-						)
-				);
-				
+				SingleInstancePlayer media;
 				if( b instanceof Text )
 				{
 					/*
 					 * Get everything we need from the Text object
 					 * and add it to the container instance
 					 */
-					TextPlayer text = new TextPlayer(null, ((Text) b).getSrc(), 
+					media = new TextPlayer(null, ((Text) b).getSrc(), 
 							b.getBegin(), b.getEnd() - b.getBegin());
-					parent.addComponent(text);
 				}
 				else if( b instanceof Image )
 				{
@@ -115,9 +119,8 @@ public class PriceLine
 					 * Get everything we need from the Image object
 					 * and add it to the container instance
 					 */
-					ImagePlayer image = new ImagePlayer(((Image) b).getSrc(),
+					media = new ImagePlayer(((Image) b).getSrc(),
 							b.getBegin(), b.getEnd() - b.getBegin());
-					parent.addComponent(image);
 					
 				}
 				else if( b instanceof Audio )
@@ -126,20 +129,41 @@ public class PriceLine
 					 * Get everything we need from the Audio object
 					 * and add it to the container instance
 					 */
-					AudioPlayer audio = new AudioPlayer(((Audio) b).getSrc(),
+					media = new AudioPlayer(((Audio) b).getSrc(),
 							b.getBegin(), b.getEnd() - b.getBegin());
-					parent.addComponent(audio);
 				}
-				else if( b instanceof Video )
+				else // b instanceof Video
 				{
 					/*
 					 * Get everything we need from and Video object
 					 * and add it to the container instance
 					 */
-					VideoPlayer video = new VideoPlayer(((Video) b).getSrc(),
+					media = new VideoPlayer(((Video) b).getSrc(),
 							b.getBegin(), b.getEnd() - b.getBegin());
-					parent.addComponent(video);
 				}
+				
+				/*
+				 * Add region information from the SMIL Document. This will
+				 * be used later to generate ViewGroup (Relative Layout)
+				 * informaiton
+				 */
+				if( ((Media)b).getRegion() != null )
+				{
+					this.regions.put( ((Media)b).getRegion().getId(),
+							(new RegionData( ((Media) b).getRegion().getZindex(), 
+									((Media) b).getRegion().getDimensions(),
+									((Media) b).getRegion().getOrigin())
+							)
+					);
+					media.layoutId = ((Media)b).getRegion().getId();
+				}
+				
+				/*
+				 * Bind an Arbiter to the media object and add it to the parent
+				 * container class.
+				 */
+				media.bindArbiter(this.subject);
+				parent.addComponent(media);
 			}
 		}
 	}
@@ -150,7 +174,7 @@ public class PriceLine
 	 */
 	private void generateViewGroupsAndDemandACheaperRate()
 	{
-		this.layouts = new ArrayList<RelativeLayout>(this.regions.size());
+		this.layouts = new ArrayList<Pair<String, Pair<Integer, RelativeLayout>>>();
 		Enumeration<String> e = this.regions.keys();
 		while( e.hasMoreElements() )
 		{
@@ -168,6 +192,7 @@ public class PriceLine
 					smilDimension.getWidth(),
 					smilDimension.getHeight());			
 			lp.setMargins(origin.getWidth(), origin.getHeight(), 0, 0);
+			
 			temp.setLayoutParams(lp);
 			
 			
@@ -175,43 +200,119 @@ public class PriceLine
 			 * Add the newly built ViewGroup to the Hashtable with the zIndex
 			 * as the ID 
 			 */
-			this.layouts.add(regionData.zIndex, temp);
-		}
-	}
-	
-	private void renderViewGroupsAndDemandAGoodDeal()
-	{
-		for(int i = 0; i < this.layouts.size(); i++)
-		{
-			this.rootViewGroup.addView(this.layouts.get(i));
+			this.layouts.add(new Pair<String, Pair<Integer, RelativeLayout>>(
+					id, new Pair<Integer, RelativeLayout>(regionData.zIndex, temp)));
 		}
 	}
 	
 	/**
-	 * The current structure for the root (implicit Sequence object) is sorted
-	 * by the ID (String value) and I need to sort them by the playback start-
-	 * time... so we need to do some sorting here. (and eat raw deals of course)
+	 * Render the ViewGroups to the container ViewGroup as passed into
+	 * the PriceLine constructor (this.rootViewGroup).
 	 */
-	public void sortRootSequenceAndEatRawDealForBreakfast(SeqPlayer cp)
+	private void renderViewGroupsAndDemandAGoodDeal()
 	{
-		Collections.sort(cp.components, new Comparator<Player>()
-			{
-				public int compare(Player a, Player b)
-				{
-					return ((Double)a.duration).compareTo((Double)b.duration);
-				}
-			});
-		for( Player p : cp.components )
+		/*
+		 * Define an array of tuples to hold a String and an
+		 * Integer value to hold id's and zIndexes.
+		 */
+		ArrayList<Pair<Integer, RelativeLayout>> pairList = new 
+				ArrayList<Pair<Integer, RelativeLayout>>(this.layouts.size());
+		
+		/*
+		 * Get an array of zIndexes and the associated ID's
+		 * for each RelativeLayout and sort by zIndex
+		 */
+		for( Pair<String, Pair<Integer, RelativeLayout>> p : this.layouts )
 		{
-			if( p instanceof SeqPlayer )
+			pairList.add(p.two);
+		}
+		Collections.sort(pairList, new Comparator<Pair<Integer, RelativeLayout>>(){
+			public int compare(Pair<Integer, RelativeLayout> a, Pair<Integer, RelativeLayout>b )
 			{
-				sortRootSequenceAndEatRawDealForBreakfast((SeqPlayer)p);
+				return a.one.compareTo(b.one);
+			}
+		});
+		
+		/*
+		 * Starting with the lowest ID, render each 
+		 * RelativeView to the screen. 
+		 */
+		for( Pair<Integer, RelativeLayout> p : pairList )
+		{
+			this.rootViewGroup.addView(p.two);
+		}
+	}
+	
+	/**
+	 * Recursive function to attach a ViewGroup to any media
+	 * element that is assigned one. This should be all elements
+	 * besides container classes (Par and Seq) and audio elements.
+	 */
+	private void attachViewGroupsAndStareFullPriceInTheEye(ContainerPlayer parent)
+	{
+		for( Player p : parent.getComponents() )
+		{
+			if( p instanceof ContainerPlayer )
+			{
+				this.attachViewGroupsAndStareFullPriceInTheEye((ContainerPlayer)p);
+			}
+			else
+			{
+				((SingleInstancePlayer)p).bindView(
+						this.findViewById(((SingleInstancePlayer)p).layoutId)
+				);
 			}
 		}
 	}
 	
+	/**
+	 * @param id
+	 * 
+	 * Return the RelativeLayout ViewGroup from the internal data-structure
+	 * given the ID to the layout (generated from the SMIL message)
+	 */
+	private RelativeLayout findViewById(String id)
+	{
+		for( Pair<String, Pair<Integer, RelativeLayout>> p : this.layouts )
+		{
+			if( p.one == id )
+			{
+				return p.two.two;
+			}
+		}
+		return null;
+	}
 	
-	public Player getDocumentAndNameYourOwnPrice()
+	/**
+	 * @param cp
+	 * 
+	 * The current structure for the root (implicit Sequence object) is sorted
+	 * by the ID (String value) and I need to sort them by the playback start-
+	 * time... so we need to do some sorting here. (and eat raw deals of course)
+	 */
+	public void sortSequenceAndEatRawDealForBreakfast(SeqPlayer cp)
+	{
+		Collections.sort(cp.components, new Comparator<Player>()
+		{
+			public int compare(Player a, Player b)
+			{
+				return ((Double)a.duration).compareTo((Double)b.duration);
+			}
+		});
+		for( Player p : cp.components )
+		{
+			if( p instanceof SeqPlayer )
+			{
+				sortSequenceAndEatRawDealForBreakfast((SeqPlayer)p);
+			}
+		}
+	}
+	
+	/**
+	 * Return the implicit SeqPlayer root object as generated by the
+	 * PriceLine class.
+	 */
+	public SeqPlayer getDocumentAndNameYourOwnPrice()
 	{
 		return this.root;
 	}
@@ -237,4 +338,23 @@ public class PriceLine
 	}
 	
 	
+	/**
+	 * 
+	 * @author john
+	 *
+	 * @param <T>
+	 * @param <V>
+	 * 
+	 * Define a Pair (or 2-tuple) since Java refuses to do so... :-(
+	 */
+	private class Pair<T, V>
+	{
+		public T one;
+		public V two;
+		public Pair( T one, V two )
+		{
+			this.one = one;
+			this.two = two;
+		}
+	}
 }

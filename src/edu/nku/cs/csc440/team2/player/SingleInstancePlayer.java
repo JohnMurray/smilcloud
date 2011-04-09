@@ -10,12 +10,7 @@ public abstract class SingleInstancePlayer extends Player
 	 * be obtained from. 
 	 */
 	protected RelativeLayout layout;
-	
-	/*
-	 * Flag to determine (quickly) if playback has started without
-	 * having to calculate time and what not.
-	 */
-	protected boolean hasStartedPlayback;
+	public String layoutId;
 	
 	/*
 	 * URL to the resource that will be loaded during the Media
@@ -33,14 +28,45 @@ public abstract class SingleInstancePlayer extends Player
 		this.timePlayed += Player.PLAYBACK_INTERVAL;
 	}
 	
-	protected void bindArbiter(Arbiter a)
-	{
-		this.subject = a;
-	}
-	
+	/*
+	 * Bind the layout to a view
+	 */
 	protected void bindView(RelativeLayout rl)
 	{
 		this.layout = rl;
 	}
+	
+	/**
+	 * Start/continue playing the media element.
+	 */
+	@Override
+	public void play() {
+		//do nothing
+		if( this.isPlaying )
+		{
+			this.incrementPlaybackTime();
+			if( this.timePlayed + this.start > this.duration )
+			{
+				this.unRender();
+			}
+		}
+		else
+		{
+			this.render();
+			this.isPlaying = true;
+			this.incrementPlaybackTime();
+		}
+	}
+	
+	
+	/**
+	 * Draw the media object to the screen.
+	 */
+	public abstract void render();
+	
+	/**
+	 * Remove the media object from the screen.
+	 */
+	public abstract void unRender();
 
 }

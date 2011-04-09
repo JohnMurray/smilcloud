@@ -47,6 +47,12 @@ public abstract class Player {
 	 */
 	protected double timePlayed = 0;
 	
+	/*
+	 * Flag to determine (quickly) if playback has started without
+	 * having to calculate time and what not.
+	 */
+	public boolean isPlaying;
+	
 	
 
 	/**
@@ -61,6 +67,12 @@ public abstract class Player {
 	 * was paused. 
 	 */
 	public abstract void pause();
+	
+	
+	/**
+	 * Prepare the Player (buffer, start stream, etc.)
+	 */
+	public abstract void prepare();
 	
 	/**
 	 * Seeks the video forward a set period of time; Fast-Forward.
@@ -108,14 +120,23 @@ public abstract class Player {
 		return this.paused;
 	}
 	
-	/**
-	 * Draw the media object to the screen.
-	 */
-	protected abstract void render();
 	
 	/**
-	 * Remove the media object from the screen.
+	 * Add an Arbiter object as the class's subject in the subscriber
+	 * pattern.
 	 */
-	protected abstract void unRender();
+	protected void bindArbiter(Arbiter a)
+	{
+		this.subject = a;
+	}
+	
+	
+	/**
+	 * Get the Arbiter (subject)
+	 */
+	public Arbiter getSubject()
+	{
+		return this.subject;
+	}
 	
 }

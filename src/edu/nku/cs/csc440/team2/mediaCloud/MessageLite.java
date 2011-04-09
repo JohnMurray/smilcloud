@@ -13,6 +13,9 @@ public class MessageLite {
 	private String date;
 	private String uniqueId;
 	
+	public MessageLite() {}
+	
+	
 	MessageLite(String name, String sender, String date, String uniqueId) {
 		this.name = name;
 		this.sender = sender;
