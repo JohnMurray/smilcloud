@@ -1,6 +1,8 @@
 package edu.nku.cs.csc440.team2.player;
 
 import android.graphics.Bitmap;
+import android.util.Log;
+import android.view.View;
 import android.widget.ImageView;
 import edu.nku.cs.csc440.team2.provider.MediaProvider;
 
@@ -21,6 +23,7 @@ public class ImagePlayer extends SingleInstancePlayer
 		if( ! this.isPlaying )
 		{
 			this.isPlaying = true;
+			this.render();
 		}
 		this.incrementPlaybackTime();
 	}
@@ -42,19 +45,45 @@ public class ImagePlayer extends SingleInstancePlayer
 	
 	public void render()
 	{
-		this.layout.addView(this.imImage);
+		boolean res = this.layout.post(new Runnable(){
+			public void run() {
+				layout.addView(imImage);
+			}
+		});
+		Log.w("ImagePlyaer", "Result of render: " + ((Boolean)res).toString());
+		Log.w("ImagePlayer", this.layout.toString());
+		Log.w("ImagePlayer", "Duration: " + this.duration);
+		Log.w("ImagePlayer", "playback time: " + this.timePlayed);
 	}
 	
 	public void unRender()
 	{
-		this.layout.removeView(this.imImage);
+		Log.w("ImagePlayer", "unrendering");
+		this.layout.post( new Runnable() {
+			public void run() {
+				//layout.removeView(imImage);
+				layout.setVisibility(View.INVISIBLE);
+				layout.getLayoutParams().height = 0;
+			}
+		});
 	}
 	
 	public void prepare()
 	{
 		this.bmImage = (new MediaProvider()).getImage(this.resourceURL);
-		this.imImage = new ImageView(this.layout.getContext());
-		this.imImage.setImageBitmap(this.bmImage);
+		
+		this.layout.post(new Runnable() {
+			public void run() {
+				imImage = new ImageView(layout.getContext());
+				imImage.setScaleType(ImageView.ScaleType.FIT_CENTER);
+				imImage.setAdjustViewBounds(true);
+				imImage.setMaxHeight(layout.getHeight());
+				imImage.setMaxWidth(layout.getHeight());
+				
+				imImage.setImageBitmap(bmImage);				
+			}
+		});
+		
 	}
 	
 }

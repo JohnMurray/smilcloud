@@ -2,11 +2,10 @@ package edu.nku.cs.csc440.team2.player;
 
 import java.io.File;
 
-import java.util.ArrayList;
-
 import java.util.concurrent.Callable;
 
 import android.app.Activity;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.os.Environment;
 import android.util.Log;
@@ -24,7 +23,6 @@ import android.widget.ImageButton;
 import android.widget.RelativeLayout;
 import android.widget.SeekBar;
 import edu.nku.cs.csc440.team2.SMILCloud;
-import edu.nku.cs.csc440.team2.provider.MediaProvider;
 import edu.nku.cs.csc440.team2.message.Message;
 import edu.nku.cs.csc460.team2.R;
 
@@ -119,7 +117,6 @@ public class SMILPlayer extends Activity {
 		pl.negotiateBigDeal();
 		this.root = (SeqPlayer)pl.getDocumentAndNameYourOwnPrice();
 		this.preparePlayer();
-		Log.w("hello", "there");
 		
 		this.startPlayback();
 		
@@ -129,13 +126,36 @@ public class SMILPlayer extends Activity {
     
     private void startPlayback()
     {
-    	this.root.play();
-    	try {
-			Thread.sleep(100);
-		} catch (InterruptedException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
+    	new Thread(new Runnable() {
+    		public void run() {
+    			/*
+    			 * For some reason, I have to wait a seconed to make sure that the cotainer
+    			 * view is loaded before I try to start adding stuff to it... It just doesn't
+    			 * like that...lol. 
+    			 */
+    			try {
+					Thread.sleep(1000);
+				} catch (InterruptedException e1) {
+					// TODO Auto-generated catch block
+					e1.printStackTrace();
+				}
+		    	while(true)
+		    	{
+			    	root.play();
+			    	try {
+						Thread.sleep(100);
+					} catch (InterruptedException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}
+			    	Log.i("SMILPlayer info", "Time Played: " + root.getTimePlayed());
+					if( root.getTimePlayed() >= root.getDuration() )
+					{
+						break;
+					}
+		    	}
+    		}
+    	}).start();
     }
     
     
@@ -170,6 +190,7 @@ public class SMILPlayer extends Activity {
         		RelativeLayout.LayoutParams.MATCH_PARENT);
         lp.setMargins(0, 0, 0, 0);
         videoContainer.setLayoutParams(lp);
+        videoContainer.setBackgroundColor(Color.CYAN);
         this.rootView.addView(videoContainer);
         return videoContainer;
     }

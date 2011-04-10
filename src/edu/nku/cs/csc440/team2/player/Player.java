@@ -51,7 +51,7 @@ public abstract class Player {
 	 * Flag to determine (quickly) if playback has started without
 	 * having to calculate time and what not.
 	 */
-	public boolean isPlaying;
+	public boolean isPlaying = false;
 	
 	
 

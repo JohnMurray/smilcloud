@@ -1,5 +1,7 @@
 package edu.nku.cs.csc440.team2.player;
 
+import android.util.Log;
+
 public class SeqPlayer extends ContainerPlayer
 {
 	
@@ -12,8 +14,9 @@ public class SeqPlayer extends ContainerPlayer
 				p.play();
 				break;
 			}
-			else if( p.isPlaying && p.getTimePlayed() == p.getDuration() )
+			else if( p.isPlaying && p.getTimePlayed() >= p.getDuration() )
 			{
+				Log.w("SeqPlayer", "player should be done playing");
 				if( p instanceof SingleInstancePlayer )
 				{
 					((SingleInstancePlayer) p).unRender();

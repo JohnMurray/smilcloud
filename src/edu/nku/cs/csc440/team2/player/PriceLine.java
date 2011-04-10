@@ -9,7 +9,16 @@ import java.util.LinkedList;
 
 import android.content.Context;
 import android.widget.RelativeLayout;
-import edu.nku.cs.csc440.team2.message.*;
+import edu.nku.cs.csc440.team2.message.Audio;
+import edu.nku.cs.csc440.team2.message.Body;
+import edu.nku.cs.csc440.team2.message.Image;
+import edu.nku.cs.csc440.team2.message.Media;
+import edu.nku.cs.csc440.team2.message.Message;
+import edu.nku.cs.csc440.team2.message.Parallel;
+import edu.nku.cs.csc440.team2.message.Sequence;
+import edu.nku.cs.csc440.team2.message.SmilDimension;
+import edu.nku.cs.csc440.team2.message.Text;
+import edu.nku.cs.csc440.team2.message.Video;
 
 /**
  * 
@@ -110,7 +119,7 @@ public class PriceLine
 					 * Get everything we need from the Text object
 					 * and add it to the container instance
 					 */
-					media = new TextPlayer(null, ((Text) b).getSrc(), 
+					media = new TextPlayer(((Text) b).getSrc(), 
 							b.getBegin(), b.getEnd() - b.getBegin());
 				}
 				else if( b instanceof Image )
@@ -296,7 +305,7 @@ public class PriceLine
 		{
 			public int compare(Player a, Player b)
 			{
-				return ((Double)a.duration).compareTo((Double)b.duration);
+				return ((Double)a.start).compareTo((Double)b.start);
 			}
 		});
 		for( Player p : cp.components )

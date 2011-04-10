@@ -5,6 +5,7 @@ import java.util.ArrayList;
 public abstract class ContainerPlayer extends Player {
 
 	protected ArrayList<Player> components = new ArrayList<Player>();
+	private boolean usingDurationCache = false;
 	
 	@Override
 	public void pause() 
@@ -28,12 +29,21 @@ public abstract class ContainerPlayer extends Player {
 
 	public double getDuration()
 	{
-		double sum = 0;
-		for( Player p : this.components )
+		if( ! this.usingDurationCache )
 		{
-			sum += p.getDuration();
+			double sum = 0;
+			for( Player p : this.components )
+			{
+				sum += p.getDuration();
+			}
+			this.duration = sum;
+			this.usingDurationCache = true;
+			return sum;
 		}
-		return sum;
+		else
+		{
+			return this.duration;
+		}
 	}
 	
 	public double getTimePlayed()
