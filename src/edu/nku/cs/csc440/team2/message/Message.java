@@ -4,7 +4,6 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.PrintWriter;
-import java.util.Arrays;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.TreeSet;
@@ -82,7 +81,12 @@ public class Message {
             int zIndex = Integer.valueOf(regionAttrs.getNamedItem("z-index").getNodeValue());
             int index = Integer.valueOf(id.substring(1)) - 1;
             if (index >= regions.length) {
-                regions = Arrays.copyOf(regions, index + 1);
+            	// regions = Arrays.copyOf(regions, index + 1);
+            	Region[] copyOf = new Region[index + 1];
+                for(int k = 0; k < regions.length ; k++){
+                	copyOf[k] = regions[k];
+                }
+                regions = copyOf;
             }
             regions[index] = new Region(new SmilDimension(width, height), backgroundColor, new SmilDimension(left, top), fit, id, zIndex);
         }
