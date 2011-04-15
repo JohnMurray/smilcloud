@@ -59,5 +59,21 @@ public abstract class ContainerPlayer extends Player {
 			p.prepare();
 		}
 	}
+	
+	public void unRenderAll()
+	{
+		for( Player p : this.components )
+		{
+			if( p instanceof ContainerPlayer )
+			{
+				((ContainerPlayer) p).unRenderAll();
+			}
+			else if( p instanceof SingleInstancePlayer )
+			{
+				if( p.isPlaying ) { p.pause(); }
+				((SingleInstancePlayer) p).unRender();
+			}
+		}
+	}
 
 }

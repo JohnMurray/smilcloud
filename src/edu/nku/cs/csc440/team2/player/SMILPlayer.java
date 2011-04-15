@@ -58,7 +58,6 @@ public class SMILPlayer extends Activity {
     	//mp.saveMedia(f.getPath(), "image", 1);
     	
     	
-    	//create the main instance and get the root View
     	/*
     	 * create the main instance and get the root View
     	 */
@@ -139,8 +138,23 @@ public class SMILPlayer extends Activity {
 					// TODO Auto-generated catch block
 					e1.printStackTrace();
 				}
+				
+				if( ! root.getSubject().isBufferQueueEmpty() )
+				{
+					/*update the UI to display the buffering info*/
+					while( ! root.getSubject().isBufferQueueEmpty() )
+					{
+						try {
+							Thread.sleep(200);
+						} catch(InterruptedException e) {
+							e.printStackTrace();
+						}
+					}
+				}
+				
 		    	while(true)
 		    	{
+		    		//wait while we still have some stuff buffering and what not
 			    	root.play();
 			    	try {
 						Thread.sleep(100);
@@ -149,8 +163,10 @@ public class SMILPlayer extends Activity {
 						e.printStackTrace();
 					}
 			    	Log.i("SMILPlayer info", "Time Played: " + root.getTimePlayed());
+			    	Log.i("SMILPlayer info", "Duration: " + root.getDuration());
 					if( root.getTimePlayed() >= root.getDuration() )
 					{
+						root.unRenderAll();
 						break;
 					}
 		    	}
@@ -172,7 +188,6 @@ public class SMILPlayer extends Activity {
     	this.root.prepare();
     	Arbiter subject = this.root.getSubject();
     	subject.setRootSeq(this.root);
-    	while( ! subject.isBufferQueueEmpty() );
     }
     
     

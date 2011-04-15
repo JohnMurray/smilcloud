@@ -94,7 +94,7 @@ public class PriceLine
 			 */
 			if( b instanceof Parallel )
 			{
-				ParPlayer par = new ParPlayer();
+				ParPlayer par = new ParPlayer(b.getBegin(), b.getEnd());
 				par.bindArbiter(this.subject);
 				parent.addComponent(par);
 				makePrivateDeal(((Parallel) b).getBody(), par);
@@ -299,7 +299,7 @@ public class PriceLine
 	 * by the ID (String value) and I need to sort them by the playback start-
 	 * time... so we need to do some sorting here. (and eat raw deals of course)
 	 */
-	public void sortSequenceAndEatRawDealForBreakfast(SeqPlayer cp)
+	private void sortSequenceAndEatRawDealForBreakfast(SeqPlayer cp)
 	{
 		Collections.sort(cp.components, new Comparator<Player>()
 		{

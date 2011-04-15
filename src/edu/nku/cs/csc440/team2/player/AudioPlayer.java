@@ -1,6 +1,7 @@
 package edu.nku.cs.csc440.team2.player;
 
 import android.media.MediaPlayer;
+import android.util.Log;
 
 public class AudioPlayer extends SingleInstancePlayer implements
 			MediaPlayer.OnPreparedListener
@@ -20,6 +21,7 @@ public class AudioPlayer extends SingleInstancePlayer implements
 		try
 		{
 			this.mMediaPlayer.start();
+			Log.w("AUDIO PLAYER", "just started playing");
 		}
 		catch(IllegalStateException e)
 		{
@@ -62,6 +64,7 @@ public class AudioPlayer extends SingleInstancePlayer implements
 		try
 		{
 			this.mMediaPlayer.stop();
+			Log.w("AUDIO PLAYER", "should have just stopped");
 		}
 		catch(IllegalStateException e)
 		{
@@ -71,20 +74,14 @@ public class AudioPlayer extends SingleInstancePlayer implements
 	
 	public void prepare()
 	{
-		try
-		{
-			this.mMediaPlayer = new MediaPlayer();
-			try {
-				this.mMediaPlayer.reset();
-				this.mMediaPlayer.setDataSource(this.resourceURL);
-				this.mMediaPlayer.setOnPreparedListener(this);
-				this.subject.notifyBufferingWithoutPause();
-				this.prepare();
-			}
-			catch (Exception e) {
-				this.mMediaPlayer.reset();
-				this.mMediaPlayer.setDataSource(this.resourceURL);
-			}
+		this.mMediaPlayer = new MediaPlayer();
+		try {
+			this.mMediaPlayer.reset();
+			this.mMediaPlayer.setDataSource(this.resourceURL);
+			this.mMediaPlayer.setOnPreparedListener(this);
+			this.mMediaPlayer.prepareAsync();
+			this.subject.notifyBufferingWithoutPause();
+		
 		}
 		catch(Exception e) {
 			e.printStackTrace();
@@ -94,6 +91,7 @@ public class AudioPlayer extends SingleInstancePlayer implements
 	@Override
 	public void onPrepared(MediaPlayer mp) {
 		this.subject.notifyDoneBufferingWithoutRestart();
+		Log.e("AUDIO", "I'm done buffering and ready to play!");
 	}
 	
 }
