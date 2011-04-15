@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+  <item android:id="@+id/bring_forward"
+        android:icon="@drawable/bring_forward"
+        android:title="@string/bring_forward_menu" />
+  <item android:id="@+id/push_back"
+        android:icon="@drawable/push_back"
+        android:title="@string/push_back_menu" />
+</menu>

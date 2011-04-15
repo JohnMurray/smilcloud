@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+  <item android:id="@+id/add_audio"
+        android:icon="@drawable/audio"
+        android:title="@string/add_audio_menu" />
+  <item android:id="@+id/add_video"
+        android:icon="@drawable/video"
+        android:title="@string/add_video_menu" />
+  <item android:id="@+id/add_image"
+        android:icon="@drawable/image"
+        android:title="@string/add_image_menu" />
+  <item android:id="@+id/add_text"
+        android:icon="@drawable/text"
+        android:title="@string/add_text_menu" />
+  <item android:id="@+id/send"
+        android:icon="@drawable/send"
+        android:title="@string/send_menu" />
+  <item android:id="@+id/preview"
+        android:icon="@drawable/preview"
+        android:title="@string/preview_menu" />
+</menu>
