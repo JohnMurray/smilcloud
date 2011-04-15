@@ -134,6 +134,21 @@ public class MediaProvider {
 
 		return text;
 	}
+	
+	/**
+	 * Delete Media by ID
+	 * @param mediaId
+	 */
+	public void deleteMedia(int mediaId){
+		
+		try {
+			RequestHelper.makeHttpGetRequest("http://nkucloud.dyndns.org:8080/mediacloud/deleteMedia.jsp?mediaId=" + mediaId);
+
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	}
 
 	/**
 	 * Save Image/Audio/Video

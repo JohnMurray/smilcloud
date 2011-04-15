@@ -6,7 +6,7 @@
     <application android:name="edu.nku.cs.csc440.team2.SMILCloud"
     			 android:icon="@drawable/icon" 
     			 android:label="@string/app_name">
-        <activity android:name="edu.nku.cs.csc440.team2.player.SMILPlayer"
+        <activity android:name="edu.nku.cs.csc440.team2.inbox.Inbox"
                   android:label="@string/app_name"
                   android:theme="@android:style/Theme.NoTitleBar.Fullscreen"
                   android:screenOrientation="landscape">
@@ -15,7 +15,7 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-
+		<service android:name="edu.nku.cs.csc440.team2.service.SmilService"></service>
     </application>
     
     <uses-permission

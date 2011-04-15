@@ -1,10 +1,13 @@
 package edu.nku.cs.csc440.team2.inbox;
 
 
+import java.util.ArrayList;
+
 import net.londatiga.android.ActionItem;
 import net.londatiga.android.NewQAAdapter;
 import net.londatiga.android.QuickAction;
 import android.app.Activity;
+import android.content.Intent;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -18,7 +21,11 @@ import android.widget.ListView;
 import android.widget.PopupWindow.OnDismissListener;
 import android.widget.Toast;
 import edu.nku.cs.csc440.team2.mediaCloud.MessageLite;
+import edu.nku.cs.csc440.team2.mediaCloud.Pair;
+import edu.nku.cs.csc440.team2.player.SMILPlayer;
 import edu.nku.cs.csc440.team2.provider.MessageProvider;
+import edu.nku.cs.csc440.team2.provider.UserProvider;
+import edu.nku.cs.csc440.team2.service.SmilService;
 import edu.nku.cs.csc460.team2.R;
 
 public class Inbox extends Activity 
@@ -38,6 +45,15 @@ public class Inbox extends Activity
     	super.onCreate(savedInstanceState);
     	setContentView(R.layout.inbox_main);
         
+    	/////////////// Testing
+    	startService(new Intent(Inbox.this,SmilService.class));
+    	
+    	///////// Get All Users
+    	UserProvider up = new UserProvider();
+    	
+    	ArrayList<Pair<String, String>> a = up.getContactList();
+    	
+    	
     	/*
     	 * Get the list of messages and put the names into a string
     	 */

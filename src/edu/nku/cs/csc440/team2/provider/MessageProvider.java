@@ -79,6 +79,20 @@ public class MessageProvider {
 
 		return msg;
 	}
+	
+	
+	public void deleteMessage(int messageId){
+		
+		try {
+			RequestHelper.makeHttpGetRequest("http://nkucloud.dyndns.org:8080/mediacloud/deleteMessage?messageId=" + messageId);
+
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	}
+	
+	
 
 	/**
 	 * Save message
