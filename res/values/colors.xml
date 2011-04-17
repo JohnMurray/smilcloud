@@ -4,4 +4,27 @@
 	<color name="red">#ff0000</color>
 	<color name="light_gray">#999999</color>
 	<color name="dark_gray">#333333</color>
+	
+	<!-- colors used by composer package -->
+	<color name="composer_bg">#000000</color>
+	<color name="audiobox_bg">#8b00cc</color>
+	<color name="audiobox_fg">#ffffff</color>
+	<color name="imagebox_bg">#1034a6</color>
+	<color name="imagebox_fg">#ffffff</color>
+	<color name="textbox_bg">#007f00</color>
+	<color name="textbox_fg">#ffffff</color>
+	<color name="videobox_bg">#ff3f00</color>
+	<color name="videobox_fg">#ffffff</color>
+	<color name="resize_grip">#ffffff</color>
+	<color name="region_editor_bg">#000000</color>
+	<color name="region_bg">#ffffff</color>
+	<color name="region_fg">#ffffff</color>
+	<color name="region_bgbox_bg">#555555</color>
+	<color name="region_bgbox_fg">#cccccc</color>
+	<color name="region_corner_bg">#ff9933</color>
+	<color name="region_corner_fg">#ff9933</color>
+	<color name="track_bg">#555555</color>
+	<color name="track_fg">#cccccc</color>
+	<color name="timeline_bg">#f7e98e</color>
+	<color name="timeline_fg">#000000</color>
 </resources>

@@ -9,17 +9,17 @@ public class SmilDimension {
     
     private int width, height;
 
-    SmilDimension() {
+    public SmilDimension() {
         width = 0;
         height = 0;
     }
 
-    SmilDimension(SmilDimension smilDimension) {
+    public SmilDimension(SmilDimension smilDimension) {
         width = smilDimension.getWidth();
         height = smilDimension.getHeight();
     }
 
-    SmilDimension(int width, int height) {
+    public SmilDimension(int width, int height) {
         this.width = width;
         this.height = height;
     }

@@ -1,95 +1,50 @@
 package edu.nku.cs.csc440.team2.composer;
 
-import edu.nku.cs.csc440.team2.message.Region;
-import android.graphics.Canvas;
-import android.graphics.Color;
-import android.graphics.ColorFilter;
-import android.graphics.Paint;
-import android.graphics.Paint.Align;
-import android.graphics.Paint.Style;
+import android.os.Parcel;
+import android.os.Parcelable;
 
 /**
  * @author William Knauer <knauerw1@nku.edu>
  * @version 2011.0321
  */
-public class TextBox extends Box
-{
+public class TextBox extends Box {
 	private static int sCount = 1;
-	private final String mLabel;
-	private Region mRegion;
-	
+	public static final char TYPE = 't';
+
+	public static final Parcelable.Creator<TextBox> CREATOR = new Parcelable.Creator<TextBox>() {
+
+		@Override
+		public TextBox createFromParcel(Parcel source) {
+			return new TextBox(source);
+		}
+
+		@Override
+		public TextBox[] newArray(int size) {
+			return new TextBox[size];
+		}
+
+	};
+
+	public TextBox(Parcel in) {
+		super(in);
+	}
+
 	public TextBox(String source, double begin, double duration,
-			Region region)
-	{
+			ParcelableRegion region) {
 		super(source, begin, duration);
-		mRegion = region;
-		mLabel = "Text " + sCount;
-		sCount ++;
-	}
-	
-	@Override
-	public void draw(Canvas canvas)
-	{
-		/* Draw background */
-		Paint bgFillPaint = new Paint();
-		bgFillPaint.setColor(Color.GREEN);
-		bgFillPaint.setAntiAlias(true);
-		bgFillPaint.setStyle(Style.FILL);
-		canvas.drawRect(getBounds(), bgFillPaint);
-		
-		/* Draw label */
-		Paint labelPaint = new Paint();
-		labelPaint.setColor(Color.WHITE);
-		labelPaint.setAntiAlias(true);
-		labelPaint.setTextAlign(Align.LEFT);
-		labelPaint.setTextSize(16.0f);
-		canvas.drawText(mLabel, getBounds().left + TEXT_OFFSET,
-				getBounds().top + (HEIGHT / 2)
-				+ labelPaint.getFontMetrics().descent, labelPaint);
-		
-		/* TODO Draw RHS grip */
-		
-		/* Draw border */
-		drawOutline(canvas);
-	}
-	
-	public void drawOutline(Canvas canvas)
-	{
-		/* Draw outline */
-		Paint outlinePaint = new Paint();
-		outlinePaint.setColor(Color.WHITE);
-		outlinePaint.setAntiAlias(true);
-		outlinePaint.setStyle(Style.STROKE);
-		outlinePaint.setStrokeWidth(2.0f);
-		canvas.drawRect(getBounds(), outlinePaint);
+		setRegion(region);
+		setId("Text " + sCount);
+		sCount++;
 	}
 
 	@Override
-	public int getOpacity()
-	{
-		// Unimplemented for now.
+	public int describeContents() {
 		return 0;
 	}
-	
-	public Region getRegion()
-	{
-		return mRegion;
-	}
 
 	@Override
-	public void setAlpha(int alpha)
-	{
-		// Unimplemented for now.
-	}
-
-	@Override
-	public void setColorFilter(ColorFilter cf)
-	{
-		// Unimplemented for now.
+	public void writeToParcel(Parcel dest, int flags) {
+		super.writeToParcel(dest);
 	}
 	
-	public void setRegion(Region region)
-	{
-		mRegion = region;
-	}
 }

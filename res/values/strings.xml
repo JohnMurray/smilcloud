@@ -9,4 +9,17 @@
     
     <string name="hello">Hello World, NewQA!</string>
     <string name="inbox_title">smilCloud Inbox</string>
+    
+    <!-- composer menu strings -->
+    <string name="add_audio_menu">Add Audio</string>
+    <string name="add_image_menu">Add Image</string>
+    <string name="add_text_menu">Add Text</string>
+    <string name="add_video_menu">Add Video</string>
+    <string name="send_menu">Send</string>
+    <string name="preview_menu">Preview</string>
+    
+    <!-- region editor menu strings -->
+    <string name="bring_forward_menu">Bring Forward</string>
+    <string name="push_back_menu">Push Back</string>
+    
 </resources>
