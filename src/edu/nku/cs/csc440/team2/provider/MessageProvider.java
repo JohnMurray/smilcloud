@@ -19,9 +19,10 @@ public class MessageProvider {
 	public MessageProvider() { }
 
 	// List of Messages
-	public MessageLite[] getAllMessage(int userId) {
+	@SuppressWarnings("unchecked")
+	public ArrayList<MessageLite> getAllMessage(int userId) {
 
-		MessageLite [] allMessageLite = null;
+		ArrayList<MessageLite> allMessageLite = null;
 		try {
 			String xml = RequestHelper
 					.makeHttpGetRequest("http://nkucloud.dyndns.org:8080/mediacloud/getMessageList.jsp?user="
@@ -29,7 +30,7 @@ public class MessageProvider {
 			
 			XStream xstream = new XStream();
 			
-			allMessageLite = (MessageLite[]) xstream.fromXML(xml);
+			allMessageLite = (ArrayList<MessageLite>) xstream.fromXML(xml);
 
 		} catch (Exception e) {
 			// TODO Auto-generated catch block

@@ -13,7 +13,7 @@ package edu.nku.cs.csc440.team2.player;
  */
 public abstract class Player {
 	
-	public static final float PLAYBACK_INTERVAL = 0.1f;
+	public static final double PLAYBACK_INTERVAL = 0.1f;
 	
 	/*
 	 * Used in the subscriber pattern to receive notifications/

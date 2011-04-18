@@ -31,7 +31,7 @@ import edu.nku.cs.csc460.team2.R;
 public class Inbox extends Activity 
 {
 	
-	private MessageLite [] messages;
+	private ArrayList<MessageLite> messages;
 
 	/**
      * @param savedInstanceState
@@ -58,12 +58,12 @@ public class Inbox extends Activity
     	 * Get the list of messages and put the names into a string
     	 */
     	this.messages = this.getMessages();
-    	final String [] data = new String[this.messages.length];
+    	final String [] data = new String[this.messages.size()];
     	if( this.messages != null )
     	{
-	    	for( int i = 0; i < this.messages.length; i++ )
+	    	for( int i = 0; i < this.messages.size(); i++ )
 	    	{
-	    		data[i] = this.messages[i].getName();
+	    		data[i] = this.messages.get(i).getName();
 	    	}
     	}
     	
@@ -208,7 +208,7 @@ public class Inbox extends Activity
     }
     
     
-    private MessageLite [] getMessages()
+    private ArrayList<MessageLite> getMessages()
     {
     	return (new MessageProvider()).getAllMessage(1);
     }

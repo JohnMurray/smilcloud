@@ -1,13 +1,10 @@
 package edu.nku.cs.csc440.team2.service;
 
+import java.util.ArrayList;
 import java.util.Calendar;
-import java.util.Date;
 import java.util.Timer;
 import java.util.TimerTask;
 
-import edu.nku.cs.csc440.team2.inbox.Inbox;
-import edu.nku.cs.csc440.team2.mediaCloud.MessageLite;
-import edu.nku.cs.csc440.team2.provider.MessageProvider;
 import android.R;
 import android.app.Notification;
 import android.app.NotificationManager;
@@ -15,7 +12,9 @@ import android.app.PendingIntent;
 import android.app.Service;
 import android.content.Intent;
 import android.os.IBinder;
-import android.widget.Toast;
+import edu.nku.cs.csc440.team2.inbox.Inbox;
+import edu.nku.cs.csc440.team2.mediaCloud.MessageLite;
+import edu.nku.cs.csc440.team2.provider.MessageProvider;
 
 public class SmilService extends Service {
 	
@@ -51,23 +50,24 @@ public class SmilService extends Service {
     private void showNotification() {
     	
     	
-    	/// HERE
+    	/// TODO: update to use the user id of the current user
     	int userId = 1;
     	
     	String i = Calendar.getInstance().getTimeInMillis() + "";
     	
     	MessageProvider mp = new MessageProvider();
     	
-    	MessageLite[] list = mp.getAllMessage(userId);
+    	ArrayList<MessageLite> list = mp.getAllMessage(userId);
     	
-    	///..................
+    	// TODO: compare against list and update the global list if needed.
+    	// TODO: only run code from here down if there is something new
     	
     	
     	// In this sample, we'll use the same text for the ticker and the expanded notification
         CharSequence text = "You've got SMIL!" + i;//getText(R.string.ok);
 
         // Set the icon, scrolling text and timestamp
-        Notification notification = new Notification(R.drawable.sym_action_email, "You've got SMIL!" + i,
+        Notification notification = new Notification(R.drawable.sym_action_email, "You've got SMIL!",
                 System.currentTimeMillis());
 
         // The PendingIntent to launch our activity if the user selects this notification
