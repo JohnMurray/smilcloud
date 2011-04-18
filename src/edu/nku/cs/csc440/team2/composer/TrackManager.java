@@ -2,6 +2,9 @@ package edu.nku.cs.csc440.team2.composer;
 
 import java.util.LinkedList;
 
+import edu.nku.cs.csc460.team2.R;
+
+import android.content.Context;
 import android.graphics.Canvas;
 import android.graphics.Rect;
 import android.os.Parcel;
@@ -9,31 +12,55 @@ import android.os.Parcelable;
 
 /**
  * @author William Knauer <knauerw1@nku.edu>
- * @version 2011.0321
+ * @version 2011.0417
  */
 public class TrackManager implements Parcelable {
 	/**
-	 * @author William Knauer <knauerw1@nku.edu>
-	 * @version 2011.0322
+	 * A MoveManager helps to facilitate the moving of a Box from one Track to
+	 * another or from one location in a Track to another within the same Track.
 	 */
 	class MoveManager {
+		/** Flag for whether or not mBox fits its target Track. */
 		private boolean mFitsTarget;
+
+		/** The Box being moved */
 		private Box mBox;
+
+		/** The Track that contained mBox before the move started */
 		private Track mOldTrack;
+
+		/** The begin time of mBox before the move started */
 		private double mOldBegin;
+
+		/** The Track to move mBox into */
 		private Track mTargetTrack;
+
+		/** The begin time where mBox should be added to its new Track */
 		private double mTargetBegin;
 
+		/**
+		 * Class constructor.
+		 */
 		public MoveManager() {
 			reset();
 		}
 
+		/**
+		 * Draws mBox to a Canvas wherever the user has dragged it.
+		 * 
+		 * @param canvas
+		 *            The canvas to draw on.
+		 */
 		public void draw(Canvas canvas) {
 			if (mBox != null) {
 				mBox.draw(canvas);
 			}
 		}
 
+		/**
+		 * Commits the move if possible. Resets the Box to its old location if
+		 * it is not possible.
+		 */
 		public void finish() {
 			if (mFitsTarget) {
 				mTargetTrack.addBox(mBox, mTargetBegin);
@@ -46,6 +73,9 @@ public class TrackManager implements Parcelable {
 			}
 		}
 
+		/**
+		 * @return Returns the drawing bounds of the Box being moved.
+		 */
 		public Rect getBounds() {
 			Rect result = null;
 			if (mBox != null) {
@@ -54,10 +84,21 @@ public class TrackManager implements Parcelable {
 			return result;
 		}
 
+		/**
+		 * @return Returns true if a move is in progress.
+		 */
 		public boolean isMoving() {
 			return (mBox != null);
 		}
 
+		/**
+		 * Offsets the drawing bounds of the Box.
+		 * 
+		 * @param dx
+		 *            The horizontal distance to offset.
+		 * @param dy
+		 *            The vertical distance to offset.
+		 */
 		public void offset(int dx, int dy) {
 			/* Offset mBox by (dx, dy) */
 			mBox.setBounds(mBox.getBounds().left + dx, mBox.getBounds().top
@@ -80,6 +121,9 @@ public class TrackManager implements Parcelable {
 			}
 		}
 
+		/**
+		 * Resets all local variables to their starting state.
+		 */
 		private void reset() {
 			mFitsTarget = false;
 			mBox = null;
@@ -89,42 +133,79 @@ public class TrackManager implements Parcelable {
 			mTargetBegin = -1.0;
 		}
 
+		/**
+		 * Initiates a move at a given set of coordinates.
+		 * 
+		 * @param x
+		 *            The x-coordinate.
+		 * @param y
+		 *            The y-coordinate.
+		 */
 		public void start(int x, int y) {
 			mBox = getBox(x, y);
 			if (mBox != null) {
 				mOldTrack = getTrack(x, y);
 				mOldBegin = mBox.getBegin();
-				removeBox(x, y);
+				removeBox(mBox);
 			}
 		}
-		
+
 	}
 
+	/**
+	 * A ResizeManager helps facilitate changing the duration of a Box within a
+	 * Track.
+	 */
 	class ResizeManager {
+		/** The Box to resize */
 		private Box mBox;
+
+		/** The Track that contains mBox */
 		private Track mTrack;
+
+		/** The x-coordinate where the resize was started */
 		private int mStartX;
+
+		/** The duration of mBox when the resize was started */
 		private double mStartDuration;
 
+		/**
+		 * Class constructor.
+		 */
 		public ResizeManager() {
 			reset();
 		}
 
+		/**
+		 * Finishes the resize by resetting the ResizeManager.
+		 */
 		public void finish() {
 			reset();
 		}
 
+		/**
+		 * @return Returns true if a resize is in progress.
+		 */
 		public boolean isResizing() {
 			return (mBox != null);
 		}
 
-		public void reset() {
+		/**
+		 * Resets the local variables to their starting state.
+		 */
+		private void reset() {
 			mBox = null;
 			mTrack = null;
 			mStartX = -1;
 			mStartDuration = -1;
 		}
 
+		/**
+		 * Performs the resize and commits the changes to mBox.
+		 * 
+		 * @param x
+		 *            The pointer's current x-coordinate.
+		 */
 		public void resize(int x) {
 			/* Determine the desired duration */
 			double delta = Composer.snapTo(Composer.pxToSec(x - mStartX));
@@ -150,8 +231,7 @@ public class TrackManager implements Parcelable {
 
 			if (ok) {
 				/* Remove the box from its track */
-				mTrack.removeBox(mBox.getBounds().centerX(), mBox.getBounds()
-						.centerY());
+				mTrack.removeBox(mBox.getBegin());
 
 				/* Update the box's duration */
 				double oldDuration = mBox.getDuration();
@@ -168,6 +248,15 @@ public class TrackManager implements Parcelable {
 			}
 		}
 
+		/**
+		 * Initiates a resize at given set of coordinates.
+		 * 
+		 * @param x
+		 *            The x-coordinate.
+		 * @param y
+		 *            The y-coordinate.
+		 * @return Returns true if a resize was initiated.
+		 */
 		public boolean start(int x, int y) {
 			/* Get the box that was touched */
 			Box b = getBox(x, y);
@@ -182,20 +271,27 @@ public class TrackManager implements Parcelable {
 			}
 			return isResizing();
 		}
-		
+
 	}
 
-	private static final int TOP_BOTTOM_PADDING = 5;
+	/** The list of Tracks contained by this TrackManager */
 	private LinkedList<Track> mTracks;
+
+	/** Helper class for moving Boxes between the Tracks */
 	private MoveManager mMoveManager;
 
+	/** Helper class for changing the duration of Boxes */
 	private ResizeManager mResizeManager;
 
+	/** The drawing bounds */
 	private Rect mBounds;
-	private int mBgColor;
-	private int mFgColor;
 
-	public static final Parcelable.Creator<TrackManager> CREATOR = new Parcelable.Creator<TrackManager>() {
+	/** The Context used to get resources and create Tracks */
+	private Context mContext;
+
+	/** Used to generate instances of this class from a Parcel */
+	public static final Parcelable.Creator<TrackManager> CREATOR
+			= new Parcelable.Creator<TrackManager>() {
 
 		@Override
 		public TrackManager createFromParcel(Parcel source) {
@@ -209,27 +305,40 @@ public class TrackManager implements Parcelable {
 
 	};
 
-	public TrackManager(int bgColor, int fgColor) {
+	/**
+	 * Class constructor.
+	 */
+	public TrackManager() {
 		mBounds = new Rect();
 		mMoveManager = new MoveManager();
 		mResizeManager = new ResizeManager();
 		mTracks = new LinkedList<Track>();
-		mBgColor = bgColor;
-		mFgColor = fgColor;
 		maintain();
 	}
 
+	/**
+	 * Class constructor for creating from a Parcel.
+	 * 
+	 * @param in
+	 *            The Parcel to construct from.
+	 */
 	public TrackManager(Parcel in) {
 		mMoveManager = new MoveManager();
 		mResizeManager = new ResizeManager();
 		mTracks = new LinkedList<Track>();
 		in.readTypedList(mTracks, Track.CREATOR);
 		mBounds = in.readParcelable(Rect.class.getClassLoader());
-		mBgColor = in.readInt();
-		mFgColor = in.readInt();
 	}
 
-	public boolean addBox(Box elt, double begin) {
+	/**
+	 * Adds a given Box at a specified time to the first track where it fits.
+	 * 
+	 * @param elt
+	 *            The Box to add.
+	 * @param begin
+	 *            The time to add the Box.
+	 */
+	public void addBox(Box elt, double begin) {
 		boolean added = false;
 		for (Track t : mTracks) {
 			if (!added) {
@@ -237,16 +346,6 @@ public class TrackManager implements Parcelable {
 			}
 		}
 		maintain();
-		return added;
-	}
-
-	public boolean addBox(Box elt, int targetX, int targetY) {
-		boolean added = false;
-		Track target = getTrack(targetX, targetY);
-		if (target != null) {
-			added = target.addBox(elt, targetX, targetY);
-		}
-		return added;
 	}
 
 	@Override
@@ -254,58 +353,99 @@ public class TrackManager implements Parcelable {
 		return 0;
 	}
 
+	/**
+	 * Draws all Tracks onto the given Canvas.
+	 * 
+	 * @param canvas
+	 *            The Canvas to draw on.
+	 */
 	public void draw(Canvas canvas) {
-		/* Draw tracks */
-		int y = getBounds().top;
-		for (Track t : mTracks) {
-			t.setBounds(0, y, mBounds.width(), y + Track.HEIGHT);
-			t.draw(canvas);
-			y += Track.HEIGHT;
-		}
+		if (mContext != null) {
+			int height = mContext.getResources().getInteger(
+					R.integer.track_height);
 
-		/* Draw moving box (if any) */
-		mMoveManager.draw(canvas);
-	}
-	
-	public Rect getBounds() {
-		return mBounds;
-	}
-
-	public Box getBox(int targetX, int targetY) {
-		Box result = null;
-		Track t = getTrack(targetX, targetY);
-		if (t != null) {
-			result = t.getBox(targetX, targetY);
-		}
-		return result;
-	}
-
-	public Box getBox(String label) {
-		Box result = null;
-		for (Track t : mTracks) {
-			if (result == null) {
-				result = t.getBox(label);
+			/* Draw tracks */
+			int y = getBounds().top;
+			for (Track t : mTracks) {
+				t.setBounds(0, y, mBounds.width(), y + height);
+				t.draw(canvas);
+				y += height;
 			}
+
+			/* Draw moving box (if any) */
+			mMoveManager.draw(canvas);
 		}
-		return result;
 	}
 
-	public LinkedList<Box> getBoxes() {
+	/**
+	 * @return Returns a List containing all the Boxes containted by all the
+	 *         Tracks in this TrackManager.
+	 */
+	public LinkedList<Box> getAllBoxes() {
 		LinkedList<Box> boxes = new LinkedList<Box>();
 		for (Track t : mTracks) {
-			for (Box b : t.getBoxes()) {
+			for (Box b : t.getAllBoxes()) {
 				boxes.add(b);
 			}
 		}
 		return boxes;
 	}
 
-	public LinkedList<Box> getConcurrentElements(Box box) {
+	public Rect getBounds() {
+		return mBounds;
+	}
+
+	/**
+	 * Gets the Box at a specified set of coordinates.
+	 * 
+	 * @param targetX
+	 *            The x-coordinate.
+	 * @param targetY
+	 *            The y-coordinate.
+	 * @return Returns the Box at the set of coordinates. Returns null if no
+	 *         such Box is found.
+	 */
+	public Box getBox(int targetX, int targetY) {
+		Box result = null;
+		Track t = getTrack(targetX, targetY);
+		if (t != null) {
+			result = t.getBox(Composer.snapTo(Composer.pxToSec(targetX)));
+		}
+		return result;
+	}
+
+	/**
+	 * Returns the Box whose id matches a given String.
+	 * 
+	 * @param id
+	 *            The String to check.
+	 * @return Returns the Box whose id matches the String. Returns null if no
+	 *         such Box is found.
+	 */
+	public Box getBox(String id) {
+		Box result = null;
+		for (Track t : mTracks) {
+			if (result == null) {
+				result = t.getBox(id);
+			}
+		}
+		return result;
+	}
+
+	/**
+	 * Finds all the Boxes whose playback times overlap with a given Box.
+	 * 
+	 * @param box
+	 *            The Box to check.
+	 * @return Returns a list of all the Boxes whose playback times overlap with
+	 *         a given Box.
+	 */
+	public LinkedList<Box> getConcurrentBoxes(Box box) {
 		LinkedList<Box> concurrent = new LinkedList<Box>();
 		double begin = box.getBegin();
 		double end = box.getEnd();
 		for (Track t : mTracks) {
-			for (Box m : t.getBoxes()) {
+			for (Box m : t.getAllBoxes()) {
 				if (m.getBegin() <= begin && begin < m.getEnd()) {
 					concurrent.add(m);
 				} else if (m.getBegin() < end && end <= m.getEnd()) {
@@ -315,27 +455,35 @@ public class TrackManager implements Parcelable {
 		}
 		return concurrent;
 	}
-	
-	public double getMaxEndTime() {
-		double result = 0;
-		for (Box b : getBoxes()) {
+
+	/**
+	 * @return Returns the furthest x-coordinate where this TrackManager needs
+	 *         to draw.
+	 */
+	public int getMaxX() {
+		int result = 0;
+		for (Box b : getAllBoxes()) {
 			if (b.getEnd() > result) {
-				result = b.getEnd();
+				result = Composer.secToPx(b.getEnd());
 			}
 		}
 		if (mMoveManager.isMoving()) {
-			if (Composer.pxToSec(mMoveManager.getBounds().right) > result) {
-				result = Composer.pxToSec(mMoveManager.getBounds().right);
+			if (mMoveManager.getBounds().right > result) {
+				result = mMoveManager.getBounds().right;
 			}
 		}
 		return result;
 	}
-	
+
+	/**
+	 * @return Returns the furthest y-coordinate where this TrackManager needs
+	 *         to draw.
+	 */
 	public int getMaxY() {
 		int result = 0;
 		for (Track t : mTracks) {
 			if (t.getBounds().bottom > result) {
-				result = t.getBounds().bottom;
+				result = t.getBounds().bottom + 5;
 			}
 		}
 		return result;
@@ -349,6 +497,16 @@ public class TrackManager implements Parcelable {
 		return mResizeManager;
 	}
 
+	/**
+	 * Gets the track at a given set of coordinates.
+	 * 
+	 * @param targetX
+	 *            The x-coordinate.
+	 * @param targetY
+	 *            The y-coordinate.
+	 * @return Returns the Track at the given set of coordinates. Returns null
+	 *         if no such Track is found.
+	 */
 	private Track getTrack(int targetX, int targetY) {
 		Track result = null;
 		for (Track t : mTracks) {
@@ -359,9 +517,14 @@ public class TrackManager implements Parcelable {
 		return result;
 	}
 
+	/**
+	 * Ensures that there is precisely one empty Track at the bottom of this
+	 * TrackManager.
+	 */
 	public void maintain() {
 		if (mTracks.isEmpty() || !mTracks.getLast().isEmpty()) {
-			Track t = new Track(mBgColor, mFgColor);
+			Track t = new Track();
+			t.setContext(mContext);
 			mTracks.addLast(t);
 		} else {
 			if (mTracks.size() >= 2) {
@@ -379,10 +542,24 @@ public class TrackManager implements Parcelable {
 		}
 	}
 
+	/**
+	 * Determines the estimated drawing height of this TrackManager.
+	 * 
+	 * @return Returns the estimated height.
+	 */
 	public int measureHeight() {
-		return (Track.HEIGHT * mTracks.size()) + (2 * TOP_BOTTOM_PADDING);
+		return (mContext.getResources().getInteger(R.integer.track_height) * mTracks
+				.size())
+				+ (2 * mContext.getResources()
+						.getInteger(R.integer.box_spacing));
 	}
 
+	/**
+	 * Removes a given Box from any Track where it is found.
+	 * 
+	 * @param b
+	 *            The Box to remove.
+	 */
 	public void removeBox(Box b) {
 		for (Track t : mTracks) {
 			if (t.contains(b)) {
@@ -391,25 +568,33 @@ public class TrackManager implements Parcelable {
 		}
 	}
 
-	public Box removeBox(int targetX, int targetY) {
-		Box result = null;
-		Track t = getTrack(targetX, targetY);
-		if (t != null) {
-			result = t.removeBox(targetX, targetY);
+	/**
+	 * Sets the drawing bounds of this TrackManager.
+	 * 
+	 * @param l
+	 *            The left bound.
+	 * @param t
+	 *            The top bound.
+	 * @param r
+	 *            The right bound.
+	 * @param b
+	 *            The bottom bound.
+	 */
+	public void setBounds(int l, int t, int r, int b) {
+		mBounds.set(l, t, r, b);
+	}
+
+	public void setContext(Context context) {
+		mContext = context;
+		for (Track t : mTracks) {
+			t.setContext(mContext);
 		}
-		return result;
 	}
-	
-	public void setBounds(int left, int top, int right, int bottom) {
-		mBounds.set(left, top, right, bottom);
-	}
-	
+
 	@Override
 	public void writeToParcel(Parcel dest, int flags) {
 		dest.writeTypedList(mTracks);
 		dest.writeParcelable(mBounds, 0);
-		dest.writeInt(mBgColor);
-		dest.writeInt(mFgColor);
 	}
-	
+
 }

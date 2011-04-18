@@ -1,5 +1,8 @@
 package edu.nku.cs.csc440.team2.composer;
 
+import edu.nku.cs.csc440.team2.message.Media;
+import edu.nku.cs.csc460.team2.R;
+import android.content.Context;
 import android.graphics.Canvas;
 import android.graphics.Paint;
 import android.graphics.Rect;
@@ -9,26 +12,43 @@ import android.os.Parcel;
 import android.os.Parcelable;
 
 /**
+ * A Box is a graphical representation of a message.Media object. Before being
+ * drawn, a Context must be set and setBounds() must be called to set the
+ * drawing target. Then draw() will draw this Box to a Canvas. 
+ *  
  * @author William Knauer <knauerw1@nku.edu>
- * @version 2011.0321
+ * @version 2011.0416
  */
 public abstract class Box implements Parcelable, Comparable<Box> {
-	public static final int HEIGHT = 40;
-	public static final int SPACING = 7;
-	public static final int TEXT_OFFSET = 5;
-	public static final int RESIZE_WIDTH = 35;
-
+	/** A Context used to get resources */
+	private Context mContext;
+	
+	/** The absolute begin time of the represented Media */
 	private double mBegin;
+	
+	/** The absolute duration of the represented Media */
 	private double mDuration;
+	
+	/** The source of the represented Media */
 	private String mSource;
+	
+	/** The drawing bounds */
 	private Rect mBounds;
+	
+	/** The resize grip bounds */
 	private Rect mResizeBounds;
+	
+	/** The region of the represented Media */
 	private ParcelableRegion mRegion;
+	
+	/** A unique human-readable id for this box */
 	private String mId;
-	private int mBgColor;
-	private int mFgColor;
-	private int mResizeColor;
 
+	/**
+	 * Class constructor for creating from a Parcel.
+	 * 
+	 * @param in The Parcel to construct from.
+	 */
 	public Box(Parcel in) {
 		mBegin = in.readDouble();
 		mDuration = in.readDouble();
@@ -37,32 +57,37 @@ public abstract class Box implements Parcelable, Comparable<Box> {
 		mResizeBounds = in.readParcelable(Rect.class.getClassLoader());
 		mRegion = in.readParcelable(ParcelableRegion.class.getClassLoader());
 		mId = in.readString();
-		mBgColor = in.readInt();
-		mFgColor = in.readInt();
-		mResizeColor = in.readInt();
+		mContext = null;
 	}
 
+	/**
+	 * Class constructor.
+	 * 
+	 * @param source The source of the Media.
+	 * @param begin The absolute begin time of the Media. 
+	 * @param duration The duration of the Media.
+	 */
 	public Box(String source, double begin, double duration) {
-		mBounds = new Rect(0, 0, Composer.secToPx(duration), HEIGHT);
+		mBounds = new Rect();
 		mSource = source;
 		mBegin = begin;
 		mDuration = duration;
 		mResizeBounds = new Rect();
 		mRegion = null;
 		mId = null;
-		mBgColor = -1;
-		mFgColor = -1;
-		mResizeColor = -1;
+		mContext = null;
 	}
 
 	@Override
 	public int compareTo(Box another) {
-		int result = -9001;
+		int result = Integer.MIN_VALUE;
 
+		/* Sort by z-index ascending */
 		if (mRegion != null && another.getRegion() != null) {
 			if (mRegion.getZindex() < another.getRegion().getZindex()) {
 				result = -1;
-			} else if (mRegion.getZindex() == another.getRegion().getZindex()) {
+			} else if (mRegion.getZindex()
+					== another.getRegion().getZindex()) {
 				result = 0;
 			} else {
 				result = 1;
@@ -72,6 +97,12 @@ public abstract class Box implements Parcelable, Comparable<Box> {
 		return result;
 	}
 
+	/**
+	 * Determines if the Media will play during a given time.
+	 * 
+	 * @param time The time to check. 
+	 * @return Returns true if the Media will play during the given time.
+	 */
 	public boolean containsTime(double time) {
 		boolean contains = false;
 		if (getBegin() <= time && time < getEnd()) {
@@ -79,48 +110,69 @@ public abstract class Box implements Parcelable, Comparable<Box> {
 		}
 		return contains;
 	}
+	
+	/**
+	 * Draws this Box onto a given Canvas within the set bounds.
+	 * 
+	 * @param canvas The canvas to draw on.
+	 */
+	public abstract void draw(Canvas canvas);
 
-	public void draw(Canvas canvas) {
-		Paint p = new Paint();
+	/**
+	 * Draws this Box onto a given Canvas within the set bounds.
+	 * 
+	 * @param canvas The canvas to draw on.
+	 * @param bgColor The background color of this Box.
+	 * @param fgColor The text and outline color of this Box.
+	 * @param resizeColor The color of the resize grip.
+	 */
+	public void draw(
+			Canvas canvas, int bgColor, int fgColor, int resizeColor) {
+		if (mContext != null) {
+			Paint p = new Paint();
+			
+			/* Draw background */
+			p.setColor(bgColor);
+			p.setAntiAlias(true);
+			p.setStyle(Style.FILL);
+			canvas.drawRect(getBounds(), p);
 		
-		/* Draw background */
-		p.setColor(getBgColor());
-		p.setAntiAlias(true);
-		p.setStyle(Style.FILL);
-		canvas.drawRect(getBounds(), p);
-
-		/* Draw label */
-		p.setColor(getFgColor());
-		p.setTextAlign(Align.LEFT);
-		p.setTextSize(16.0f);
-		canvas.drawText(
-				getId(),
-				getBounds().left + TEXT_OFFSET,
-				getBounds().top + (getBounds().height() / 2)
-						+ p.getFontMetrics().descent, p);
-
-		/* Draw resize grip */
-		updateResizeBounds();
-		p.setColor(getResizeColor());
-		canvas.drawRect(getResizeBounds(), p);
-
-		/* Draw border */
-		p.setColor(getFgColor());
-		p.setStyle(Style.STROKE);
-		p.setStrokeWidth(2.0f);
-		canvas.drawRect(getBounds(), p);
+			/* Draw label */
+			p.setColor(fgColor);
+			p.setTextAlign(Align.LEFT);
+			p.setTextSize(mContext.getResources().getInteger(
+					R.integer.box_text_size));
+			canvas.drawText(
+					getId(),
+					getBounds().left + mContext.getResources().getInteger(
+							R.integer.box_text_offset),
+					getBounds().top + (getBounds().height() / 2)
+							+ p.getFontMetrics().descent, p);
+		
+			/* Draw resize grip */
+			updateResizeBounds();
+			p.setColor(resizeColor);
+			canvas.drawRect(getResizeBounds(), p);
+		
+			/* Draw border */
+			p.setColor(fgColor);
+			p.setStyle(Style.STROKE);
+			p.setStrokeWidth(mContext.getResources().getInteger(
+					R.integer.box_border_width));
+			canvas.drawRect(getBounds(), p);
+		}
 	}
 
 	public double getBegin() {
 		return mBegin;
 	}
-	
-	public int getBgColor() {
-		return mBgColor;
-	}
 
 	public Rect getBounds() {
 		return mBounds;
+	}
+	
+	public Context getContext() {
+		return mContext;
 	}
 
 	public double getDuration() {
@@ -129,10 +181,6 @@ public abstract class Box implements Parcelable, Comparable<Box> {
 
 	public double getEnd() {
 		return mBegin + mDuration;
-	}
-	
-	public int getFgColor() {
-		return mFgColor;
 	}
 
 	public String getId() {
@@ -146,10 +194,6 @@ public abstract class Box implements Parcelable, Comparable<Box> {
 	public Rect getResizeBounds() {
 		return mResizeBounds;
 	}
-	
-	public int getResizeColor() {
-		return mResizeColor;
-	}
 
 	public String getSource() {
 		return mSource;
@@ -159,20 +203,16 @@ public abstract class Box implements Parcelable, Comparable<Box> {
 		mBegin = begin;
 	}
 	
-	public void setBgColor(int color) {
-		mBgColor = color;
-	}
-
 	public void setBounds(int left, int top, int right, int bottom) {
 		mBounds.set(left, top, right, bottom);
+	}
+	
+	public void setContext(Context context) {
+		mContext = context;
 	}
 
 	public void setDuration(double duration) {
 		mDuration = duration;
-	}
-	
-	public void setFgColor(int color) {
-		mFgColor = color;
 	}
 
 	public void setId(String id) {
@@ -183,19 +223,33 @@ public abstract class Box implements Parcelable, Comparable<Box> {
 		mRegion = region;
 	}
 	
-	public void setResizeColor(int color) {
-		mResizeColor = color;
-	}
-	
 	public void setSource(String source) {
 		mSource = source;
 	}
+	
+	/**
+	 * Generates a Media object from this Box.
+	 * 
+	 * @return Returns a new Media object. 
+	 */
+	public abstract Media toMedia();
 
-	public void updateResizeBounds() {
+	/**
+	 * Sets the drawing bounds of the resize grip relative to the drawing
+	 * bounds of this Box.
+	 */
+	protected void updateResizeBounds() {
 		mResizeBounds.set(getBounds());
-		mResizeBounds.left = mResizeBounds.right - RESIZE_WIDTH;
+		mResizeBounds.left = mResizeBounds.right;
+		mResizeBounds.left -= mContext.getResources().getInteger(
+				R.integer.resize_grip_width);
 	}
 
+	/**
+	 * Writes this class to a Parcel.
+	 * 
+	 * @param dest The Parcel to write to.
+	 */
 	public void writeToParcel(Parcel dest) {
 		dest.writeDouble(mBegin);
 		dest.writeDouble(mDuration);
@@ -204,9 +258,6 @@ public abstract class Box implements Parcelable, Comparable<Box> {
 		dest.writeParcelable(mResizeBounds, 0);
 		dest.writeParcelable(mRegion, 0);
 		dest.writeString(mId);
-		dest.writeInt(mBgColor);
-		dest.writeInt(mFgColor);
-		dest.writeInt(mResizeColor);
 	}
 	
 }

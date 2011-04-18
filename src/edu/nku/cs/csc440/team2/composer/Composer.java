@@ -18,7 +18,7 @@ import android.view.ViewGroup.LayoutParams;
 
 /**
  * @author William Knauer <knauerw1@nku.edu>
- * @version 2011.0414
+ * @version 2011.0417
  */
 public class Composer extends Activity {
 	public class ComposerView extends View implements OnGestureListener {
@@ -64,10 +64,9 @@ public class Composer extends Activity {
 		}
 
 		void create() {
-			mBounds = new Rect(0, 0, 0, 1000);
-			mTrackManager = new TrackManager(
-					getResources().getColor(R.color.track_bg),
-					getResources().getColor(R.color.track_fg));
+			mBounds = new Rect();
+			mTrackManager = new TrackManager();
+			mTrackManager.setContext(getApplicationContext());
 			mTimeline = new Timeline(
 					getResources().getColor(R.color.timeline_bg),
 					getResources().getColor(R.color.timeline_fg));
@@ -80,6 +79,7 @@ public class Composer extends Activity {
 		void load(Bundle bundle) {
 			mBounds = bundle.getParcelable("mBounds");
 			mTrackManager = bundle.getParcelable("mTrackManager");
+			mTrackManager.setContext(getApplicationContext());
 			mTimeline = new Timeline(
 					getResources().getColor(R.color.timeline_bg),
 					getResources().getColor(R.color.timeline_fg));
@@ -107,7 +107,7 @@ public class Composer extends Activity {
 			mBounds.set(
 					0,
 					0,
-					secToPx(mTrackManager.getMaxEndTime()),
+					mTrackManager.getMaxX(),
 					mTrackManager.getMaxY());
 			mBounds.right += 2 * getWidth();
 			mBounds.bottom += getHeight();
@@ -141,8 +141,15 @@ public class Composer extends Activity {
 			
 			Box target = mTrackManager.getBox(x, y);
 			if (target != null) {
-				launchPropertiesActivity(target);
-				invalidate();
+				if (target instanceof AudioBox) {
+					launchAudioBoxProperties(target.getId());
+				} else if (target instanceof ImageBox) {
+					launchImageBoxProperties(target.getId());
+				} else if (target instanceof TextBox) {
+					launchTextBoxProperties(target.getId());
+				} else if (target instanceof VideoBox) {
+					launchVideoBoxProperties(target.getId());
+				}
 			}
 
 		}
@@ -207,6 +214,7 @@ public class Composer extends Activity {
 
 		void setTrackManager(TrackManager tm) {
 			mTrackManager = tm;
+			mTrackManager.setContext(getApplicationContext());
 			invalidate();
 		}
 		
@@ -214,17 +222,7 @@ public class Composer extends Activity {
 
 	private static float sScale = 1.5f;
 
-	public static final int REQ_AUDIO = 23;
-
-	public static final int REQ_IMAGE = 24;
-
-	public static final int REQ_TEXT = 25;
-
-	public static final int REQ_VIDEO = 26;
-
-	public static final int RESULT_SAVE = 1;
-	public static final int RESULT_DELETED = 2;
-	public static final int RESULT_UNCHANGED = 3;
+	public static final int REQ_PROPERTIES = 23;
 
 	/**
 	 * @return Returns the current scaling factor.
@@ -276,66 +274,49 @@ public class Composer extends Activity {
 	}
 
 	private ComposerView mComposerView;
-
-	public boolean addBox(int type) {
-		Intent i = null;
-		int code = -1;
-		switch (type) {
-		case AudioBox.TYPE:
-			i = new Intent(this, AudioProperties.class);
-			code = REQ_AUDIO;
-			break;
-		case ImageBox.TYPE:
-			i = new Intent(this, ImageProperties.class);
-			code = REQ_IMAGE;
-			break;
-		case TextBox.TYPE:
-			i = new Intent(this, TextProperties.class);
-			code = REQ_TEXT;
-			break;
-		case VideoBox.TYPE:
-			i = new Intent(this, VideoProperties.class);
-			code = REQ_VIDEO;
-			break;
+	
+	public void launchAudioBoxProperties(String boxId) {
+		Intent i = new Intent(this, AudioProperties.class);
+		i.putExtra("track_manager", mComposerView.getTrackManager());
+		if (boxId != null) {
+			i.putExtra("box_id", boxId);
 		}
-		if (i != null) {
-			i.putExtra("track_manager", mComposerView.getTrackManager());
-			startActivityForResult(i, code);
+		startActivityForResult(i, REQ_PROPERTIES);
+	}
+	
+	public void launchImageBoxProperties(String boxId) {
+		Intent i = new Intent(this, ImageProperties.class);
+		i.putExtra("track_manager", mComposerView.getTrackManager());
+		if (boxId != null) {
+			i.putExtra("box_id", boxId);
 		}
-		return true;
+		startActivityForResult(i, REQ_PROPERTIES);
+	}
+	
+	public void launchTextBoxProperties(String boxId) {
+		Intent i = new Intent(this, TextProperties.class);
+		i.putExtra("track_manager", mComposerView.getTrackManager());
+		if (boxId != null) {
+			i.putExtra("box_id", boxId);
+		}
+		startActivityForResult(i, REQ_PROPERTIES);
+	}
+	
+	public void launchVideoBoxProperties(String boxId) {
+		Intent i = new Intent(this, VideoProperties.class);
+		i.putExtra("track_manager", mComposerView.getTrackManager());
+		if (boxId != null) {
+			i.putExtra("box_id", boxId);
+		}
+		startActivityForResult(i, REQ_PROPERTIES);
 	}
 	
 	public void launchPlayer() {}
 
-	public void launchPropertiesActivity(Box b) {
-		if (b instanceof AudioBox) {
-			Intent i = new Intent(this, AudioProperties.class);
-			i.putExtra("track_manager", mComposerView.getTrackManager());
-			i.putExtra("box_id", b.getId());
-			startActivityForResult(i, REQ_AUDIO);
-		} else if (b instanceof ImageBox) {
-			Intent i = new Intent(this, ImageProperties.class);
-			i.putExtra("track_manager", mComposerView.getTrackManager());
-			i.putExtra("box_id", b.getId());
-			startActivityForResult(i, REQ_IMAGE);
-		} else if (b instanceof TextBox) {
-			Intent i = new Intent(this, TextProperties.class);
-			i.putExtra("track_manager", mComposerView.getTrackManager());
-			i.putExtra("box_id", b.getId());
-			startActivityForResult(i, REQ_TEXT);
-		} else if (b instanceof VideoBox) {
-			Intent i = new Intent(this, VideoProperties.class);
-			i.putExtra("track_manager", mComposerView.getTrackManager());
-			i.putExtra("box_id", b.getId());
-			startActivityForResult(i, REQ_VIDEO);
-		}
-	}
-
 	@Override
 	public void onActivityResult(int requestCode, int resultCode, Intent data) {
-		if (requestCode == REQ_AUDIO || requestCode == REQ_IMAGE
-				|| requestCode == REQ_TEXT || requestCode == REQ_VIDEO) {
-			if (resultCode == RESULT_OK || resultCode == RESULT_DELETED) {
+		if (requestCode == REQ_PROPERTIES) {
+			if (resultCode == RESULT_OK) {
 				Log.d("intent", "intent is " + data);
 				TrackManager t = data.getParcelableExtra("track_manager");
 				t.maintain();
@@ -368,13 +349,17 @@ public class Composer extends Activity {
 	public boolean onOptionsItemSelected(MenuItem item) {
 		switch (item.getItemId()) {
 		case R.id.add_audio:
-			return addBox(AudioBox.TYPE);
+			launchAudioBoxProperties(null);
+			return true;
 		case R.id.add_image:
-			return addBox(ImageBox.TYPE);
+			launchImageBoxProperties(null);
+			return true;
 		case R.id.add_text:
-			return addBox(TextBox.TYPE);
+			launchTextBoxProperties(null);
+			return true;
 		case R.id.add_video:
-			return addBox(VideoBox.TYPE);
+			launchVideoBoxProperties(null);
+			return true;
 		case R.id.preview:
 			launchPlayer();
 			return true;

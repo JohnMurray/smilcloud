@@ -13,7 +13,7 @@ import android.widget.Button;
  * ImageBox. The begin and duration for playback cannot be changed from here.
  * 
  * @author William Knauer <knauerw1@nku.edu>
- * @version 2011.0414
+ * @version 2011.0416
  */
 public class ImageProperties extends Activity {
 	/** Handle for the button that sets the media source. */
@@ -81,7 +81,7 @@ public class ImageProperties extends Activity {
 				/* Return the data structure and deletion status */
 				Intent i = new Intent();
 				i.putExtra("track_manager", mTrackManager);
-				setResult(Composer.RESULT_DELETED, i);
+				setResult(RESULT_OK, i);
 				finish();
 			}
 
@@ -106,7 +106,7 @@ public class ImageProperties extends Activity {
 			finish();
 		} else {
 			/* Return canceled status */
-			setResult(Composer.RESULT_UNCHANGED);
+			setResult(RESULT_CANCELED);
 			finish();
 		}
 	}
@@ -131,9 +131,6 @@ public class ImageProperties extends Activity {
 			} else {
 				/* Media must be created */
 				mBox = new ImageBox(null, 0.0, 1.0, null);
-				mBox.setBgColor(getResources().getColor(R.color.imagebox_bg));
-				mBox.setFgColor(getResources().getColor(R.color.imagebox_fg));
-				mBox.setResizeColor(getResources().getColor(R.color.resize_grip));
 				mBoxId = mBox.getId();
 				mTrackManager.addBox(mBox, mBox.getBegin());
 			}
