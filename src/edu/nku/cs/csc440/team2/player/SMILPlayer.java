@@ -20,6 +20,7 @@ import android.view.animation.AlphaAnimation;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
 import android.widget.ImageButton;
+import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
 import android.widget.SeekBar;
 import edu.nku.cs.csc440.team2.SMILCloud;
@@ -37,6 +38,9 @@ public class SMILPlayer extends Activity {
 	private RelativeLayout rootView;
 	private SeqPlayer root;
 	private boolean hasBeenTouched = false;
+	private boolean playerControlPause = false;
+	private ProgressBar pb = null;
+	private boolean playbackReset = false;
 	//private ScheduledThreadPoolExecutor scheduledThreadPoolExecutor = new ScheduledThreadPoolExecutor(2);
 	//private ScheduledFuture<Void> scheduledFuture = null;
 	
@@ -127,6 +131,9 @@ public class SMILPlayer extends Activity {
     {
     	new Thread(new Runnable() {
     		public void run() {
+    			//get the subject from the root
+    			Arbiter subject = root.getSubject();
+    			
     			/*
     			 * For some reason, I have to wait a seconed to make sure that the cotainer
     			 * view is loaded before I try to start adding stuff to it... It just doesn't
@@ -135,14 +142,13 @@ public class SMILPlayer extends Activity {
     			try {
 					Thread.sleep(1000);
 				} catch (InterruptedException e1) {
-					// TODO Auto-generated catch block
 					e1.printStackTrace();
 				}
 				
-				if( ! root.getSubject().isBufferQueueEmpty() )
+				if( ! subject.isBufferQueueEmpty() )
 				{
-					/*update the UI to display the buffering info*/
-					while( ! root.getSubject().isBufferQueueEmpty() )
+					/* TODO update the UI to display the buffering info*/
+					while( ! subject.isBufferQueueEmpty() )
 					{
 						try {
 							Thread.sleep(200);
@@ -151,11 +157,35 @@ public class SMILPlayer extends Activity {
 						}
 					}
 				}
+				/*
+    			 * Initialize the progress bar to its max value for updating later on
+    			 */
+    			pb.setMax((int)root.getDuration());
+    			
 				
 		    	while(true)
 		    	{
 		    		//wait while we still have some stuff buffering and what not
+		    		while( ! subject.isBufferQueueEmpty() || playerControlPause )
+		    		{
+		    			if( ! subject.paused ) 
+		    			{
+		    				subject.paused = true;
+		    				root.pause();
+		    			}
+		    			try {
+		    				Thread.sleep(200);
+		    			} catch(InterruptedException e) {
+		    				e.printStackTrace();
+		    			}
+		    		}
+		    		subject.paused = false;
+		    		
+		    		
+		    		//we must be done buffering, so play the document already!
 			    	root.play();
+			    	subject.incrementTotalPlaybackTime();
+			    	pb.setProgress((int)subject.getTotalPlaybackTime());
 			    	try {
 						Thread.sleep(100);
 					} catch (InterruptedException e) {
@@ -168,6 +198,14 @@ public class SMILPlayer extends Activity {
 					{
 						root.unRenderAll();
 						break;
+					}
+					if( playbackReset )
+					{
+						root.pause();
+						root.reset();
+						root.getSubject().reset();
+						if( !playerControlPause ) { root.play(); }
+						playbackReset = false;
 					}
 		    	}
     		}
@@ -257,16 +295,16 @@ public class SMILPlayer extends Activity {
     	 * 
     	 * Get the references to all the controls we will be using in the Player
     	 */
-    	ImageButton playPause = (ImageButton)(((ViewGroup)ctrl_overlay.getChildAt(0)).getChildAt(0));
+    	ImageButton play = (ImageButton)(((ViewGroup)ctrl_overlay.getChildAt(0)).getChildAt(0));
     	ImageButton rewind = (ImageButton)(((ViewGroup)ctrl_overlay.getChildAt(0)).getChildAt(1));
-    	ImageButton fastForward = (ImageButton)(((ViewGroup)ctrl_overlay.getChildAt(0)).getChildAt(2));
-    	SeekBar seekBar = (SeekBar)(((ViewGroup)ctrl_overlay.getChildAt(0)).getChildAt(3));
+    	ImageButton pause = (ImageButton)(((ViewGroup)ctrl_overlay.getChildAt(0)).getChildAt(2));
+    	pb = (ProgressBar)(((ViewGroup)ctrl_overlay.getChildAt(0)).getChildAt(3));
     	
     	/*
     	 * For each control that we will be using for the Player we will define
     	 * the on touch events. 
     	 */
-    	playPause.setOnClickListener(new View.OnClickListener() {
+    	play.setOnClickListener(new View.OnClickListener() {
 			
 			@Override
 			public void onClick(View v) {
@@ -282,6 +320,7 @@ public class SMILPlayer extends Activity {
 					 * TODO: add code to implement onTouch listener for
 					 * current control
 					 */
+					playerControlPause = false;
 					Log.i("Main Activity", "playPause has been pressed but has already been touched");
 				}
 			}
@@ -303,12 +342,20 @@ public class SMILPlayer extends Activity {
 					 * TODO: add code to implement onTouch listener for
 					 * current control
 					 */
+					if( root.getTimePlayed() >= root.getDuration() )
+					{
+						root.reset();
+						root.getSubject().reset();
+						startPlayback();
+					}
+					else { playbackReset = true; }
+					pb.setProgress(0);
 					Log.i("Main Activity", "rewind has been pressed but has already been touched");
 				}
 			}
 		});
     	
-    	fastForward.setOnClickListener(new View.OnClickListener() {
+    	pause.setOnClickListener(new View.OnClickListener() {
 			
 			@Override
 			public void onClick(View v) {
@@ -324,12 +371,13 @@ public class SMILPlayer extends Activity {
 					 * TODO: add code to implement onTouch listener for
 					 * current control
 					 */
+					playerControlPause = true;
 					Log.i("Main Activity", "fastforward has been pressed but has already been touched");
 				}
 			}
 		});
     	
-    	seekBar.setOnClickListener(new View.OnClickListener() {
+    	pb.setOnClickListener(new View.OnClickListener() {
 			
 			@Override
 			public void onClick(View v) {

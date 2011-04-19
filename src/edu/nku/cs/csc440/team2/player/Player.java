@@ -22,11 +22,6 @@ public abstract class Player {
 	 */
 	protected Arbiter subject;
 	
-	/* 
-	 * Boolean to tell if the object is currently paused
-	 */
-	protected boolean paused;
-	
 	/*
 	 * Determines the start time for the object in a double
 	 * type. However, the precision of the time should not
@@ -108,18 +103,6 @@ public abstract class Player {
 		return this.timePlayed;
 	}
 	
-	/**
-	 * 
-	 * @return boolean
-	 * 
-	 * Determine if the video is paused or not via the boolean
-	 * flag that is set in the object.
-	 */
-	public boolean isPaused()
-	{
-		return this.paused;
-	}
-	
 	
 	/**
 	 * Add an Arbiter object as the class's subject in the subscriber
@@ -137,6 +120,15 @@ public abstract class Player {
 	public Arbiter getSubject()
 	{
 		return this.subject;
+	}
+	
+	/**
+	 * Reset the player object
+	 */
+	public void reset() 
+	{
+		this.timePlayed = 0;
+		this.isPlaying = false;
 	}
 	
 }
