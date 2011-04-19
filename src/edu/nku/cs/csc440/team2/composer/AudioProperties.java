@@ -52,9 +52,9 @@ public class AudioProperties extends Activity {
 
 			@Override
 			public void onClick(View v) {
-				// TODO open source editor
-				mBox.setSource(mBox.getId());
-				mSetSourceButton.setEnabled(false);
+				Intent i = new Intent(getApplicationContext(),
+						AudioBrowser.class);
+				startActivityForResult(i, 0);
 			}
 
 		});
@@ -109,6 +109,17 @@ public class AudioProperties extends Activity {
 
 		});
 	}
+	
+	@Override
+	protected void onActivityResult (int requestCode,
+			int resultCode, Intent data) {
+		if (resultCode == RESULT_OK) {
+			// TODO set mBox data based on result
+			mBox.setSource("");
+			mSetSourceButton.setText(mBox.getId());
+			mSetSourceButton.setEnabled(false);
+		}
+	}
 
 	@Override
 	public void onBackPressed() {
@@ -154,6 +165,7 @@ public class AudioProperties extends Activity {
 		/* Disallow editing of the media's source if it's already set */
 		if (mBox.getSource() != null) {
 			mSetSourceButton.setEnabled(false);
+			mSetSourceButton.setText(mBox.getId());
 		}
 	}
 

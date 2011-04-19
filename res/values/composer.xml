@@ -47,5 +47,7 @@
     
     <!-- miscellaneous strings -->
     <string name="audio_no_items">No audio available.</string>
+    <string name="image_no_items">No images available.</string>
+    <string name="video_no_items">No video available.</string>
     
 </resources>
