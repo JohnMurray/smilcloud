@@ -1,7 +1,5 @@
 package edu.nku.cs.csc440.team2.provider;
 
-import edu.nku.cs.csc440.team2.message.Message;
-
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -10,13 +8,16 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
-import edu.nku.cs.csc440.team2.mediaCloud.MessageLite;
+
 import org.apache.http.NameValuePair;
 import org.apache.http.message.BasicNameValuePair;
+
 import android.os.Environment;
-import android.util.Log;
 
 import com.thoughtworks.xstream.XStream;
+
+import edu.nku.cs.csc440.team2.mediaCloud.MessageLite;
+import edu.nku.cs.csc440.team2.message.Message;
 
 
 public class MessageProvider {
@@ -24,16 +25,30 @@ public class MessageProvider {
 	private String tempFolder = Environment.getExternalStorageDirectory() + "/smiltemp";
 
 	public MessageProvider() { }
+	
+	// Saved Messages
+	public ArrayList<MessageLite> getSavedMessages(int userId){
+		
+		String url = "http://nkucloud.dyndns.org:8080/mediacloud/getSavedMessageList.jsp?user=" + userId;
+		
+		return getRemoteMessageLites(url);
+	}
 
 	// List of Messages
-	@SuppressWarnings("unchecked")
 	public ArrayList<MessageLite> getAllMessage(int userId) {
 
+		String url = "http://nkucloud.dyndns.org:8080/mediacloud/getMessageList.jsp?user=" + userId;
+		
+		return getRemoteMessageLites(url);
+	}
+	
+	@SuppressWarnings("unchecked")
+	private ArrayList<MessageLite> getRemoteMessageLites(String url){
+		
 		ArrayList<MessageLite> allMessageLite = null;
 		try {
 			String xml = RequestHelper
-					.makeHttpGetRequest("http://nkucloud.dyndns.org:8080/mediacloud/getMessageList.jsp?user="
-							+ userId);
+					.makeHttpGetRequest(url);
 			
 			XStream xstream = new XStream();
 			

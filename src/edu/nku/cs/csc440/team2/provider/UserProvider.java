@@ -17,23 +17,7 @@ public class UserProvider {
 
 	public UserProvider(){}
 	
-	public User getUserById(int id){
-		
-		// Return user
-		User user = null;
-		
-		
-		return user;
-	}
 	
-	public User getUserByUsernamePassword(String username, String password){
-		
-		// Return user
-		User user = null;
-		
-		
-		return user;
-	}
 	
 	public ArrayList<Pair<String, String>> getContactList(){
 		
@@ -54,7 +38,7 @@ public class UserProvider {
 		
 	}
 	
-	public User addUser(String userName, String password, String firstName, String lastName){
+	public int addUser(String userName, String password, String firstName, String lastName){
 		
 		int userId = -1;
 		
@@ -83,6 +67,6 @@ public class UserProvider {
 			e.printStackTrace();
 		}
 		
-		return getUserById(userId);
+		return userId;
 	}
 }
