@@ -10,6 +10,7 @@ public class Media {
 	private String name;
 	private String type;
 	private String mediaId;
+	private String duration;
 
 	public Media() {}
 	
@@ -17,15 +18,22 @@ public class Media {
 		this.mediaUrl = mediaUrl;
 		this.thumbUrl = thumbUrl;
 		this.name = name;	
-		this.type = type;
 	}
 	
 	public void store(Connection conn, int userId) {
-		this.addMedia(conn,mediaUrl,thumbUrl,name,type,userId);
+		this.addMedia(conn,mediaUrl,thumbUrl,name,type,userId,duration);
 	}
 	
 	public String getMediaId() {
 		return mediaId;
+	}
+	
+	public String getDuration() {
+		return duration;
+	}
+	
+	public void setDuration(String duration) {
+		this.duration = duration;
 	}
 	
 	public void setMediaId(String mediaId) {
@@ -36,12 +44,24 @@ public class Media {
 		return mediaUrl;
 	}
 	
+	public void setMediaUrl(String mediaUrl) {
+		this.mediaUrl = mediaUrl;
+	}
+	
 	public String getThumbUrl() {
 		return thumbUrl;
 	}
 	
+	public void setThumbUrl(String thumbUrl) {
+		this.thumbUrl = thumbUrl;
+	}
+	
 	public String getName() {
 		return name;
+	}
+	
+	public void setName(String name) {
+		this.name = name;
 	}
 	
 	public String getType() {
@@ -52,15 +72,16 @@ public class Media {
 		this.type = type;
 	}
 	
-	private void addMedia(Connection conn, String mediaUrl, String thumbUrl, String name, String type, int userId) {		
+	private void addMedia(Connection conn, String mediaUrl, String thumbUrl, String name, String type, int userId, String duration) {		
 		try{			
-			String sql = "INSERT INTO media(thumbUrl, name, mediaUrl, type, userId) VALUES (?, ?,?, ?, ?)";
+			String sql = "INSERT INTO media(thumbUrl, name, mediaUrl, type, userId, duration) VALUES (?, ?,?, ?, ?, ?)";
 			PreparedStatement preparedStatement = conn.prepareStatement(sql);
 			preparedStatement.setString(1, thumbUrl);
 			preparedStatement.setString(2, name);
 			preparedStatement.setString(3, mediaUrl);
 			preparedStatement.setString(4, type);
 			preparedStatement.setInt(5, userId);
+			preparedStatement.setString(6, duration);
 			preparedStatement.executeUpdate();
 			preparedStatement.close();
 			preparedStatement = null;
@@ -72,6 +93,25 @@ public class Media {
 			System.out.println("SQLState: " + ex.getSQLState());
 			System.out.println("VendorError: " + ex.getErrorCode());
 		}
+	}
+	
+	public static boolean deleteMedia(Connection conn, String mediaId) {
+		try{			
+			String sql = "DELETE FROM media WHERE mediaId = ?";
+			PreparedStatement preparedStatement = conn.prepareStatement(sql);
+			preparedStatement.setInt(1, Integer.parseInt(mediaId));
+			preparedStatement.executeUpdate();
+			preparedStatement.close();
+			preparedStatement = null;
+						
+		} catch (SQLException ex) {
+			// handle any errors
+			System.out.println("SQLException: " + ex.getMessage());
+			System.out.println("SQLState: " + ex.getSQLState());
+			System.out.println("VendorError: " + ex.getErrorCode());
+			return false;
+		}
+		return true;
 	}
 	
 	public static Media[] getLibrary(Connection conn, int userId) {
