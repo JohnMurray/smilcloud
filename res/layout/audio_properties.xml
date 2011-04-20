@@ -27,12 +27,13 @@
 				android:layout_height="wrap_content" />
 			<SeekBar
 				android:id="@+id/clip_offset_bar"
+				android:max="10000"
 				android:layout_width="match_parent"
 				android:layout_height="wrap_content"
 				android:layout_below="@id/clip_offset_label" />
 			<TextView
 				android:id="@+id/clip_begin_label"
-				android:text="Clip Begin: 0s"
+				android:text="Clip Begin: -"
 				android:paddingBottom="10dip"
 				android:layout_width="wrap_content"
 				android:layout_height="wrap_content"
@@ -40,7 +41,7 @@
 				android:layout_alignLeft="@id/clip_offset_bar" />
 			<TextView
 				android:id="@+id/clip_end_label"
-				android:text="Clip End: 0s"
+				android:text="Clip End: -"
 				android:paddingBottom="10dip"
 				android:layout_width="wrap_content"
 				android:layout_height="wrap_content"

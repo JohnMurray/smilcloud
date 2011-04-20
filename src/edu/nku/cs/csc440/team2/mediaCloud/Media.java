@@ -13,7 +13,7 @@ public class Media {
 	private String duration;
 
 	public Media() {}
-	
+
 	public Media(String mediaUrl, String thumbUrl, String name) {
 		this.mediaUrl = mediaUrl;
 		this.thumbUrl = thumbUrl;

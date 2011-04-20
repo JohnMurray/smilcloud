@@ -3,11 +3,11 @@ package edu.nku.cs.csc440.team2.composer;
 import java.util.Collections;
 import java.util.LinkedList;
 
+import edu.nku.cs.csc440.team2.SMILCloud;
 import edu.nku.cs.csc460.team2.R;
 
 import android.app.Activity;
 import android.content.Context;
-import android.content.Intent;
 import android.graphics.Canvas;
 import android.graphics.Paint;
 import android.graphics.Paint.Style;
@@ -21,61 +21,109 @@ import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.View;
 
+/**
+ * A RegionEditor allows a user to graphically modify a Region using
+ * touch-based input. It supports setting z-indices of Regions and guarantees
+ * that every z-index in a Message is unique.
+ * 
+ * @author William Knauer <knauerw1@nku.edu>
+ * @version 2011.0420
+ */
 public class RegionEditor extends Activity {
+	/**
+	 * A RegionEditorView is the view set by a RegionEditor to facilitate the
+	 * graphical editing of a Region.
+	 */
 	public class RegionEditorView extends View implements OnGestureListener {
-		public static final int CORNER_SIZE = 30;
-
+		/** The height and width of the handles on each corner of the Region */
+		private final int cornerSize;
+		
+		/** Interprets touch-based input to trigger callbacks */
 		private GestureDetector mGestureDetector;
+		
+		/** List of Boxes that have non-null Regions */
 		private LinkedList<Box> mBoxesWithRegions;
+		
+		/** 
+		 * List of Boxes whose playback overlaps with the Box whose Region is
+		 * being edited.
+		 */
 		private LinkedList<Box> mConcurrentBoxes;
-
+		
+		/** The bounds of this Region */
 		private Rect mBounds;
+		
+		/** The bounds of the top-left corner grip within mBounds */
 		private Rect mTopLeft;
+		
+		/** The bounds of the top-right corner grip within mBounds */
 		private Rect mTopRight;
+		
+		/** The bounds of the bottom-left corner grip within mBounds */
 		private Rect mBottomLeft;
+		
+		/** The bounds of the bottom-right corner grip within mBounds */
 		private Rect mBottomRight;
 
+		/** Stores whatever Rect is being touched at a given moment */
 		private Rect mTarget;
 
+		/**
+		 * Class constructor.
+		 * 
+		 * @param context The context used to construct this view.
+		 */
 		public RegionEditorView(Context context) {
 			super(context);
-			
+			cornerSize = context.getResources().getInteger(
+					R.integer.region_corner_size);
 			mTarget = null;
-			mBounds = mRegion.getBounds();
-
-			if (mBounds.width() <= CORNER_SIZE
-					|| mBounds.height() <= CORNER_SIZE) {
-				mBounds.set(0, 0, 4 * CORNER_SIZE, 4 * CORNER_SIZE);
-			}
-
-			mTopLeft = new Rect(0, 0, CORNER_SIZE, CORNER_SIZE);
-			mTopRight = new Rect(0, 0, CORNER_SIZE, CORNER_SIZE);
-			mBottomLeft = new Rect(0, 0, CORNER_SIZE, CORNER_SIZE);
-			mBottomRight = new Rect(0, 0, CORNER_SIZE, CORNER_SIZE);
-			updateBounds();
-
 			mGestureDetector = new GestureDetector(this);
-
 			mBoxesWithRegions = new LinkedList<Box>();
-			for (Box b : mTrackManager.getBoxes()) {
+			mBounds = mBox.getRegion().getBounds();
+			if (mBounds.width() <= cornerSize
+					|| mBounds.height() <= cornerSize) {
+				mBounds.set(0, 0, 4 * cornerSize, 4 * cornerSize);
+			}
+			mTopLeft = new Rect(0, 0, cornerSize, cornerSize);
+			mTopRight = new Rect(0, 0, cornerSize, cornerSize);
+			mBottomLeft = new Rect(0, 0, cornerSize, cornerSize);
+			mBottomRight = new Rect(0, 0, cornerSize, cornerSize);
+			
+			/* Assign bounds to the region's corner rectangles */
+			updateBounds();
+			
+			/* Populate mBoxesWithRegions */
+			for (Box b : mTrackManager.getAllBoxes()) {
 				if (b.getRegion() != null) {
 					mBoxesWithRegions.add(b);
 				}
 			}
-
+			
+			/* Sort mBoxesWithRegions by z-index ascending */
 			Collections.sort(mBoxesWithRegions);
+			
+			/* Set the z-indices of mBoxesWithRegions to their List indices */
 			commitZindices();
-			mConcurrentBoxes = mTrackManager.getConcurrentElements(mBox);
+			
+			/* Populate mConcurrentBoxes */
+			mConcurrentBoxes = mTrackManager.getConcurrentBoxes(mBox);
 		}
 
+		/**
+		 * Raises the z-index of mBox just enough to bring it in front of the
+		 * next shallowest region visible on the screen.
+		 */
 		public void bringForward() {
 			boolean done = false;
 			while (!done && mBoxesWithRegions.getLast() != mBox) {
-				// if next is in mconcurrentboxes done is true
+				/* Get the index of the next element in the list */
 				int next = mBoxesWithRegions.indexOf(mBox) + 1;
+				
+				/* Stop if the next element's playback overlaps with mBox */
 				done = mConcurrentBoxes.contains(mBoxesWithRegions.get(next));
 
-				// move up by one within mBoxesWithRegions
+				/* Swap mBox with element at next */
 				mBoxesWithRegions.remove(mBox);
 				mBoxesWithRegions.add(next, mBox);
 			}
@@ -83,6 +131,10 @@ public class RegionEditor extends Activity {
 			invalidate();
 		}
 
+		/**
+		 * Sets the z-index of each Box in mBoxesWithRegions to its index
+		 * within mBoxesWithRegions.
+		 */
 		public void commitZindices() {
 			for (int i = 0; i < mBoxesWithRegions.size(); i++) {
 				mBoxesWithRegions.get(i).getRegion().setZindex(i);
@@ -90,10 +142,10 @@ public class RegionEditor extends Activity {
 		}
 
 		@Override
-		public boolean onDown(MotionEvent arg0) {
-			int targetX = (int) arg0.getX();
-			int targetY = (int) arg0.getY();
-
+		public boolean onDown(MotionEvent ev) {
+			/* Assign mTarget based on input */
+			int targetX = (int) ev.getX();
+			int targetY = (int) ev.getY();
 			if (mBounds.contains(targetX, targetY)) {
 				if (mTopLeft.contains(targetX, targetY)) {
 					mTarget = mTopLeft;
@@ -127,7 +179,7 @@ public class RegionEditor extends Activity {
 					if (b == mBox) {
 						/* Draw region background */
 						p.setColor(getResources().getColor(R.color.region_bg));
-						canvas.drawRect(mRegion.getBounds(), p);
+						canvas.drawRect(mBounds, p);
 						
 						/* Draw each region corner background */
 						p.setColor(getResources().getColor(R.color.region_corner_bg));
@@ -167,31 +219,34 @@ public class RegionEditor extends Activity {
 		@Override
 		public boolean onFling(MotionEvent arg0, MotionEvent arg1, float arg2,
 				float arg3) {
-			return false;
+			return true;
 		}
 
 		@Override
-		public void onLongPress(MotionEvent arg0) {
-		}
+		public void onLongPress(MotionEvent arg0) {}
 
 		@Override
-		public boolean onScroll(MotionEvent arg0, MotionEvent arg1, float arg2,
-				float arg3) {
+		public boolean onScroll(MotionEvent e1, MotionEvent e2, float distX,
+				float distY) {
+			/*
+			 *  Resize the Region based on the distance the touch pointer
+			 *  moves.
+			 */
 			if (mTarget != null) {
 				if (mTarget == mBounds) {
-					mBounds.offset((int) -arg2, (int) -arg3);
+					mBounds.offset((int) -distX, (int) -distY);
 				} else if (mTarget == mTopLeft) {
-					mBounds.left -= arg2;
-					mBounds.top -= arg3;
+					mBounds.left -= distX;
+					mBounds.top -= distY;
 				} else if (mTarget == mTopRight) {
-					mBounds.right -= arg2;
-					mBounds.top -= arg3;
+					mBounds.right -= distX;
+					mBounds.top -= distY;
 				} else if (mTarget == mBottomRight) {
-					mBounds.right -= arg2;
-					mBounds.bottom -= arg3;
+					mBounds.right -= distX;
+					mBounds.bottom -= distY;
 				} else if (mTarget == mBottomLeft) {
-					mBounds.left -= arg2;
-					mBounds.bottom -= arg3;
+					mBounds.left -= distX;
+					mBounds.bottom -= distY;
 				}
 				updateBounds();
 			}
@@ -199,8 +254,7 @@ public class RegionEditor extends Activity {
 		}
 
 		@Override
-		public void onShowPress(MotionEvent arg0) {
-		}
+		public void onShowPress(MotionEvent arg0) {}
 
 		@Override
 		public boolean onSingleTapUp(MotionEvent arg0) {
@@ -209,26 +263,39 @@ public class RegionEditor extends Activity {
 
 		@Override
 		public boolean onTouchEvent(MotionEvent ev) {
+			/* Pass touch event to the GestureDetector */
 			mGestureDetector.onTouchEvent(ev);
+			
 			if (ev.getAction() == MotionEvent.ACTION_UP) {
 				onUp(ev);
 			}
 			return true;
 		}
 
-		public boolean onUp(MotionEvent ev) {
+		/**
+		 * Actions to be performed whenever the user lifts their finger from
+		 * the touch screen.
+		 * 
+		 * @param ev The MotionEvent that triggered the function call.
+		 */
+		public void onUp(MotionEvent ev) {
 			mTarget = null;
-			return true;
 		}
 
+		/**
+		 * Lowers the z-index of mBox just enough to push it behind the next
+		 * deepest region visible on the screen.
+		 */
 		public void pushBack() {
 			boolean done = false;
 			while (!done && mBoxesWithRegions.getFirst() != mBox) {
-				// if prev is in mconcboxes then done is true
+				/* Get the index of the previous element in the list */
 				int prev = mBoxesWithRegions.indexOf(mBox) - 1;
+				
+				/* Stop if the next element's playback overlaps with mBox */
 				done = mConcurrentBoxes.contains(mBoxesWithRegions.get(prev));
 
-				// move down by one within mBoxesWithRegions
+				/* Swap mBox with element at prev */
 				mBoxesWithRegions.remove(mBox);
 				mBoxesWithRegions.add(prev, mBox);
 			}
@@ -236,7 +303,12 @@ public class RegionEditor extends Activity {
 			invalidate();
 		}
 
+		/**
+		 * Updates the bounds of the corner grips so they are actually at
+		 * the corners of the Region's bounds.
+		 */
 		public void updateBounds() {
+			/* Correct if the user somehow inverted mBounds */
 			if (mBounds.left > mBounds.right) {
 				int temp = mBounds.left;
 				mBounds.left = mBounds.right;
@@ -248,14 +320,14 @@ public class RegionEditor extends Activity {
 				mBounds.bottom = temp;
 			}
 
-			// place corners
+			/* Place the corner grips at the corners of mBounds */
 			mTopLeft.offsetTo(mBounds.left, mBounds.top);
-			mTopRight.offsetTo(mBounds.right - CORNER_SIZE, mBounds.top);
-			mBottomRight.offsetTo(mBounds.right - CORNER_SIZE, mBounds.bottom
-					- CORNER_SIZE);
-			mBottomLeft.offsetTo(mBounds.left, mBounds.bottom - CORNER_SIZE);
+			mTopRight.offsetTo(mBounds.right - cornerSize, mBounds.top);
+			mBottomRight.offsetTo(mBounds.right - cornerSize, mBounds.bottom
+					- cornerSize);
+			mBottomLeft.offsetTo(mBounds.left, mBounds.bottom - cornerSize);
 
-			// fix overlaps
+			/* Fix any overlaps between the corner grips */
 			if (Rect.intersects(mTopLeft, mTopRight)) {
 				mTopRight.offsetTo(mTopLeft.right, mTopRight.top);
 				mBottomRight.offsetTo(mTopRight.left, mBottomRight.top);
@@ -283,38 +355,35 @@ public class RegionEditor extends Activity {
 		
 	}
 
+	/** The TrackManager that contains all the Boxes we are working with */
 	private TrackManager mTrackManager;
+	
+	/** The Box within the mTrackManager whose Region we are editing */
 	private Box mBox;
+	
+	/** The view that facilitates the graphical editing of the Region */
 	private RegionEditorView mView;
-
-	private ParcelableRegion mRegion;
-
+	
 	@Override
 	public void onBackPressed() {
-		Intent i = new Intent();
-		i.putExtra("track_manager", mTrackManager);
-		setResult(RESULT_OK, i);
+		setResult(RESULT_OK);
+		save();
 		finish();
 	}
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-
-		if (savedInstanceState != null) {
-			mTrackManager = savedInstanceState.getParcelable("track_manager");
-			mBox = mTrackManager.getBox(savedInstanceState.getString("box_id"));
-		} else {
-			mTrackManager = getIntent().getParcelableExtra("track_manager");
-			mBox = mTrackManager.getBox(getIntent().getStringExtra("box_id"));
-		}
-
+		
+		/* Load from the Application */
+		mTrackManager = ((SMILCloud) getApplication()).getTrackManager();
+		mBox = ((SMILCloud) getApplication()).getSelectedBox();
+		
+		/* Create a region for mBox if we must */
 		if (mBox.getRegion() == null) {
 			mBox.setRegion(new ParcelableRegion());
 		}
-
-		mRegion = mBox.getRegion();
-
+		
 		mView = new RegionEditorView(this);
 		setContentView(mView);
 	}
@@ -349,8 +418,15 @@ public class RegionEditor extends Activity {
 
 	@Override
 	public void onSaveInstanceState(Bundle outState) {
-		outState.putParcelable("track_manager", mTrackManager);
-		outState.putString("box_id", mBox.getId());
+		save();
+	}
+	
+	/**
+	 * Saves the TrackManager and Box to the Application.
+	 */
+	private void save() {
+		((SMILCloud) getApplication()).setTrackManager(mTrackManager);
+		((SMILCloud) getApplication()).setSelectedBox(mBox);
 	}
 	
 }
