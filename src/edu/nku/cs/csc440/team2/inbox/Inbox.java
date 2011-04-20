@@ -48,36 +48,6 @@ public class Inbox extends Activity
     public void onCreate(Bundle savedInstanceState) {
     	super.onCreate(savedInstanceState);
     	setContentView(R.layout.inbox_main);
-        
-    	/////////////// Testing
-    	/////////////// Testing
-    	/////////////// Testing
-
-    	///***** Service *****\\\
-    	startService(new Intent(Inbox.this,SmilService.class));
-    	
-    	//MediaProvider mdp = new MediaProvider();
-    	//UserProvider up = new UserProvider();
-    	//Media[] mediaList = mdp.getAllMedia(1);
-    	
-    	//Bitmap bm = mdp.getImage("http://www.google.com/images/logos/ps_logo2.png");
-    	
-    	//String txt = mdp.getText("http://turbobotz.net/test.txt");
-    	
-   	
-    	
-    	
-    	
-    	
-    	///////// Get All Users
-    	//UserProvider up = new UserProvider();
-    	
-    	//ArrayList<Pair<String, String>> a = up.getContactList();
-    	
-    	/////////////// Testing
-    	/////////////// Testing
-    	/////////////// Testing
-    	/////////////// Testing
     	
     	/*
     	 * Get the list of messages and put the names into a string
