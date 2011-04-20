@@ -1,8 +1,5 @@
 package edu.nku.cs.csc440.team2.UIMenus;
 
-import edu.nku.cs.csc440.team2.User;
-import edu.nku.cs.csc440.team2.provider.UserProvider;
-import edu.nku.cs.csc460.team2.R;
 import android.app.Activity;
 import android.os.Bundle;
 import android.view.View;
@@ -10,6 +7,10 @@ import android.view.View.OnClickListener;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
+import edu.nku.cs.csc440.team2.SMILCloud;
+import edu.nku.cs.csc440.team2.User;
+import edu.nku.cs.csc440.team2.provider.UserProvider;
+import edu.nku.cs.csc460.team2.R;
 
 public class RegisterScreen extends Activity {
 	
@@ -44,7 +45,17 @@ public class RegisterScreen extends Activity {
 				EditText pd = (EditText)findViewById(R.id.register_first_name);
 				password = pd.getText().toString();
 				
-				User newUser = (new UserProvider()).addUser(userName, password, firstName, lastName);
+				int newUser = (new UserProvider()).addUser(userName, password, firstName, lastName);
+				if( newUser != -1 )
+				{
+					//TODO the user was not created.. do something about this
+					Toast.makeText(RegisterScreen.this, "Unable to register. Try again.", 
+							Toast.LENGTH_LONG);
+				}
+				else
+				{
+					((SMILCloud) getApplication()).setUserId(newUser);
+				}
 			}
     		
     	});

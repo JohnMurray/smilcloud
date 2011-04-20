@@ -11,12 +11,11 @@ import android.app.Application;
 public class SMILCloud extends Application 
 {
   private ArrayList<MessageLite> messages;
-  
   private TrackManager trackManager;
   private Box selectedBox;
-  
   private String queuedDocumentToPlayID;
   private String queueDocumentToEditID;
+  private int userID = -1;
 	
   	public void setTrackManager(TrackManager t) {
   		this.trackManager = t;
@@ -42,13 +41,24 @@ public class SMILCloud extends Application
 	public void queueDocumentToEdit(String id) { this.queueDocumentToEditID = id; }
 	public String getQueuedDocumentForEditing() { return this.queueDocumentToEditID; }
 
-  public synchronized void addMessage(MessageLite message)
-  {
-    this.messages.add(message);
-  }
+	public synchronized void addMessage(MessageLite message)
+	{
+		this.messages.add(message);
+	}
 
-  public synchronized ArrayList<MessageLite> getMessages()
-  {
-    return this.messages;
-  }
+	public synchronized ArrayList<MessageLite> getMessages()
+	{
+		return this.messages;
+	}
+	
+	
+	public synchronized void setUserId(int userID)
+	{
+		this.userID = userID;
+	}
+	
+	public synchronized int getUserId(int userID)
+	{
+		return this.userID;
+	}
 }
