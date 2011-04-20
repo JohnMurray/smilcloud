@@ -2,6 +2,7 @@ package edu.nku.cs.csc440.team2.composer;
 
 import java.util.LinkedList;
 
+import edu.nku.cs.csc440.team2.message.Message;
 import edu.nku.cs.csc460.team2.R;
 
 import android.content.Context;
@@ -535,5 +536,10 @@ public class TrackManager {
 			t.setContext(mContext);
 		}
 	}
-
+	
+	public Message toMessage() {
+		// TODO implement me!
+		return null;
+	}
+	
 }
