@@ -1,17 +1,21 @@
 package edu.nku.cs.csc440.team2.player;
 
 import android.media.MediaPlayer;
+import android.media.MediaPlayer.OnBufferingUpdateListener;
+import android.media.MediaPlayer.OnCompletionListener;
+import android.util.Log;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
-import android.view.View;
-import android.view.ViewGroup;
 
 public class VideoPlayer extends SingleInstancePlayer implements
-		MediaPlayer.OnPreparedListener, SurfaceHolder.Callback
+		MediaPlayer.OnPreparedListener, SurfaceHolder.Callback,
+		MediaPlayer.OnBufferingUpdateListener, 
+		MediaPlayer.OnCompletionListener
 {
 	private MediaPlayer mMediaPlayer;
 	private SurfaceView sfView;
 	private SurfaceHolder sfHolder;
+	private boolean videoRendered = false;
 	
 	public VideoPlayer(String resource, double begin, double duration)
 	{
@@ -22,6 +26,10 @@ public class VideoPlayer extends SingleInstancePlayer implements
 
 	public void play()
 	{
+		if( ! this.videoRendered )
+		{
+			this.render();
+		}
 		try
 		{
 			this.mMediaPlayer.start();
@@ -36,13 +44,16 @@ public class VideoPlayer extends SingleInstancePlayer implements
 	
 	public void pause()
 	{
-		try
+		if( this.isPlaying )
 		{
-			this.mMediaPlayer.pause();
-		}
-		catch(IllegalStateException e)
-		{
-			e.printStackTrace();
+			try
+			{
+				this.mMediaPlayer.pause();
+			}
+			catch(IllegalStateException e)
+			{
+				e.printStackTrace();
+			}
 		}
 	}
 	
@@ -58,6 +69,7 @@ public class VideoPlayer extends SingleInstancePlayer implements
 	
 	public void render()
 	{
+		Log.w("Video", "Rendering the video");
 		this.layout.post(new Runnable() {
 			public void run() {
 				//layout.setVisibility(View.VISIBLE);
@@ -68,24 +80,28 @@ public class VideoPlayer extends SingleInstancePlayer implements
 				//layout.addView(sfView);
 			}
 		});
+		this.videoRendered = true;
 	}
 	
 	public void unRender()
 	{
-		this.layout.post(new Runnable() {
-			public void run() {
-				layout.removeView(sfView);
-				try
-				{
-					mMediaPlayer.stop();
+		if( this.isPlaying )
+		{
+			this.layout.post(new Runnable() {
+				public void run() {
+					layout.removeView(sfView);
+					try
+					{
+						mMediaPlayer.stop();
+					}
+					catch(IllegalStateException e)
+					{
+						e.printStackTrace();
+					}
+					//layout.setVisibility(View.INVISIBLE);				
 				}
-				catch(IllegalStateException e)
-				{
-					e.printStackTrace();
-				}
-				//layout.setVisibility(View.INVISIBLE);				
-			}
-		});
+			});
+		}
 	}
 	
 	public void prepare()
@@ -109,6 +125,7 @@ public class VideoPlayer extends SingleInstancePlayer implements
 				layout.addView(sfView);
 				sfHolder = sfView.getHolder();
 				sfHolder.addCallback(VideoPlayer.this);
+				sfHolder.setType(SurfaceHolder.SURFACE_TYPE_PUSH_BUFFERS);
 				//sfView.setVisibility(View.INVISIBLE);
 			}
 		});
@@ -119,11 +136,19 @@ public class VideoPlayer extends SingleInstancePlayer implements
 	public void onPrepared(MediaPlayer mp)
 	{
 		this.subject.notifyDoneBufferingWithoutRestart();
+		Log.w("Video", "Prepared video");
 	}
 
+	
+	/*
+	 * Surface callbacks from here down
+	 * (non-Javadoc)
+	 * @see android.view.SurfaceHolder.Callback#surfaceCreated(android.view.SurfaceHolder)
+	 */
 	@Override
 	public void surfaceCreated(SurfaceHolder holder) {
 		this.subject.notifyDoneBufferingWithoutRestart();
+		Log.w("Video", "Surface is ready for rendering!");
 	}
 
 	@Override
@@ -132,5 +157,30 @@ public class VideoPlayer extends SingleInstancePlayer implements
 
 	@Override
 	public void surfaceDestroyed(SurfaceHolder holder) {}
+
+	
+	/*
+	 * MediaPlayer.OnCompletionListner
+	 * (non-Javadoc)
+	 * @see android.media.MediaPlayer.OnCompletionListener#onCompletion(android.media.MediaPlayer)
+	 */
+	@Override
+	public void onCompletion(MediaPlayer mp) {}
+
+	/*
+	 * MediaPlayer.onBufferingUpdateListener
+	 * (non-Javadoc)
+	 * @see android.media.MediaPlayer.OnBufferingUpdateListener#onBufferingUpdate(android.media.MediaPlayer, int)
+	 */
+	@Override
+	public void onBufferingUpdate(MediaPlayer mp, int percent) {}
+	
+	
+	@Override
+	public void reset()
+	{
+		this.mMediaPlayer.seekTo(0);
+		super.reset();
+	}
 	
 }

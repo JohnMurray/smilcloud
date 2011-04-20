@@ -75,5 +75,15 @@ public abstract class ContainerPlayer extends Player {
 			}
 		}
 	}
+	
+	@Override
+	public void reset()
+	{
+		for( Player p : this.components )
+		{
+			p.reset();
+		}
+		super.reset();
+	}
 
 }

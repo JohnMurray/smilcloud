@@ -8,6 +8,7 @@ import net.londatiga.android.NewQAAdapter;
 import net.londatiga.android.QuickAction;
 import android.app.Activity;
 import android.content.Intent;
+import android.graphics.Bitmap;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -20,9 +21,11 @@ import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.PopupWindow.OnDismissListener;
 import android.widget.Toast;
+import edu.nku.cs.csc440.team2.mediaCloud.Media;
 import edu.nku.cs.csc440.team2.mediaCloud.MessageLite;
 import edu.nku.cs.csc440.team2.mediaCloud.Pair;
 import edu.nku.cs.csc440.team2.player.SMILPlayer;
+import edu.nku.cs.csc440.team2.provider.MediaProvider;
 import edu.nku.cs.csc440.team2.provider.MessageProvider;
 import edu.nku.cs.csc440.team2.provider.UserProvider;
 import edu.nku.cs.csc440.team2.service.SmilService;
@@ -46,13 +49,30 @@ public class Inbox extends Activity
     	setContentView(R.layout.inbox_main);
         
     	/////////////// Testing
+    	/////////////// Testing
+    	/////////////// Testing
+
+    	///***** Service *****\\\
     	startService(new Intent(Inbox.this,SmilService.class));
     	
+    	MediaProvider mdp = new MediaProvider();
+    	//Media[] mediaList = mdp.getAllMedia(1);
+    	
+    	//Bitmap bm = mdp.getImage("http://www.google.com/images/logos/ps_logo2.png");
+    	
+    	String txt = mdp.getText("http://turbobotz.net/test.txt");
+    	
+   	
+    	
     	///////// Get All Users
-    	UserProvider up = new UserProvider();
+    	//UserProvider up = new UserProvider();
     	
-    	ArrayList<Pair<String, String>> a = up.getContactList();
+    	//ArrayList<Pair<String, String>> a = up.getContactList();
     	
+    	/////////////// Testing
+    	/////////////// Testing
+    	/////////////// Testing
+    	/////////////// Testing
     	
     	/*
     	 * Get the list of messages and put the names into a string

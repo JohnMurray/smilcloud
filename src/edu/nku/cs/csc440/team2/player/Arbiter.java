@@ -9,6 +9,8 @@ public class Arbiter
 	private ArrayList<Player> subscribers = new ArrayList<Player>();
 	private SeqPlayer rootSeq;
 	private Stack<Boolean> waitForBuffer = new Stack<Boolean>();
+	private double totalPlaybackTime = 0.0;
+	public boolean paused;
 	
 	public void register(Player p)
 	{
@@ -70,5 +72,20 @@ public class Arbiter
 	public void setRootSeq(SeqPlayer seq)
 	{
 		this.rootSeq = seq;
+	}
+	
+	public void incrementTotalPlaybackTime()
+	{
+		this.totalPlaybackTime  += Player.PLAYBACK_INTERVAL;
+	}
+	
+	public double getTotalPlaybackTime()
+	{
+		return this.totalPlaybackTime;
+	}
+	
+	public void reset()
+	{
+		this.totalPlaybackTime = 0.0;
 	}
 }

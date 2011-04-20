@@ -33,13 +33,16 @@ public class AudioPlayer extends SingleInstancePlayer implements
 	
 	public void pause()
 	{
-		try
+		if( this.isPlaying )
 		{
-			this.mMediaPlayer.pause();
-		}
-		catch(IllegalStateException e)
-		{
-			e.printStackTrace();
+			try
+			{
+				this.mMediaPlayer.pause();
+			}
+			catch(IllegalStateException e)
+			{
+				e.printStackTrace();
+			}
 		}
 	}
 	
@@ -60,15 +63,17 @@ public class AudioPlayer extends SingleInstancePlayer implements
 	
 	public void unRender()
 	{
-		//do nothing... as we should
-		try
+		if( this.isPlaying )
 		{
-			this.mMediaPlayer.stop();
-			Log.w("AUDIO PLAYER", "should have just stopped");
-		}
-		catch(IllegalStateException e)
-		{
-			e.printStackTrace();
+			try
+			{
+				this.mMediaPlayer.stop();
+				Log.w("AUDIO PLAYER", "should have just stopped");
+			}
+			catch(IllegalStateException e)
+			{
+				e.printStackTrace();
+			}
 		}
 	}
 	
@@ -92,6 +97,13 @@ public class AudioPlayer extends SingleInstancePlayer implements
 	public void onPrepared(MediaPlayer mp) {
 		this.subject.notifyDoneBufferingWithoutRestart();
 		Log.e("AUDIO", "I'm done buffering and ready to play!");
+	}
+	
+	@Override
+	public void reset()
+	{
+		this.mMediaPlayer.seekTo(0);
+		super.reset();
 	}
 	
 }

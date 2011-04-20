@@ -27,7 +27,10 @@ public class ParPlayer extends ContainerPlayer
 			}
 			else
 			{
-				p.play();
+				if( this.subject.getTotalPlaybackTime() >= p.start )
+				{
+					p.play();
+				}
 			}
 		}
 		this.timePlayed += Player.PLAYBACK_INTERVAL;
