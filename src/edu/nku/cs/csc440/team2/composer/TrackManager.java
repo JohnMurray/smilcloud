@@ -7,14 +7,12 @@ import edu.nku.cs.csc460.team2.R;
 import android.content.Context;
 import android.graphics.Canvas;
 import android.graphics.Rect;
-import android.os.Parcel;
-import android.os.Parcelable;
 
 /**
  * @author William Knauer <knauerw1@nku.edu>
  * @version 2011.0417
  */
-public class TrackManager implements Parcelable {
+public class TrackManager {
 	/**
 	 * A MoveManager helps to facilitate the moving of a Box from one Track to
 	 * another or from one location in a Track to another within the same Track.
@@ -289,22 +287,6 @@ public class TrackManager implements Parcelable {
 	/** The Context used to get resources and create Tracks */
 	private Context mContext;
 
-	/** Used to generate instances of this class from a Parcel */
-	public static final Parcelable.Creator<TrackManager> CREATOR
-			= new Parcelable.Creator<TrackManager>() {
-
-		@Override
-		public TrackManager createFromParcel(Parcel source) {
-			return new TrackManager(source);
-		}
-
-		@Override
-		public TrackManager[] newArray(int size) {
-			return new TrackManager[size];
-		}
-
-	};
-
 	/**
 	 * Class constructor.
 	 */
@@ -314,20 +296,6 @@ public class TrackManager implements Parcelable {
 		mResizeManager = new ResizeManager();
 		mTracks = new LinkedList<Track>();
 		maintain();
-	}
-
-	/**
-	 * Class constructor for creating from a Parcel.
-	 * 
-	 * @param in
-	 *            The Parcel to construct from.
-	 */
-	public TrackManager(Parcel in) {
-		mMoveManager = new MoveManager();
-		mResizeManager = new ResizeManager();
-		mTracks = new LinkedList<Track>();
-		in.readTypedList(mTracks, Track.CREATOR);
-		mBounds = in.readParcelable(Rect.class.getClassLoader());
 	}
 
 	/**
@@ -346,11 +314,6 @@ public class TrackManager implements Parcelable {
 			}
 		}
 		maintain();
-	}
-
-	@Override
-	public int describeContents() {
-		return 0;
 	}
 
 	/**
@@ -410,24 +373,6 @@ public class TrackManager implements Parcelable {
 		Track t = getTrack(targetX, targetY);
 		if (t != null) {
 			result = t.getBox(Composer.snapTo(Composer.pxToSec(targetX)));
-		}
-		return result;
-	}
-
-	/**
-	 * Returns the Box whose id matches a given String.
-	 * 
-	 * @param id
-	 *            The String to check.
-	 * @return Returns the Box whose id matches the String. Returns null if no
-	 *         such Box is found.
-	 */
-	public Box getBox(String id) {
-		Box result = null;
-		for (Track t : mTracks) {
-			if (result == null) {
-				result = t.getBox(id);
-			}
 		}
 		return result;
 	}
@@ -589,12 +534,6 @@ public class TrackManager implements Parcelable {
 		for (Track t : mTracks) {
 			t.setContext(mContext);
 		}
-	}
-
-	@Override
-	public void writeToParcel(Parcel dest, int flags) {
-		dest.writeTypedList(mTracks);
-		dest.writeParcelable(mBounds, 0);
 	}
 
 }

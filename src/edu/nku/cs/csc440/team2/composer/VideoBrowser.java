@@ -15,9 +15,10 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
-import android.widget.VideoView;
+import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 /**
  * An VideoBrowser gets a list of available video Media from the MediaProvider
@@ -28,7 +29,7 @@ import android.widget.TextView;
  * http://softwarepassion.com/android-series-custom-listview-items-and-adapters
  * 
  * @author William Knauer <knauerw1@nku.edu>
- * @version 2011.0418
+ * @version 2011.0420
  */
 public class VideoBrowser extends ListActivity {
 	/**
@@ -71,7 +72,11 @@ public class VideoBrowser extends ListActivity {
 				}
 				TextView time = (TextView) view.findViewById(R.id.video_browser_row_time);
 				if (time != null) {
-					time.setText("9:99"); // TODO replace with m.getTime() ?
+					time.setText("" + m.getDuration() + 's');
+				}
+				ImageView thumb = (ImageView) view.findViewById(R.id.video_browser_row_thumb);
+				if (thumb != null) {
+					thumb.setImageBitmap(mProvider.getImage(m.getThumbUrl()));
 				}
 			}
 			return view;
@@ -87,6 +92,9 @@ public class VideoBrowser extends ListActivity {
 
 	/** The adapter for displaying video Media in a ListActivity */
 	private VideoListAdapter mVideoListAdapter;
+	
+	/** Flag for whether or not media was successfully retrieved */
+	private boolean mServerDown;
 
 	/** Loads media into mMedia */
 	private Runnable mViewMedia = new Runnable() {
@@ -113,6 +121,11 @@ public class VideoBrowser extends ListActivity {
 				mVideoListAdapter.notifyDataSetChanged();
 			}
 			mProgressDialog.dismiss();
+			if (mServerDown) {
+				Toast.makeText(getBaseContext(),
+						"Unable to connect to server.",
+						Toast.LENGTH_LONG).show();
+			}
 		}
 
 	};
@@ -121,21 +134,20 @@ public class VideoBrowser extends ListActivity {
 	 * Retrieves the Media from the cloud and stores it in mMedia.
 	 */
 	public void getMedia() {
-		Media[] media = mProvider.getAllMedia(1);
-		for (int i = 0; i < media.length; i ++) {
-			if (media[i].getType().equalsIgnoreCase("video")) {
-				mMedia.add(media[i]);
+		Media[] media = mProvider.getAllMedia(1); // TODO replace with user id
+		
+		/* Keep program from crashing if cloud is not accessible */
+		if (media != null) {
+			for (int i = 0; i < media.length; i ++) {
+				if (media[i].getType().equalsIgnoreCase("audio")) {
+					mMedia.add(media[i]);
+				}
 			}
+			mServerDown = false;
+		} else {
+			mServerDown = true;
 		}
 		
-		Media m1 = new Media("", "", "dramatic chipmunk");
-		m1.setType("video");
-		mMedia.add(m1);
-
-		Media m2 = new Media("", "", "bed intruder song");
-		m2.setType("video");
-		mMedia.add(m2);
-
 		runOnUiThread(finishMediaRetrieval);
 	}
 
@@ -152,6 +164,7 @@ public class VideoBrowser extends ListActivity {
 		setContentView(R.layout.video_browser);
 		mProvider = new MediaProvider();
 		mMedia = new LinkedList<Media>();
+		mServerDown = false;
 		mVideoListAdapter = new VideoListAdapter(this,
 				R.layout.video_browser_row, mMedia);
 		setListAdapter(mVideoListAdapter);
@@ -174,9 +187,9 @@ public class VideoBrowser extends ListActivity {
 		Intent i = new Intent();
 		i.putExtra("name", m.getName());
 		i.putExtra("id", m.getMediaId());
+		i.putExtra("length", m.getDuration());
 		i.putExtra("source", m.getMediaUrl());
 		i.putExtra("thumb", m.getThumbUrl());
-		// i.putExtra("length", m.getLenth());
 
 		/* Return result and finish */
 		setResult(RESULT_OK, i);

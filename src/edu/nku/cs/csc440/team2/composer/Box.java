@@ -8,8 +8,6 @@ import android.graphics.Paint;
 import android.graphics.Rect;
 import android.graphics.Paint.Align;
 import android.graphics.Paint.Style;
-import android.os.Parcel;
-import android.os.Parcelable;
 
 /**
  * A Box is a graphical representation of a message.Media object. Before being
@@ -17,9 +15,9 @@ import android.os.Parcelable;
  * drawing target. Then draw() will draw this Box to a Canvas. 
  *  
  * @author William Knauer <knauerw1@nku.edu>
- * @version 2011.0416
+ * @version 2011.0420
  */
-public abstract class Box implements Parcelable, Comparable<Box> {
+public abstract class Box implements Comparable<Box> {
 	/** A Context used to get resources */
 	private Context mContext;
 	
@@ -28,6 +26,9 @@ public abstract class Box implements Parcelable, Comparable<Box> {
 	
 	/** The absolute duration of the represented Media */
 	private double mDuration;
+	
+	/** The name of the represented Media */
+	private String mName;
 	
 	/** The source of the represented Media */
 	private String mSource;
@@ -45,22 +46,6 @@ public abstract class Box implements Parcelable, Comparable<Box> {
 	private String mId;
 
 	/**
-	 * Class constructor for creating from a Parcel.
-	 * 
-	 * @param in The Parcel to construct from.
-	 */
-	public Box(Parcel in) {
-		mBegin = in.readDouble();
-		mDuration = in.readDouble();
-		mSource = in.readString();
-		mBounds = in.readParcelable(Rect.class.getClassLoader());
-		mResizeBounds = in.readParcelable(Rect.class.getClassLoader());
-		mRegion = in.readParcelable(ParcelableRegion.class.getClassLoader());
-		mId = in.readString();
-		mContext = null;
-	}
-
-	/**
 	 * Class constructor.
 	 * 
 	 * @param source The source of the Media.
@@ -75,6 +60,7 @@ public abstract class Box implements Parcelable, Comparable<Box> {
 		mResizeBounds = new Rect();
 		mRegion = null;
 		mId = null;
+		mName = null;
 		mContext = null;
 	}
 
@@ -143,7 +129,7 @@ public abstract class Box implements Parcelable, Comparable<Box> {
 			p.setTextSize(mContext.getResources().getInteger(
 					R.integer.box_text_size));
 			canvas.drawText(
-					getId(),
+					getName(),
 					getBounds().left + mContext.getResources().getInteger(
 							R.integer.box_text_offset),
 					getBounds().top + (getBounds().height() / 2)
@@ -187,6 +173,10 @@ public abstract class Box implements Parcelable, Comparable<Box> {
 		return mId;
 	}
 
+	public String getName() {
+		return mName;
+	}
+	
 	public ParcelableRegion getRegion() {
 		return mRegion;
 	}
@@ -219,6 +209,10 @@ public abstract class Box implements Parcelable, Comparable<Box> {
 		mId = id;
 	}
 
+	public void setName(String name) {
+		mName = name;
+	}
+	
 	public void setRegion(ParcelableRegion region) {
 		mRegion = region;
 	}
@@ -243,21 +237,6 @@ public abstract class Box implements Parcelable, Comparable<Box> {
 		mResizeBounds.left = mResizeBounds.right;
 		mResizeBounds.left -= mContext.getResources().getInteger(
 				R.integer.resize_grip_width);
-	}
-
-	/**
-	 * Writes this class to a Parcel.
-	 * 
-	 * @param dest The Parcel to write to.
-	 */
-	public void writeToParcel(Parcel dest) {
-		dest.writeDouble(mBegin);
-		dest.writeDouble(mDuration);
-		dest.writeString(mSource);
-		dest.writeParcelable(mBounds, 0);
-		dest.writeParcelable(mResizeBounds, 0);
-		dest.writeParcelable(mRegion, 0);
-		dest.writeString(mId);
 	}
 	
 }

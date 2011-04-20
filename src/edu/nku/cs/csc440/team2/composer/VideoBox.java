@@ -4,8 +4,6 @@ import edu.nku.cs.csc440.team2.message.Media;
 import edu.nku.cs.csc440.team2.message.Video;
 import edu.nku.cs.csc460.team2.R;
 import android.graphics.Canvas;
-import android.os.Parcel;
-import android.os.Parcelable;
 
 /**
  * A VideoBox is a Box that represents an Image object.
@@ -16,31 +14,6 @@ import android.os.Parcelable;
 public class VideoBox extends AudioVideoBox {
 	/** A static counter used to generate unique ids */
 	private static int sCount = 1;
-
-	/** Used to generate instances of this class from a Parcel */
-	public static final Parcelable.Creator<VideoBox> CREATOR = new Parcelable.Creator<VideoBox>() {
-
-		@Override
-		public VideoBox createFromParcel(Parcel source) {
-			return new VideoBox(source);
-		}
-
-		@Override
-		public VideoBox[] newArray(int size) {
-			return new VideoBox[size];
-		}
-
-	};
-
-	/**
-	 * Class constructor for creating from a Parcel.
-	 * 
-	 * @param in
-	 *            The Parcel to construct from.
-	 */
-	public VideoBox(Parcel in) {
-		super(in);
-	}
 
 	/**
 	 * Class constructor.
@@ -65,11 +38,6 @@ public class VideoBox extends AudioVideoBox {
 	}
 
 	@Override
-	public int describeContents() {
-		return 0;
-	}
-
-	@Override
 	public void draw(Canvas canvas) {
 		if (getContext() != null) {
 			super.draw(canvas,
@@ -83,11 +51,6 @@ public class VideoBox extends AudioVideoBox {
 	public Media toMedia() {
 		return new Video(getBegin(), getEnd(), getSource(), getRegion()
 				.toRegion(), getClipBegin(), getClipEnd());
-	}
-
-	@Override
-	public void writeToParcel(Parcel dest, int flags) {
-		super.writeToParcel(dest);
 	}
 
 }

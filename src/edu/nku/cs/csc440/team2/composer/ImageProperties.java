@@ -1,5 +1,6 @@
 package edu.nku.cs.csc440.team2.composer;
 
+import edu.nku.cs.csc440.team2.SMILCloud;
 import edu.nku.cs.csc460.team2.R;
 import android.app.Activity;
 import android.content.Intent;
@@ -13,36 +14,29 @@ import android.widget.Button;
  * ImageBox. The begin and duration for playback cannot be changed from here.
  * 
  * @author William Knauer <knauerw1@nku.edu>
- * @version 2011.0416
+ * @version 2011.0420
  */
 public class ImageProperties extends Activity {
+	/** Request code for launching ImageBrowser */
+	private static final int REQ_SOURCE = 1;
+
+	/** Request code for launching RegionEditor */
+	private static final int REQ_REGION = 2;
+
 	/** Handle for the button that sets the media source. */
 	private Button mSetSourceButton;
-	
+
 	/** Handle for the button that opens the RegionEditor */
 	private Button mRegionEditButton;
-	
+
 	/** Handle for the button that deletes the media from the composer. */
 	private Button mDeleteButton;
-	
+
 	/** The data structure that contains the message. */
 	private TrackManager mTrackManager;
-	
+
 	/** The media being edited/created. */
 	private ImageBox mBox;
-	
-	/** The id of the media being edited. */
-	private String mBoxId;
-	
-	/**
-	 * Launches the RegionEditor activity.
-	 */
-	private void launchRegionEditor() {
-		Intent i = new Intent(this, RegionEditor.class);
-		i.putExtra("track_manager", mTrackManager);
-		i.putExtra("box_id", mBox.getId());
-		startActivityForResult(i, 0);
-	}
 
 	/**
 	 * Assigns local handles and callbacks for widgets in the UI.
@@ -53,9 +47,8 @@ public class ImageProperties extends Activity {
 
 			@Override
 			public void onClick(View v) {
-				// TODO open source editor
-				mBox.setSource(mBox.getId());
-				mSetSourceButton.setEnabled(false);
+				Intent i = new Intent(getBaseContext(), ImageBrowser.class);
+				startActivityForResult(i, 0);
 			}
 
 		});
@@ -65,7 +58,8 @@ public class ImageProperties extends Activity {
 
 			@Override
 			public void onClick(View v) {
-				launchRegionEditor();
+				Intent i = new Intent(getBaseContext(), RegionEditor.class);
+				startActivityForResult(i, 0);
 			}
 
 		});
@@ -77,11 +71,11 @@ public class ImageProperties extends Activity {
 			public void onClick(View v) {
 				/* Delete the media from the data structure */
 				mTrackManager.removeBox(mBox);
+				mBox = null;
 
 				/* Return the data structure and deletion status */
-				Intent i = new Intent();
-				i.putExtra("track_manager", mTrackManager);
-				setResult(RESULT_OK, i);
+				setResult(RESULT_OK);
+				save();
 				finish();
 			}
 
@@ -89,26 +83,35 @@ public class ImageProperties extends Activity {
 	}
 
 	@Override
-	protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-		/* Update local data from RegionEditor */
-		mTrackManager = data.getParcelableExtra("track_manager");
-		mBox = (ImageBox) mTrackManager.getBox(mBoxId);
+	protected void onActivityResult(int requestCode,
+			int resultCode, Intent data) {
+		if (requestCode == REQ_SOURCE) {
+			/* Set Box info from intent */
+			mBox.setName(data.getStringExtra("name"));
+			mBox.setId(data.getStringExtra("id"));
+			mBox.setSource(data.getStringExtra("source"));
+			// TODO mBox.setThumbUrl(data.getStringExtra("thumb"));
+
+		} else if (requestCode == REQ_REGION) {
+			// nothing to do
+		}
 	}
 
 	@Override
 	public void onBackPressed() {
 		/* If all required fields are filled in */
 		if (mBox.getSource() != null && mBox.getRegion() != null) {
-			/* Return the data structure and OK status */
-			Intent i = new Intent();
-			i.putExtra("track_manager", mTrackManager);
-			setResult(RESULT_OK, i);
-			finish();
+			/* Return OK status */
+			setResult(RESULT_OK);
 		} else {
 			/* Return canceled status */
+			mTrackManager.removeBox(mBox);
+			mBox = null;
 			setResult(RESULT_CANCELED);
-			finish();
 		}
+		
+		save();
+		finish();
 	}
 
 	@Override
@@ -116,36 +119,41 @@ public class ImageProperties extends Activity {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.image_properties);
 		loadWidgetsFromView();
-		
-		/* If we are being reconstructed from a previous state */
-		if (savedInstanceState != null) {
-			mTrackManager = savedInstanceState.getParcelable("track_manager");
-			mBoxId = savedInstanceState.getString("box_id");
-			mBox = (ImageBox) mTrackManager.getBox(mBoxId);
-		} else {
-			mTrackManager = getIntent().getParcelableExtra("track_manager");
-			/* If we are editing existing media */
-			if (getIntent().hasExtra("box_id")) {
-				mBoxId = getIntent().getStringExtra("box_id");
-				mBox = (ImageBox) mTrackManager.getBox(mBoxId);
-			} else {
-				/* Media must be created */
-				mBox = new ImageBox(null, 0.0, 1.0, null);
-				mBoxId = mBox.getId();
-				mTrackManager.addBox(mBox, mBox.getBegin());
-			}
-		}
-		
-		/* Disallow editing of the media's source if it's already set */
-		if (mBox.getSource() != null) {
-			mSetSourceButton.setEnabled(false);
-		}
 	}
 
 	@Override
 	protected void onSaveInstanceState(Bundle outState) {
-		outState.putParcelable("track_manager", mTrackManager);
-		outState.putString("box_id", mBoxId);
+		save();
+	}
+
+	@Override
+	protected void onStart() {
+		super.onStart();
+
+		/* Load from Application */
+		mTrackManager = ((SMILCloud) getApplication()).getTrackManager();
+		mBox = (ImageBox) ((SMILCloud) getApplication()).getSelectedBox();
+
+		if (mBox == null) {
+			/* Media must be created */
+			mBox = new ImageBox(null, 0.0, 1.0, null);
+			mTrackManager.addBox(mBox, mBox.getBegin());
+		}
+
+		if (mBox.getSource() != null) {
+			/* Disallow editing of the media's source */
+			mSetSourceButton.setEnabled(false);
+			mSetSourceButton.setText(mBox.getName());
+		}
+	}
+	
+	/**
+	 * Saves the TrackManager and Box to the Application.
+	 */
+	private void save() {
+		/* Save to Application */
+		((SMILCloud) getApplication()).setTrackManager(mTrackManager);
+		((SMILCloud) getApplication()).setSelectedBox(mBox);
 	}
 
 }

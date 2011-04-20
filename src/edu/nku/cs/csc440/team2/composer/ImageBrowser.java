@@ -18,6 +18,7 @@ import android.widget.ArrayAdapter;
 import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 /**
  * An ImageBrowser gets a list of available image Media from the MediaProvider
@@ -28,7 +29,7 @@ import android.widget.TextView;
  * http://softwarepassion.com/android-series-custom-listview-items-and-adapters
  * 
  * @author William Knauer <knauerw1@nku.edu>
- * @version 2011.0418
+ * @version 2011.0420
  */
 public class ImageBrowser extends ListActivity {
 	/**
@@ -70,9 +71,9 @@ public class ImageBrowser extends ListActivity {
 					name.setText(m.getName());
 				}
 				ImageView thumb = (ImageView) view
-						.findViewById(R.id.image_browser_row_thumbnail);
+						.findViewById(R.id.image_browser_row_thumb);
 				if (thumb != null) {
-					//thumb.setImageBitmap(); TODO hook into Media
+					thumb.setImageBitmap(mProvider.getImage(m.getThumbUrl()));
 				}
 			}
 			return view;
@@ -88,6 +89,9 @@ public class ImageBrowser extends ListActivity {
 
 	/** The adapter for displaying image Media in a ListActivity */
 	private ImageListAdapter mImageListAdapter;
+	
+	/** Flag for whether or not media was successfully retrieved */
+	private boolean mServerDown;
 
 	/** Loads media into mMedia */
 	private Runnable mViewMedia = new Runnable() {
@@ -114,6 +118,11 @@ public class ImageBrowser extends ListActivity {
 				mImageListAdapter.notifyDataSetChanged();
 			}
 			mProgressDialog.dismiss();
+			if (mServerDown) {
+				Toast.makeText(getBaseContext(),
+						"Unable to connect to server.",
+						Toast.LENGTH_LONG).show();
+			}
 		}
 
 	};
@@ -122,21 +131,20 @@ public class ImageBrowser extends ListActivity {
 	 * Retrieves the Media from the cloud and stores it in mMedia.
 	 */
 	public void getMedia() {
-		//Media[] media = mProvider.getAllMedia(0);
-		//for (int i = 0; i < media.length; i ++) {
-		//	if (media[i].getType().equalsIgnoreCase("image")) {
-		//		mMedia.add(media[i]);
-		//	}
-		//}
+		Media[] media = mProvider.getAllMedia(1);
 		
-		Media m1 = new Media("", "", "Cloud crapping a rainbow");
-		m1.setType("image");
-		mMedia.add(m1);
-
-		Media m2 = new Media("", "", "longcat");
-		m2.setType("image");
-		mMedia.add(m2);
-
+		/* Keep program from crashing if cloud is not accessible */
+		if (media != null) {
+			for (int i = 0; i < media.length; i ++) {
+				if (media[i].getType().equalsIgnoreCase("image")) {
+					mMedia.add(media[i]);
+				}
+			}
+			mServerDown = false;
+		} else {
+			mServerDown = true;
+		}
+		
 		runOnUiThread(finishMediaRetrieval);
 	}
 
@@ -153,6 +161,7 @@ public class ImageBrowser extends ListActivity {
 		setContentView(R.layout.image_browser);
 		mProvider = new MediaProvider();
 		mMedia = new LinkedList<Media>();
+		mServerDown = false;
 		mImageListAdapter = new ImageListAdapter(this,
 				R.layout.image_browser_row, mMedia);
 		setListAdapter(mImageListAdapter);

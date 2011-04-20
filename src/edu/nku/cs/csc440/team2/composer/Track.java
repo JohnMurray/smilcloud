@@ -9,8 +9,6 @@ import android.graphics.Canvas;
 import android.graphics.Paint;
 import android.graphics.Paint.Style;
 import android.graphics.Rect;
-import android.os.Parcel;
-import android.os.Parcelable;
 
 /**
  * A Track is the graphical equivalent of a SMIL Sequence player.
@@ -18,7 +16,7 @@ import android.os.Parcelable;
  * @author William Knauer <knauerw1@nku.edu>
  * @version 2011.0417
  */
-public class Track implements Parcelable {
+public class Track {
 	/** The Context used to get resources */
 	private Context mContext;
 
@@ -27,21 +25,6 @@ public class Track implements Parcelable {
 
 	/** The drawing bounds of this Track */
 	private Rect mBounds;
-
-	/** Used to generate instances of this class from a Parcel */
-	public static final Parcelable.Creator<Track> CREATOR = new Parcelable.Creator<Track>() {
-
-		@Override
-		public Track createFromParcel(Parcel source) {
-			return new Track(source);
-		}
-
-		@Override
-		public Track[] newArray(int size) {
-			return new Track[size];
-		}
-
-	};
 
 	/**
 	 * Class constructor.
@@ -52,21 +35,6 @@ public class Track implements Parcelable {
 	public Track() {
 		mBounds = new Rect();
 		mBoxes = new LinkedList<Box>();
-	}
-
-	/**
-	 * Class constructor for creating from a Parcel.
-	 * 
-	 * @param in
-	 *            The Parcel to construct from.
-	 */
-	public Track(Parcel in) {
-		mBounds = in.readParcelable(Rect.class.getClassLoader());
-		mBoxes = new LinkedList<Box>();
-		int numBoxes = in.readInt();
-		for (int i = 0; i < numBoxes; i++) {
-			mBoxes.add((Box) in.readParcelable(Box.class.getClassLoader()));
-		}
 	}
 
 	/**
@@ -97,11 +65,6 @@ public class Track implements Parcelable {
 	 */
 	public boolean contains(Box elt) {
 		return mBoxes.contains(elt);
-	}
-
-	@Override
-	public int describeContents() {
-		return 0;
 	}
 
 	/**
@@ -268,16 +231,6 @@ public class Track implements Parcelable {
 		mContext = context;
 		for (Box b : mBoxes) {
 			b.setContext(mContext);
-		}
-	}
-
-	@Override
-	public void writeToParcel(Parcel dest, int flags) {
-		dest.writeParcelable(mBounds, 0);
-
-		dest.writeInt(mBoxes.size());
-		for (Box b : mBoxes) {
-			dest.writeParcelable(b, 0);
 		}
 	}
 

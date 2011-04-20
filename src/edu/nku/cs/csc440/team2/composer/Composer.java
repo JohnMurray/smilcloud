@@ -1,12 +1,12 @@
 package edu.nku.cs.csc440.team2.composer;
 
+import edu.nku.cs.csc440.team2.SMILCloud;
 import edu.nku.cs.csc460.team2.R;
 import android.app.Activity;
 import android.content.Intent;
 import android.graphics.Canvas;
 import android.graphics.Rect;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.GestureDetector;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -18,7 +18,7 @@ import android.view.ViewGroup.LayoutParams;
 
 /**
  * @author William Knauer <knauerw1@nku.edu>
- * @version 2011.0417
+ * @version 2011.0420
  */
 public class Composer extends Activity {
 	public class ComposerView extends View implements OnGestureListener {
@@ -66,7 +66,7 @@ public class Composer extends Activity {
 		void create() {
 			mBounds = new Rect();
 			mTrackManager = new TrackManager();
-			mTrackManager.setContext(getApplicationContext());
+			mTrackManager.setContext(getBaseContext());
 			mTimeline = new Timeline(
 					getResources().getColor(R.color.timeline_bg),
 					getResources().getColor(R.color.timeline_fg));
@@ -78,11 +78,16 @@ public class Composer extends Activity {
 
 		void load(Bundle bundle) {
 			mBounds = bundle.getParcelable("mBounds");
-			mTrackManager = bundle.getParcelable("mTrackManager");
-			mTrackManager.setContext(getApplicationContext());
+			if (mTrackManager == null) {
+				mTrackManager = ((SMILCloud) getApplication()).getTrackManager();
+				((SMILCloud) getApplication()).getSelectedBox(); // nullify
+			}
+			mTrackManager.setContext(getBaseContext());
+			mTrackManager.maintain();
 			mTimeline = new Timeline(
 					getResources().getColor(R.color.timeline_bg),
 					getResources().getColor(R.color.timeline_fg));
+			invalidate();
 		}
 
 		@Override
@@ -142,13 +147,17 @@ public class Composer extends Activity {
 			Box target = mTrackManager.getBox(x, y);
 			if (target != null) {
 				if (target instanceof AudioBox) {
-					launchAudioBoxProperties(target.getId());
+					((SMILCloud) getApplication()).setSelectedBox(target);
+					launchAudioBoxProperties();
 				} else if (target instanceof ImageBox) {
-					launchImageBoxProperties(target.getId());
+					((SMILCloud) getApplication()).setSelectedBox(target);
+					launchImageBoxProperties();
 				} else if (target instanceof TextBox) {
-					launchTextBoxProperties(target.getId());
+					((SMILCloud) getApplication()).setSelectedBox(target);
+					launchTextBoxProperties();
 				} else if (target instanceof VideoBox) {
-					launchVideoBoxProperties(target.getId());
+					((SMILCloud) getApplication()).setSelectedBox(target);
+					launchVideoBoxProperties();
 				}
 			}
 
@@ -204,17 +213,19 @@ public class Composer extends Activity {
 				mTrackManager.getResizeManager().finish();
 				invalidate();
 			}
+			((SMILCloud) getApplication()).getSelectedBox();
 			return true;
 		}
 
 		void save(Bundle bundle) {
 			bundle.putParcelable("mBounds", mBounds);
-			bundle.putParcelable("mTrackManager", mTrackManager);
+			((SMILCloud) getApplication()).setTrackManager(mTrackManager);
 		}
 
 		void setTrackManager(TrackManager tm) {
 			mTrackManager = tm;
-			mTrackManager.setContext(getApplicationContext());
+			mTrackManager.setContext(getBaseContext());
+			mTrackManager.maintain();
 			invalidate();
 		}
 		
@@ -275,39 +286,23 @@ public class Composer extends Activity {
 
 	private ComposerView mComposerView;
 	
-	public void launchAudioBoxProperties(String boxId) {
+	public void launchAudioBoxProperties() {
 		Intent i = new Intent(this, AudioProperties.class);
-		i.putExtra("track_manager", mComposerView.getTrackManager());
-		if (boxId != null) {
-			i.putExtra("box_id", boxId);
-		}
 		startActivityForResult(i, REQ_PROPERTIES);
 	}
 	
-	public void launchImageBoxProperties(String boxId) {
+	public void launchImageBoxProperties() {
 		Intent i = new Intent(this, ImageProperties.class);
-		i.putExtra("track_manager", mComposerView.getTrackManager());
-		if (boxId != null) {
-			i.putExtra("box_id", boxId);
-		}
 		startActivityForResult(i, REQ_PROPERTIES);
 	}
 	
-	public void launchTextBoxProperties(String boxId) {
+	public void launchTextBoxProperties() {
 		Intent i = new Intent(this, TextProperties.class);
-		i.putExtra("track_manager", mComposerView.getTrackManager());
-		if (boxId != null) {
-			i.putExtra("box_id", boxId);
-		}
 		startActivityForResult(i, REQ_PROPERTIES);
 	}
 	
-	public void launchVideoBoxProperties(String boxId) {
+	public void launchVideoBoxProperties() {
 		Intent i = new Intent(this, VideoProperties.class);
-		i.putExtra("track_manager", mComposerView.getTrackManager());
-		if (boxId != null) {
-			i.putExtra("box_id", boxId);
-		}
 		startActivityForResult(i, REQ_PROPERTIES);
 	}
 	
@@ -317,10 +312,9 @@ public class Composer extends Activity {
 	public void onActivityResult(int requestCode, int resultCode, Intent data) {
 		if (requestCode == REQ_PROPERTIES) {
 			if (resultCode == RESULT_OK) {
-				Log.d("intent", "intent is " + data);
-				TrackManager t = data.getParcelableExtra("track_manager");
-				t.maintain();
-				mComposerView.setTrackManager(t);
+				// do nothing
+			} else if (resultCode == RESULT_CANCELED) {
+				// do nothing
 			}
 		}
 	}
@@ -349,16 +343,16 @@ public class Composer extends Activity {
 	public boolean onOptionsItemSelected(MenuItem item) {
 		switch (item.getItemId()) {
 		case R.id.add_audio:
-			launchAudioBoxProperties(null);
+			launchAudioBoxProperties();
 			return true;
 		case R.id.add_image:
-			launchImageBoxProperties(null);
+			launchImageBoxProperties();
 			return true;
 		case R.id.add_text:
-			launchTextBoxProperties(null);
+			launchTextBoxProperties();
 			return true;
 		case R.id.add_video:
-			launchVideoBoxProperties(null);
+			launchVideoBoxProperties();
 			return true;
 		case R.id.preview:
 			launchPlayer();

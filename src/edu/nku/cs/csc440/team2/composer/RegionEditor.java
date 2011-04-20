@@ -3,11 +3,11 @@ package edu.nku.cs.csc440.team2.composer;
 import java.util.Collections;
 import java.util.LinkedList;
 
+import edu.nku.cs.csc440.team2.SMILCloud;
 import edu.nku.cs.csc460.team2.R;
 
 import android.app.Activity;
 import android.content.Context;
-import android.content.Intent;
 import android.graphics.Canvas;
 import android.graphics.Paint;
 import android.graphics.Paint.Style;
@@ -27,7 +27,7 @@ import android.view.View;
  * that every z-index in a Message is unique.
  * 
  * @author William Knauer <knauerw1@nku.edu>
- * @version 2011.0416
+ * @version 2011.0420
  */
 public class RegionEditor extends Activity {
 	/**
@@ -366,29 +366,24 @@ public class RegionEditor extends Activity {
 	
 	@Override
 	public void onBackPressed() {
-		/* Pass updated TrackManager back to calling Activity and finish */
-		Intent i = new Intent();
-		i.putExtra("track_manager", mTrackManager);
-		setResult(RESULT_OK, i);
+		setResult(RESULT_OK);
+		save();
 		finish();
 	}
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-
-		if (savedInstanceState != null) {
-			mTrackManager = savedInstanceState.getParcelable("track_manager");
-			mBox = mTrackManager.getBox(savedInstanceState.getString("box_id"));
-		} else {
-			mTrackManager = getIntent().getParcelableExtra("track_manager");
-			mBox = mTrackManager.getBox(getIntent().getStringExtra("box_id"));
-		}
 		
+		/* Load from the Application */
+		mTrackManager = ((SMILCloud) getApplication()).getTrackManager();
+		mBox = ((SMILCloud) getApplication()).getSelectedBox();
+		
+		/* Create a region for mBox if we must */
 		if (mBox.getRegion() == null) {
 			mBox.setRegion(new ParcelableRegion());
 		}
-
+		
 		mView = new RegionEditorView(this);
 		setContentView(mView);
 	}
@@ -423,8 +418,15 @@ public class RegionEditor extends Activity {
 
 	@Override
 	public void onSaveInstanceState(Bundle outState) {
-		outState.putParcelable("track_manager", mTrackManager);
-		outState.putString("box_id", mBox.getId());
+		save();
+	}
+	
+	/**
+	 * Saves the TrackManager and Box to the Application.
+	 */
+	private void save() {
+		((SMILCloud) getApplication()).setTrackManager(mTrackManager);
+		((SMILCloud) getApplication()).setSelectedBox(mBox);
 	}
 	
 }

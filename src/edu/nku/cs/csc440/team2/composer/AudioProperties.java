@@ -1,5 +1,6 @@
 package edu.nku.cs.csc440.team2.composer;
 
+import edu.nku.cs.csc440.team2.SMILCloud;
 import edu.nku.cs.csc460.team2.R;
 import android.app.Activity;
 import android.content.Intent;
@@ -16,7 +17,7 @@ import android.widget.TextView;
  * AudioBox. The begin and duration for playback cannot be changed from here.
  * 
  * @author William Knauer <knauerw1@nku.edu>
- * @version 2011.0416
+ * @version 2011.0420
  */
 public class AudioProperties extends Activity {
 	/** Handle for the button that sets the media source. */
@@ -40,9 +41,6 @@ public class AudioProperties extends Activity {
 	/** The media being edited/created. */
 	private AudioBox mBox;
 	
-	/** The id of the media being edited. */
-	private String mBoxId;
-
 	/**
 	 * Assigns local handles and callbacks for widgets in the UI.
 	 */
@@ -52,8 +50,7 @@ public class AudioProperties extends Activity {
 
 			@Override
 			public void onClick(View v) {
-				Intent i = new Intent(getApplicationContext(),
-						AudioBrowser.class);
+				Intent i = new Intent(getBaseContext(), AudioBrowser.class);
 				startActivityForResult(i, 0);
 			}
 
@@ -69,13 +66,15 @@ public class AudioProperties extends Activity {
 						/* Assign new clipBegin time from SeekBar position */
 						double maxClipBegin = mBox.getClipDuration()
 								- mBox.getDuration();
-						mBox.setClipBegin(Composer.snapTo(progress * 0.01
+						mBox.setClipBegin(Composer.snapTo(progress
+								* (1.0 / mClipOffsetBar.getMax())
 								* maxClipBegin));
 						
 						/* Update UI labels */
 						mClipBeginLabel.setText("Clip Begin: "
 								+ mBox.getClipBegin());
-						mClipEndLabel.setText("Clip End: " + mBox.getClipEnd());
+						mClipEndLabel.setText("Clip End: "
+								+ mBox.getClipEnd());
 					}
 
 					@Override
@@ -99,11 +98,11 @@ public class AudioProperties extends Activity {
 			public void onClick(View v) {
 				/* Delete the media from the data structure */
 				mTrackManager.removeBox(mBox);
+				mBox = null;
 
 				/* Return the data structure and deletion status */
-				Intent i = new Intent();
-				i.putExtra("track_manager", mTrackManager);
-				setResult(RESULT_OK, i);
+				setResult(RESULT_OK);
+				save();
 				finish();
 			}
 
@@ -114,27 +113,29 @@ public class AudioProperties extends Activity {
 	protected void onActivityResult (int requestCode,
 			int resultCode, Intent data) {
 		if (resultCode == RESULT_OK) {
-			// TODO set mBox data based on result
-			mBox.setSource("");
-			mSetSourceButton.setText(mBox.getId());
-			mSetSourceButton.setEnabled(false);
+			/* Media was successfully chosen */
+			mBox.setName(data.getStringExtra("name"));
+			mBox.setId(data.getStringExtra("id"));
+			mBox.setClipDuration(data.getDoubleExtra("length", 1.0));
+			mBox.setSource(data.getStringExtra("source"));
 		}
 	}
-
+	
 	@Override
 	public void onBackPressed() {
 		/* If all required fields are filled in */
 		if (mBox.getSource() != null) {
-			/* Return the data structure and OK status */
-			Intent i = new Intent();
-			i.putExtra("track_manager", mTrackManager);
-			setResult(RESULT_OK, i);
-			finish();
+			/* Return OK status */
+			setResult(RESULT_OK);
 		} else {
 			/* Return canceled status */
+			mTrackManager.removeBox(mBox);
+			mBox = null;
 			setResult(RESULT_CANCELED);
-			finish();
 		}
+		
+		save();
+		finish();
 	}
 
 	@Override
@@ -142,37 +143,46 @@ public class AudioProperties extends Activity {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.audio_properties);
 		loadWidgetsFromView();
-		
-		/* If we are being reconstructed from a previous state */
-		if (savedInstanceState != null) {
-			mTrackManager = savedInstanceState.getParcelable("track_manager");
-			mBoxId = savedInstanceState.getString("box_id");
-			mBox = (AudioBox) mTrackManager.getBox(mBoxId);
-		} else {
-			mTrackManager = getIntent().getParcelableExtra("track_manager");
-			/* If we are editing existing media */
-			if (getIntent().hasExtra("box_id")) {
-				mBoxId = getIntent().getStringExtra("box_id");
-				mBox = (AudioBox) mTrackManager.getBox(mBoxId);
-			} else {
-				/* Media must be created */
-				mBox = new AudioBox(null, 0.0, 1.0, 1.0);
-				mBoxId = mBox.getId();
-				mTrackManager.addBox(mBox, mBox.getBegin());
-			}
-		}
-		
-		/* Disallow editing of the media's source if it's already set */
-		if (mBox.getSource() != null) {
-			mSetSourceButton.setEnabled(false);
-			mSetSourceButton.setText(mBox.getId());
-		}
 	}
 
 	@Override
 	protected void onSaveInstanceState(Bundle outState) {
-		outState.putParcelable("track_manager", mTrackManager);
-		outState.putString("box_id", mBoxId);
+		save();
+	}
+	
+	@Override
+	protected void onStart() {
+		super.onStart();
+
+		/* Load from Application */
+		mTrackManager = ((SMILCloud) getApplication()).getTrackManager();
+		mBox = (AudioBox) ((SMILCloud) getApplication()).getSelectedBox();
+		
+		if (mBox == null) {
+			/* Media must be created */
+			mBox = new AudioBox(null, 0.0, 1.0, 1.0);
+			mTrackManager.addBox(mBox, mBox.getBegin());
+		}
+		
+		/* Initialize the SeekBar */
+		double range = mBox.getClipDuration() - mBox.getDuration();
+		double val = mBox.getClipBegin() / range;
+		mClipOffsetBar.setProgress((int) (val * mClipOffsetBar.getMax()));
+		
+		/* Disallow editing of the media's source if it's already set */
+		if (mBox.getSource() != null) {
+			mSetSourceButton.setEnabled(false);
+			mSetSourceButton.setText(mBox.getName());
+		}
+	}
+	
+	/**
+	 * Saves the TrackManager and Box to the Application.
+	 */
+	private void save() {
+		/* Save to Application */
+		((SMILCloud) getApplication()).setTrackManager(mTrackManager);
+		((SMILCloud) getApplication()).setSelectedBox(mBox);
 	}
 
 }
