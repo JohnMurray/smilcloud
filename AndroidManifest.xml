@@ -6,7 +6,7 @@
     <application android:name="edu.nku.cs.csc440.team2.SMILCloud"
     			 android:icon="@drawable/cloud_application_icon" 
     			 android:label="@string/app_name">
-        <activity android:name="edu.nku.cs.csc440.team2.player.SMILPlayer"
+        <activity android:name="edu.nku.cs.csc440.team2.inbox.Inbox"
                   android:label="@string/app_name"
                   android:theme="@android:style/Theme.NoTitleBar.Fullscreen"
                   android:screenOrientation="landscape">
