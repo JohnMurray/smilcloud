@@ -21,6 +21,7 @@ import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.PopupWindow.OnDismissListener;
 import android.widget.Toast;
+import edu.nku.cs.csc440.team2.User;
 import edu.nku.cs.csc440.team2.mediaCloud.Media;
 import edu.nku.cs.csc440.team2.mediaCloud.MessageLite;
 import edu.nku.cs.csc440.team2.mediaCloud.Pair;
@@ -56,6 +57,7 @@ public class Inbox extends Activity
     	startService(new Intent(Inbox.this,SmilService.class));
     	
     	MediaProvider mdp = new MediaProvider();
+    	UserProvider up = new UserProvider();
     	//Media[] mediaList = mdp.getAllMedia(1);
     	
     	//Bitmap bm = mdp.getImage("http://www.google.com/images/logos/ps_logo2.png");
@@ -63,6 +65,9 @@ public class Inbox extends Activity
     	String txt = mdp.getText("http://turbobotz.net/test.txt");
     	
    	
+    	User u = up.addUser("porsche", "password", "Porsche", "Prapatanant");
+    	
+    	
     	
     	///////// Get All Users
     	//UserProvider up = new UserProvider();

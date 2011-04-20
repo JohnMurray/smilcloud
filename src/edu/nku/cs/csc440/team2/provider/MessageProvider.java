@@ -1,8 +1,13 @@
 package edu.nku.cs.csc440.team2.provider;
 
 import edu.nku.cs.csc440.team2.message.Message;
+
+import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
+import java.io.FileReader;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import edu.nku.cs.csc440.team2.mediaCloud.MessageLite;
@@ -15,6 +20,8 @@ import com.thoughtworks.xstream.XStream;
 
 
 public class MessageProvider {
+	
+	private String tempFolder = Environment.getExternalStorageDirectory() + "/smiltemp";
 
 	public MessageProvider() { }
 
@@ -95,7 +102,7 @@ public class MessageProvider {
 	
 	public void saveMessage(int userId, String messageTitle, Message msg) {
 		
-		String xml = "";//msg.toXml();
+		String xml = getSmil(msg);
 
 		String url = "http://nkucloud.dyndns.org:8080/mediacloud/storeMessage.jsp";
 		
@@ -126,12 +133,10 @@ public class MessageProvider {
 	 */
 	public void sendMessage(int senderId, int recipientId, String messageTitle ,Message msg) {
 
-		String xml = "";//msg.toXml();
+		String xml = getSmil(msg);
 
 		String url = "http://nkucloud.dyndns.org:8080/mediacloud/sendMessage.jsp";
 		
-		
-
 		List<NameValuePair> data = new ArrayList<NameValuePair>();
 		
 		data.add(new BasicNameValuePair("userId", senderId + ""));
@@ -150,6 +155,38 @@ public class MessageProvider {
 
 		//return "";
 
+	}
+	
+	private String getSmil(Message msg){
+		
+		String xml = "";
+		// Read SMIL
+		try {
+			File smilFile = msg.toFile(tempFolder + "/temp.smil");
+			
+			// From cache
+			StringBuilder sb = new StringBuilder();
+
+		    BufferedReader br = new BufferedReader(new FileReader(smilFile));
+		    String line;
+
+		    while ((line = br.readLine()) != null) {
+		        sb.append(line);
+		        sb.append('\n');
+		    }
+		    
+		    xml = sb.toString();
+		    
+			
+		} catch (FileNotFoundException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
+		return xml;
 	}
 
 }
