@@ -1,16 +1,16 @@
 package net.londatiga.android;
 
-import edu.nku.cs.csc460.team2.R;
+import android.content.Context;
+import android.database.Cursor;
+import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.LayoutInflater;
-
-import android.content.Context;
-
 import android.widget.BaseAdapter;
 import android.widget.TextView;
+import edu.nku.cs.csc460.team2.R;
 
 public class NewQAAdapter extends BaseAdapter {
+	private Cursor cursor = null;
 	private LayoutInflater mInflater;
 	private String[] data;
 	
@@ -22,9 +22,18 @@ public class NewQAAdapter extends BaseAdapter {
 		this.data = data;
 	}
 	
+	public void setData(Cursor cursor)
+	{
+		this.cursor = cursor;
+	}
+	
 	@Override
 	public int getCount() {
-		return data.length;
+		if( this.cursor == null )
+		{
+			return this.data.length;
+		}
+		return this.cursor.getCount();
 	}
 
 	@Override
