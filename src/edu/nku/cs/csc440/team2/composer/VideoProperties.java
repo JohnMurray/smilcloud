@@ -181,7 +181,7 @@ public class VideoProperties extends Activity {
 		
 		if (mBox == null) {
 			/* Media must be created */
-			mBox = new VideoBox(null, 0.0, 1.0, 15.0, null);
+			mBox = new VideoBox(null, 0.0, 1.0, 1.0, null);
 			mTrackManager.addBox(mBox, mBox.getBegin());
 		}
 		
