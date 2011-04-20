@@ -17,7 +17,31 @@ public class UserProvider {
 
 	public UserProvider(){}
 	
-	
+	public int login(String userName, String password){
+		
+		int userId = -1;
+		
+		List<NameValuePair> data = new ArrayList<NameValuePair>();
+		
+		
+		data.add(new BasicNameValuePair("userName", userName));
+		data.add(new BasicNameValuePair("password", password));
+		
+		String url = "http://nkucloud.dyndns.org:8080/mediacloud/authUser.jsp";
+
+		try {
+
+			String result = RequestHelper.makeHttpPostRequest(url, data);
+			
+			userId = Integer.parseInt(result.trim());
+			
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
+		return userId;
+	}
 	
 	public ArrayList<Pair<String, String>> getContactList(){
 		
@@ -51,13 +75,12 @@ public class UserProvider {
 		data.add(new BasicNameValuePair("lastName", firstName));
 		
 		String url = "http://nkucloud.dyndns.org:8080/mediacloud/addUser.jsp";
-		//url = "http://localhost:55052/User/Test/1";
 
 		try {
 
 			String result = RequestHelper.makeHttpPostRequest(url, data);
 			
-			userId = Integer.parseInt(result);
+			userId = Integer.parseInt(result.trim());
 			
 			
 		} catch (ClientProtocolException e) {

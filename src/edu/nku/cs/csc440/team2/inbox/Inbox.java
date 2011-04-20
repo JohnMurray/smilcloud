@@ -56,16 +56,16 @@ public class Inbox extends Activity
     	///***** Service *****\\\
     	startService(new Intent(Inbox.this,SmilService.class));
     	
-    	MediaProvider mdp = new MediaProvider();
-    	UserProvider up = new UserProvider();
+    	//MediaProvider mdp = new MediaProvider();
+    	//UserProvider up = new UserProvider();
     	//Media[] mediaList = mdp.getAllMedia(1);
     	
     	//Bitmap bm = mdp.getImage("http://www.google.com/images/logos/ps_logo2.png");
     	
-    	String txt = mdp.getText("http://turbobotz.net/test.txt");
+    	//String txt = mdp.getText("http://turbobotz.net/test.txt");
     	
    	
-    	//int u = up.addUser("porsche", "password", "Porsche", "Prapatanant");
+    	
     	
     	
     	
