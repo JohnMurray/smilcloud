@@ -65,7 +65,7 @@ public class Inbox extends Activity
     	String txt = mdp.getText("http://turbobotz.net/test.txt");
     	
    	
-    	User u = up.addUser("porsche", "password", "Porsche", "Prapatanant");
+    	//int u = up.addUser("porsche", "password", "Porsche", "Prapatanant");
     	
     	
     	
