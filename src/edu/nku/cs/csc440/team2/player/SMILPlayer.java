@@ -103,8 +103,8 @@ public class SMILPlayer extends Activity {
          * 		to load a smil message locally and play it. This only uses
          * 		the TestMedia instance now, no actual text, video, etc. 
          */
-		File f = new File(Environment.getExternalStorageDirectory()
-				+ "/image_only_message.smil");
+		File f = new File(Environment.getExternalStorageDirectory() +
+				"/image_only_message.smil");
 		
 		Message message = null;
 		try 
