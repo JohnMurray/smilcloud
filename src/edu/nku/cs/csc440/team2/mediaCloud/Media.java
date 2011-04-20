@@ -11,11 +11,13 @@ public class Media {
 	private String type;
 	private String mediaId;
 	private String duration;
-	
+
+	public Media() {}
+
 	public Media(String mediaUrl, String thumbUrl, String name) {
 		this.mediaUrl = mediaUrl;
 		this.thumbUrl = thumbUrl;
-		this.name = name;		
+		this.name = name;	
 	}
 	
 	public void store(Connection conn, int userId) {

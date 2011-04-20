@@ -93,10 +93,33 @@ public class MessageProvider {
 		}
 	}
 	
+	public void saveMessage(int userId, String messageTitle, Message msg) {
+		
+		String xml = "";//msg.toXml();
+
+		String url = "http://nkucloud.dyndns.org:8080/mediacloud/storeMessage.jsp";
+		
+		
+		List<NameValuePair> data = new ArrayList<NameValuePair>();
+		
+		
+		data.add(new BasicNameValuePair("userId", userId + ""));
+		data.add(new BasicNameValuePair("name", messageTitle));
+		data.add(new BasicNameValuePair("message", xml));
+
+		try {
+
+			// Make POST request
+			RequestHelper.makeHttpPostRequest(url, data);
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	}
 	
 
 	/**
-	 * Save message
+	 * Send message
 	 * 
 	 * @param Message
 	 * @return Message ID
