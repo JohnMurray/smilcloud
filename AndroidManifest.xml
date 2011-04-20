@@ -51,6 +51,14 @@
                   android:label="@string/app_name"
                   android:screenOrientation="landscape" >
         </activity>
+        <activity android:name="edu.nku.cs.csc440.team2.UIMenus.RegisterScreen"
+        		  android:label="@string/app_name"
+        		  android:screenOrientation="landscape">
+        </activity>
+        <activity android:name="edu.nku.cs.csc440.team2.UIMenus.WelcomeScreen"
+        		  android:label="@string/app_name"
+        		  android:screenOrientation="landscape">
+        </activity>
 		<service android:name="edu.nku.cs.csc440.team2.service.SmilService"></service>
     </application>
     

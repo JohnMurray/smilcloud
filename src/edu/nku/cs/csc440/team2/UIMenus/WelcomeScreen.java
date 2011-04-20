@@ -34,7 +34,8 @@ public class WelcomeScreen extends Activity {
 			@Override
 			public void onClick(View v) {
 				//launch intent
-				
+				startActivity(new Intent(
+						WelcomeScreen.this, RegisterScreen.class));
 			}
     		
     	});
