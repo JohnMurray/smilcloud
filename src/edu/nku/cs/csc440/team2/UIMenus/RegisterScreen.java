@@ -1,5 +1,7 @@
 package edu.nku.cs.csc440.team2.UIMenus;
 
+import edu.nku.cs.csc440.team2.User;
+import edu.nku.cs.csc440.team2.provider.UserProvider;
 import edu.nku.cs.csc460.team2.R;
 import android.app.Activity;
 import android.os.Bundle;
@@ -41,6 +43,8 @@ public class RegisterScreen extends Activity {
 				
 				EditText pd = (EditText)findViewById(R.id.register_first_name);
 				password = pd.getText().toString();
+				
+				User newUser = (new UserProvider()).addUser(userName, password, firstName, lastName);
 			}
     		
     	});
