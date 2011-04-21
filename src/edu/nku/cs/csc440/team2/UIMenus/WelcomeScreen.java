@@ -16,33 +16,27 @@ public class WelcomeScreen extends Activity {
     	super.onCreate(savedInstanceState);
     	setContentView(R.layout.welcome_screen);
     	
-    	/////// TEST
-    	//UserProvider up = new UserProvider();
-    	//int p = up.addUser("user2", "password", "f1", "l1");
-    	//int u = up.login("user2", "password");
-    	
     	Button login = (Button)findViewById(R.id.welcome_login);
     	Button register = (Button)findViewById(R.id.welcome_register);
     	
     	login.setOnClickListener(new OnClickListener() {
-
 			@Override
 			public void onClick(View arg0) {
 				//launch intent
-				
-			}
-    		
+				WelcomeScreen.this.startActivity(new Intent(
+						WelcomeScreen.this, AuthenticateScreen.class));
+				WelcomeScreen.this.finish();
+			}	
     	});
     	
     	register.setOnClickListener(new OnClickListener() {
-
 			@Override
 			public void onClick(View v) {
 				//launch intent
 				startActivity(new Intent(
 						WelcomeScreen.this, RegisterScreen.class));
+				WelcomeScreen.this.finish();
 			}
-    		
     	});
     }
 }

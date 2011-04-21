@@ -10,9 +10,9 @@
                   android:label="@string/app_name"
                   android:theme="@android:style/Theme.NoTitleBar.Fullscreen"
                   android:screenOrientation="landscape">
-            <intent-filter>
+        	<intent-filter>
+            	<category android:name="android.intent.category.LAUNCHER" />
             	<action android:name="android.intent.action.MAIN" />
-                <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
         <activity android:name="edu.nku.cs.csc440.team2.composer.Composer"
@@ -56,6 +56,18 @@
         		  android:screenOrientation="landscape">
         </activity>
         <activity android:name="edu.nku.cs.csc440.team2.UIMenus.WelcomeScreen"
+        		  android:label="@string/app_name"
+        		  android:screenOrientation="landscape">
+        </activity>
+        <activity android:name="edu.nku.cs.csc440.team2.UIMenus.MainMenu"
+        		  android:label="@string/app_name"
+        		  android:screenOrientation="landscape">
+        </activity>
+        <activity android:name="edu.nku.cs.csc440.team2.UIMenus.AuthenticateScreen"
+        		  android:label="@string/app_name"
+        		  android:screenOrientation="landscape">
+        </activity>
+        <activity android:name="edu.nku.cs.csc440.team2.inbox.Inbox"
         		  android:label="@string/app_name"
         		  android:screenOrientation="landscape">
         </activity>

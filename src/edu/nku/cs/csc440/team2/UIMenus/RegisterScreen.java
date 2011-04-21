@@ -1,6 +1,8 @@
 package edu.nku.cs.csc440.team2.UIMenus;
 
 import android.app.Activity;
+import android.content.Context;
+import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -46,15 +48,29 @@ public class RegisterScreen extends Activity {
 				password = pd.getText().toString();
 				
 				int newUser = (new UserProvider()).addUser(userName, password, firstName, lastName);
-				if( newUser != -1 )
+				if( newUser == -1 )
 				{
-					//TODO the user was not created.. do something about this
-					Toast.makeText(RegisterScreen.this, "Unable to register. Try again.", 
-							Toast.LENGTH_LONG);
+					//the user was not created.. do something about this
+					Context context = getApplicationContext();
+					CharSequence text = "Unable to register. Try again.";
+					Toast toast = Toast.makeText(context, text, Toast.LENGTH_LONG);
+					toast.show();
+				}
+				else if( newUser == -2 )
+				{
+					//the user was not created(non-unique).. do something about this
+					Context context = getApplicationContext();
+					CharSequence text = "User already exists, please log in.";
+					Toast toast = Toast.makeText(context, text, Toast.LENGTH_LONG);
+					toast.show();
 				}
 				else
 				{
 					((SMILCloud) getApplication()).setUserId(newUser);
+					//launch the "Main Menu" activity
+					Intent i = new Intent(RegisterScreen.this, MainMenu.class);
+					startActivity(i);
+					RegisterScreen.this.finish();
 				}
 			}
     		
