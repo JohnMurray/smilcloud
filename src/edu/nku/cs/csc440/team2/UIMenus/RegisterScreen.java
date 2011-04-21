@@ -44,7 +44,7 @@ public class RegisterScreen extends Activity {
 				EditText un = (EditText)findViewById(R.id.register_username);
 				userName = un.getText().toString();
 				
-				EditText pd = (EditText)findViewById(R.id.register_first_name);
+				EditText pd = (EditText)findViewById(R.id.register_password);
 				password = pd.getText().toString();
 				
 				int newUser = (new UserProvider()).addUser(userName, password, firstName, lastName);
