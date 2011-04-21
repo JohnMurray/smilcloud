@@ -10,7 +10,13 @@
 		<ImageView
 			android:id="@+id/video_browser_row_thumb"
 			android:layout_column="1"
-			android:paddingRight="10dip" />
+			android:paddingRight="10dip"
+			android:minWidth="200dip"
+			android:maxWidth="200dip"
+			android:minHeight="200dip"
+			android:maxHeight="200dip"
+			android:adjustViewBounds="true"
+			android:scaleType="fitCenter"/>
 		<TextView
 			android:id="@+id/video_browser_row_name"
 			android:layout_column="2"

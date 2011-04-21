@@ -40,7 +40,7 @@ public abstract class Box implements Comparable<Box> {
 	private Rect mResizeBounds;
 	
 	/** The region of the represented Media */
-	private ParcelableRegion mRegion;
+	private ComposerRegion mRegion;
 	
 	/** A unique human-readable id for this box */
 	private String mId;
@@ -177,7 +177,7 @@ public abstract class Box implements Comparable<Box> {
 		return mName;
 	}
 	
-	public ParcelableRegion getRegion() {
+	public ComposerRegion getRegion() {
 		return mRegion;
 	}
 
@@ -213,7 +213,7 @@ public abstract class Box implements Comparable<Box> {
 		mName = name;
 	}
 	
-	public void setRegion(ParcelableRegion region) {
+	public void setRegion(ComposerRegion region) {
 		mRegion = region;
 	}
 	

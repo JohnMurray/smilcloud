@@ -120,14 +120,24 @@ public class Track {
 		}
 
 		/* Check each box in this Track */
-		for (Box mb : mBoxes) {
+		for (Box b : mBoxes) {
 			/* If elt's begin overlaps with b */
-			if (mb.getBegin() <= begin && begin < mb.getEnd()) {
+			if (b.getBegin() <= begin && begin < b.getEnd()) {
 				fits = false;
 			}
 
 			/* If elt's end overlaps with b */
-			if (mb.getBegin() < end && end <= mb.getEnd()) {
+			if (b.getBegin() < end && end <= b.getEnd()) {
+				fits = false;
+			}
+			
+			/* If b's begin overlaps with elt */
+			if (begin <= b.getBegin() && b.getBegin() < end) {
+				fits = false;
+			}
+			
+			/* If b's end overlaps with elt */
+			if (begin < b.getEnd() && b.getEnd() <= end) {
 				fits = false;
 			}
 		}

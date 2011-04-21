@@ -60,7 +60,7 @@ public class VideoProperties extends Activity {
 			@Override
 			public void onClick(View v) {
 				Intent i = new Intent(getBaseContext(), VideoBrowser.class);
-				startActivityForResult(i, 0);
+				startActivityForResult(i, REQ_SOURCE);
 			}
 
 		});
@@ -106,7 +106,7 @@ public class VideoProperties extends Activity {
 			@Override
 			public void onClick(View v) {
 				Intent i = new Intent(getBaseContext(), RegionEditor.class);
-				startActivityForResult(i, 0);
+				startActivityForResult(i, REQ_REGION);
 			}
 
 		});
@@ -131,14 +131,22 @@ public class VideoProperties extends Activity {
 
 	@Override
 	protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-		if (requestCode == REQ_SOURCE) {
-			/* Media was successfully chosen */
-			mBox.setName(data.getStringExtra("name"));
-			mBox.setId(data.getStringExtra("id"));
-			mBox.setClipDuration(data.getDoubleExtra("length", 1.0));
-			mBox.setSource(data.getStringExtra("source"));
-		} else if (requestCode == REQ_REGION) {
-			// do nothing
+		if (resultCode == RESULT_OK) {
+			if (requestCode == REQ_SOURCE) {
+				/* Media was successfully chosen */
+				mBox.setName(data.getStringExtra("name"));
+				mBox.setId(data.getStringExtra("id"));
+				mBox.setClipDuration(data.getDoubleExtra("length", 1.0));
+				mBox.setSource(data.getStringExtra("source"));
+			} else if (requestCode == REQ_REGION) {
+				// do nothing
+			}
+		}
+		
+		/* Disallow editing of the media's source if it's already set */
+		if (mBox.getSource() != null) {
+			mSetSourceButton.setEnabled(false);
+			mSetSourceButton.setText(mBox.getName());
 		}
 	}
 

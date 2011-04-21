@@ -2,7 +2,16 @@ package edu.nku.cs.csc440.team2.composer;
 
 import java.util.LinkedList;
 
+import edu.nku.cs.csc440.team2.message.Audio;
+import edu.nku.cs.csc440.team2.message.Body;
+import edu.nku.cs.csc440.team2.message.Image;
+import edu.nku.cs.csc440.team2.message.Media;
 import edu.nku.cs.csc440.team2.message.Message;
+import edu.nku.cs.csc440.team2.message.Parallel;
+import edu.nku.cs.csc440.team2.message.Sequence;
+import edu.nku.cs.csc440.team2.message.Text;
+import edu.nku.cs.csc440.team2.message.Video;
+import edu.nku.cs.csc440.team2.provider.MediaProvider;
 import edu.nku.cs.csc460.team2.R;
 
 import android.content.Context;
@@ -11,7 +20,7 @@ import android.graphics.Rect;
 
 /**
  * @author William Knauer <knauerw1@nku.edu>
- * @version 2011.0417
+ * @version 2011.0421
  */
 public class TrackManager {
 	/**
@@ -538,8 +547,174 @@ public class TrackManager {
 	}
 	
 	public Message toMessage() {
-		// TODO implement me!
-		return null;
+		Message m = new Message("someId"); // TODO replace with something from the Application
+		
+		Parallel p = new Parallel();
+		for (Box b : getAllBoxes()) {
+			if (b instanceof TextBox) {
+				// TODO upload ((TextBox) b).getName(); to cloud
+				// TODO modify the MediaProvider to make it happen?
+			}
+			p.addElement(b.toMedia());
+		}
+		
+		m.addElement(p);
+		return m;
+	}
+	
+	public static class Factory {
+		
+		public static TrackManager create(Message m) {
+			TrackManager t = new TrackManager();
+			MediaProvider p = new MediaProvider();
+			edu.nku.cs.csc440.team2.mediaCloud.Media[] allMedia 
+					= p.getAllMedia(1); // TODO replace user id
+			
+			/* Set each text-type Media's name to its associated text */
+			for (int i = 0; i < allMedia.length; i ++) {
+				if (allMedia[i].getType().equalsIgnoreCase("text")) {
+					allMedia[i].setName(p.getText(allMedia[i].getMediaUrl()));
+				}
+			}
+			
+			/* Add everything to the TrackManager */
+			for (Body b : m.getBody()) {
+				addElement(b, t, allMedia);
+			}
+			
+			return t;
+		}
+		
+		private static void addElement(Body source, TrackManager t,
+				edu.nku.cs.csc440.team2.mediaCloud.Media[] allMedia) {
+			if (source instanceof Sequence) {
+				for (Body b : ((Sequence) source).getBody()) {
+					addElement(b, t, allMedia);
+				}
+			} else if (source instanceof Parallel) {
+				for (Body b : ((Parallel) source).getBody()) {
+					addElement(b, t, allMedia);
+				}
+			} else if (source instanceof Media) {
+				if (source instanceof Audio) {
+					addAudio((Audio) source, t, allMedia);
+				} else if (source instanceof Image) {
+					addImage((Image) source, t, allMedia);
+				} else if (source instanceof Text) {
+					addText((Text) source, t, allMedia);
+				} else if (source instanceof Video) {
+					addVideo((Video) source, t, allMedia);
+				}
+			}
+		}
+		
+		private static void addAudio(Audio source, TrackManager t,
+				edu.nku.cs.csc440.team2.mediaCloud.Media[] allMedia) {
+			
+			/* Create the AudioBox */
+			AudioBox box = new AudioBox(
+					source.getSrc(),
+					source.getBegin(),
+					source.getEnd() - source.getBegin(),
+					-1.0);
+			
+			/* Find our Media object */
+			edu.nku.cs.csc440.team2.mediaCloud.Media m;
+			m = find(allMedia, source.getSrc());
+			
+			/* Finish the AudioBox and add it to the TrackManager */
+			if (m != null) {
+				box.setClipDuration(getClipDuration(m.getDuration()));
+				box.setName(m.getName());
+				t.addBox(box, box.getBegin());
+			}
+		}
+		
+		private static void addImage(Image source, TrackManager t,
+				edu.nku.cs.csc440.team2.mediaCloud.Media[] allMedia) {
+			
+			/* Create the ImageBox */
+			ImageBox box = new ImageBox(
+					source.getSrc(),
+					source.getBegin(),
+					source.getEnd() - source.getBegin(),
+					new ComposerRegion(source.getRegion()));
+			
+			/* Find our Media object */
+			edu.nku.cs.csc440.team2.mediaCloud.Media m;
+			m = find(allMedia, source.getSrc());
+			
+			/* Finish the ImageBox and add it to the TrackManager */
+			if (m != null) {
+				box.setName(m.getName());
+				t.addBox(box, box.getBegin());
+			}
+		}
+		
+		private static void addText(Text source, TrackManager t,
+				edu.nku.cs.csc440.team2.mediaCloud.Media[] allMedia) {
+			
+			/* Create the TextBox */
+			TextBox box = new TextBox(
+					null,
+					source.getBegin(),
+					source.getEnd() - source.getBegin(),
+					new ComposerRegion(source.getRegion()));
+			
+			/* Find our Media object */
+			edu.nku.cs.csc440.team2.mediaCloud.Media m;
+			m = find(allMedia, source.getSrc());
+			
+			/* Finish the TextBox and add it to the TrackManager */
+			if (m != null) {
+				box.setName(m.getName()); // TODO wat
+				t.addBox(box, box.getBegin());
+			}
+		}
+		
+		private static void addVideo(Video source, TrackManager t,
+				edu.nku.cs.csc440.team2.mediaCloud.Media[] allMedia) {
+			
+			/* Create the VideoBox */
+			VideoBox box = new VideoBox(
+					source.getSrc(),
+					source.getBegin(),
+					source.getEnd() - source.getBegin(),
+					-1.0,
+					new ComposerRegion(source.getRegion()));
+			
+			/* Find our Media object */
+			edu.nku.cs.csc440.team2.mediaCloud.Media m;
+			m = find(allMedia, source.getSrc());
+			
+			/* Finish the VideoBox and add it to the TrackManager */
+			if (m != null) {
+				box.setClipDuration(getClipDuration(m.getDuration()));
+				box.setName(m.getName());
+				t.addBox(box, box.getBegin());
+			}
+		}
+		
+		private static double getClipDuration(String duration) {
+			/* Calculate duration in seconds */
+			String[] dur = duration.split(":");
+			double seconds = Double.parseDouble(dur[2]);
+			seconds += Double.parseDouble(dur[1]) * 60.0;
+			seconds += Double.parseDouble(dur[0]) * 60.0 * 60.0;
+			return seconds;
+		}
+		
+		private static edu.nku.cs.csc440.team2.mediaCloud.Media find(
+				edu.nku.cs.csc440.team2.mediaCloud.Media[] media,
+				String source) {
+			for (int i = 0; i < media.length; i ++) {
+				if (media[i].getMediaUrl().equals(source)) {
+					return media[i];
+				}
+			}
+			return null;
+		}
+		
 	}
 	
 }

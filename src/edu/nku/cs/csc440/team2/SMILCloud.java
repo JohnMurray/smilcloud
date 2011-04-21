@@ -57,7 +57,7 @@ public class SMILCloud extends Application
 		this.userID = userID;
 	}
 	
-	public synchronized int getUserId(int userID)
+	public synchronized int getUserId()
 	{
 		return this.userID;
 	}

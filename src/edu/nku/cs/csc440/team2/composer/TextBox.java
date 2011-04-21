@@ -24,7 +24,7 @@ public class TextBox extends Box {
 	 * @param region The region of the Media.
 	 */
 	public TextBox(String source, double begin, double duration,
-			ParcelableRegion region) {
+			ComposerRegion region) {
 		super(source, begin, duration);
 		setRegion(region);
 		setId("Text " + sCount);

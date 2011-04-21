@@ -118,6 +118,12 @@ public class AudioProperties extends Activity {
 			mBox.setId(data.getStringExtra("id"));
 			mBox.setClipDuration(data.getDoubleExtra("length", 1.0));
 			mBox.setSource(data.getStringExtra("source"));
+			
+			/* Disallow editing of the media's source if it's already set */
+			if (mBox.getSource() != null) {
+				mSetSourceButton.setEnabled(false);
+				mSetSourceButton.setText(mBox.getName());
+			}
 		}
 	}
 	

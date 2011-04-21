@@ -1,6 +1,7 @@
 package edu.nku.cs.csc440.team2.composer;
 
 import edu.nku.cs.csc440.team2.SMILCloud;
+import edu.nku.cs.csc440.team2.player.SMILPlayer;
 import edu.nku.cs.csc460.team2.R;
 import android.app.Activity;
 import android.content.Intent;
@@ -285,6 +286,7 @@ public class Composer extends Activity {
 	}
 
 	private ComposerView mComposerView;
+	private String mId;
 	
 	public void launchAudioBoxProperties() {
 		Intent i = new Intent(this, AudioProperties.class);
@@ -306,7 +308,12 @@ public class Composer extends Activity {
 		startActivityForResult(i, REQ_PROPERTIES);
 	}
 	
-	public void launchPlayer() {}
+	public void launchPlayer() {
+		SMILCloud app = (SMILCloud) getApplication();
+		app.queueDocumentToPlay(mId); // TODO finish
+		Intent i = new Intent(this, SMILPlayer.class);
+		startActivity(i);
+	}
 
 	@Override
 	public void onActivityResult(int requestCode, int resultCode, Intent data) {
@@ -357,11 +364,25 @@ public class Composer extends Activity {
 		case R.id.preview:
 			launchPlayer();
 			return true;
+		case R.id.save:
+			saveMessage();
+			return true;
 		case R.id.send:
+			sendMessage();
 			return true;
 		default:
 			return super.onOptionsItemSelected(item);
 		}
+	}
+
+	private void sendMessage() {
+		// TODO Auto-generated method stub
+		
+	}
+
+	private void saveMessage() {
+		// TODO Auto-generated method stub
+		
 	}
 
 	@Override

@@ -3,6 +3,7 @@ package edu.nku.cs.csc440.team2.composer;
 import java.util.LinkedList;
 import java.util.List;
 
+import edu.nku.cs.csc440.team2.SMILCloud;
 import edu.nku.cs.csc440.team2.mediaCloud.Media;
 import edu.nku.cs.csc440.team2.provider.MediaProvider;
 import edu.nku.cs.csc460.team2.R;
@@ -73,11 +74,11 @@ public class AudioBrowser extends ListActivity {
 				TextView length = (TextView) view
 						.findViewById(R.id.audio_browser_row_time);
 				if (length != null) {
-					length.setText("" + m.getDuration() + 's');
+					length.setText(m.getDuration());
 				}
 				ImageView thumb = (ImageView) view.findViewById(R.id.audio_browser_row_thumb);
 				if (thumb != null) {
-					thumb.setImageBitmap(mProvider.getImage(m.getThumbUrl()));
+					//thumb.setImageBitmap(mProvider.getImage(m.getThumbUrl()));
 				}
 			}
 			return view;
@@ -135,7 +136,8 @@ public class AudioBrowser extends ListActivity {
 	 * Retrieves the Media from the cloud and stores it in mMedia.
 	 */
 	public void getMedia() {
-		Media[] media = mProvider.getAllMedia(1); // TODO replace with user id
+		Media[] media = mProvider.getAllMedia(
+				((SMILCloud) getApplication()).getUserId());
 		
 		/* Keep program from crashing if cloud is not accessible */
 		if (media != null) {
@@ -184,11 +186,17 @@ public class AudioBrowser extends ListActivity {
 	protected void onListItemClick(ListView l, View v, int position, long id) {
 		Media m = (Media) l.getItemAtPosition(position);
 
+		/* Calculate duration in seconds */
+		String[] dur = m.getDuration().split(":");
+		double seconds = Double.parseDouble(dur[2]);
+		seconds += Double.parseDouble(dur[1]) * 60.0;
+		seconds += Double.parseDouble(dur[0]) * 60.0 * 60.0;
+		
 		/* Dump data into intent */
 		Intent i = new Intent();
 		i.putExtra("name", m.getName());
 		i.putExtra("id", m.getMediaId());
-		i.putExtra("length", m.getDuration());
+		i.putExtra("length", seconds);
 		i.putExtra("source", m.getMediaUrl());
 		i.putExtra("thumb", m.getThumbUrl());
 

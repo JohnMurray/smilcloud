@@ -38,6 +38,8 @@
     <string name="add_image_menu">Add Image</string>
     <string name="add_text_menu">Add Text</string>
     <string name="add_video_menu">Add Video</string>
+    <string name="save_send_menu">Save/Send</string>
+    <string name="save_menu">Save</string>
     <string name="send_menu">Send</string>
     <string name="preview_menu">Preview</string>
     

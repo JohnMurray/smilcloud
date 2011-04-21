@@ -172,6 +172,9 @@ public class RegionEditor extends Activity {
 			p.setColor(getResources().getColor(R.color.region_editor_bg));
 			canvas.drawPaint(p);
 			
+			/* Draw target screen size */
+			// TODO set target screen size // p.setColor(getResources().getColor(R.color.));
+			
 			/* Draw all overlapping regions */
 			for (int i = 0; i < mBoxesWithRegions.size(); i++) {
 				Box b = mBoxesWithRegions.get(i);
@@ -190,7 +193,7 @@ public class RegionEditor extends Activity {
 
 					} else {
 						/* Draw overlapping region background */
-						ParcelableRegion r = b.getRegion();
+						ComposerRegion r = b.getRegion();
 						p.setColor(getResources().getColor(R.color.region_bgbox_bg));
 						canvas.drawRect(r.getBounds(), p);
 						
@@ -381,7 +384,7 @@ public class RegionEditor extends Activity {
 		
 		/* Create a region for mBox if we must */
 		if (mBox.getRegion() == null) {
-			mBox.setRegion(new ParcelableRegion());
+			mBox.setRegion(new ComposerRegion());
 		}
 		
 		mView = new RegionEditorView(this);

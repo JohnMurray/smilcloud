@@ -24,7 +24,7 @@ public class ImageBox extends Box {
 	 * @param region The region of the Media.
 	 */
 	public ImageBox(String source, double begin, double duration,
-			ParcelableRegion region) {
+			ComposerRegion region) {
 		super(source, begin, duration);
 		setRegion(region);
 		setId("Image " + sCount);

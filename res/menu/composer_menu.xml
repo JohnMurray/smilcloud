@@ -12,9 +12,16 @@
   <item android:id="@+id/add_text"
         android:icon="@drawable/text"
         android:title="@string/add_text_menu" />
-  <item android:id="@+id/send"
+  <item android:id="@+id/save_send"
         android:icon="@drawable/send"
-        android:title="@string/send_menu" />
+        android:title="@string/save_send_menu" >
+        <menu>
+        	<item android:id="@+id/save"
+                  android:title="@string/save_menu" />
+            <item android:id="@+id/send"
+                  android:title="@string/send_menu" />
+        </menu>
+  </item>
   <item android:id="@+id/preview"
         android:icon="@drawable/preview"
         android:title="@string/preview_menu" />

@@ -30,7 +30,7 @@ public class VideoBox extends AudioVideoBox {
 	 *            The region of the Media.
 	 */
 	public VideoBox(String source, double begin, double duration,
-			double clipDuration, ParcelableRegion region) {
+			double clipDuration, ComposerRegion region) {
 		super(source, begin, duration, clipDuration);
 		setRegion(region);
 		setId("Video " + sCount);

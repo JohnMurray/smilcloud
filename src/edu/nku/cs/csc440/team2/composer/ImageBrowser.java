@@ -3,6 +3,7 @@ package edu.nku.cs.csc440.team2.composer;
 import java.util.LinkedList;
 import java.util.List;
 
+import edu.nku.cs.csc440.team2.SMILCloud;
 import edu.nku.cs.csc440.team2.mediaCloud.Media;
 import edu.nku.cs.csc440.team2.provider.MediaProvider;
 import edu.nku.cs.csc460.team2.R;
@@ -73,7 +74,7 @@ public class ImageBrowser extends ListActivity {
 				ImageView thumb = (ImageView) view
 						.findViewById(R.id.image_browser_row_thumb);
 				if (thumb != null) {
-					thumb.setImageBitmap(mProvider.getImage(m.getThumbUrl()));
+					thumb.setImageBitmap(mProvider.getImage(m.getMediaUrl()));
 				}
 			}
 			return view;
@@ -131,7 +132,8 @@ public class ImageBrowser extends ListActivity {
 	 * Retrieves the Media from the cloud and stores it in mMedia.
 	 */
 	public void getMedia() {
-		Media[] media = mProvider.getAllMedia(1);
+		Media[] media = mProvider.getAllMedia(
+				((SMILCloud) getApplication()).getUserId());
 		
 		/* Keep program from crashing if cloud is not accessible */
 		if (media != null) {

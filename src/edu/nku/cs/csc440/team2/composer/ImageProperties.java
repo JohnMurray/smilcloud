@@ -48,7 +48,7 @@ public class ImageProperties extends Activity {
 			@Override
 			public void onClick(View v) {
 				Intent i = new Intent(getBaseContext(), ImageBrowser.class);
-				startActivityForResult(i, 0);
+				startActivityForResult(i, REQ_SOURCE);
 			}
 
 		});
@@ -59,7 +59,7 @@ public class ImageProperties extends Activity {
 			@Override
 			public void onClick(View v) {
 				Intent i = new Intent(getBaseContext(), RegionEditor.class);
-				startActivityForResult(i, 0);
+				startActivityForResult(i, REQ_REGION);
 			}
 
 		});
@@ -85,15 +85,22 @@ public class ImageProperties extends Activity {
 	@Override
 	protected void onActivityResult(int requestCode,
 			int resultCode, Intent data) {
-		if (requestCode == REQ_SOURCE) {
-			/* Set Box info from intent */
-			mBox.setName(data.getStringExtra("name"));
-			mBox.setId(data.getStringExtra("id"));
-			mBox.setSource(data.getStringExtra("source"));
-			// TODO mBox.setThumbUrl(data.getStringExtra("thumb"));
-
-		} else if (requestCode == REQ_REGION) {
-			// nothing to do
+		if (resultCode == RESULT_OK) {
+			if (requestCode == REQ_SOURCE) {
+				/* Set Box info from intent */
+				mBox.setName(data.getStringExtra("name"));
+				mBox.setId(data.getStringExtra("id"));
+				mBox.setSource(data.getStringExtra("source"));
+	
+			} else if (requestCode == REQ_REGION) {
+				// nothing to do
+			}
+			
+			/* Disallow editing of the media's source if it's already set */
+			if (mBox.getSource() != null) {
+				mSetSourceButton.setEnabled(false);
+				mSetSourceButton.setText(mBox.getName());
+			}
 		}
 	}
 
