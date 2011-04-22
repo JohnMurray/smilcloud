@@ -17,6 +17,7 @@ public class SMILCloud extends Application {
 	private String queuedDocumentToPlayID = null;
 	private String queueDocumentToEditID = null;
 	private int userID = NO_USER;
+	private String shareMessageID = null;
 
 	public void setTrackManager(TrackManager t) {
 		this.trackManager = t;
@@ -68,5 +69,15 @@ public class SMILCloud extends Application {
 	
 	public synchronized int getUserId() {
 		return this.userID;
+	}
+	
+	public synchronized String getSharedMessageId()
+	{
+		return this.shareMessageID;
+	}
+	
+	public synchronized void setSharedMessageId(String s)
+	{
+		this.shareMessageID = s;
 	}
 }

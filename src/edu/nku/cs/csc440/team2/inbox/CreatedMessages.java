@@ -7,6 +7,7 @@ import net.londatiga.android.ActionItem;
 import net.londatiga.android.NewQAAdapter;
 import net.londatiga.android.QuickAction;
 import android.app.Activity;
+import android.content.Intent;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -21,6 +22,7 @@ import android.widget.PopupWindow.OnDismissListener;
 import android.widget.Toast;
 import edu.nku.cs.csc440.team2.SMILCloud;
 import edu.nku.cs.csc440.team2.mediaCloud.MessageLite;
+import edu.nku.cs.csc440.team2.player.SMILPlayer;
 import edu.nku.cs.csc440.team2.provider.MessageProvider;
 import edu.nku.cs.csc460.team2.R;
 
@@ -102,6 +104,16 @@ public class CreatedMessages extends Activity
 				
 				mMoreImage.setImageResource(R.drawable.ic_list_more_selected);
 				
+				String tempId = null;
+				for( MessageLite ml : CreatedMessages.this.messages )
+				{
+					if( ml.getName() == text )
+					{
+						tempId = ml.getUniqueId();
+					}
+				}
+				final String messageId = tempId;
+				
 				/*
 				 * Define the click listener for sharing
 				 */
@@ -120,9 +132,11 @@ public class CreatedMessages extends Activity
 				plyAction.setOnClickListener(new OnClickListener() {
 					@Override
 					public void onClick(View v) {
-						Toast.makeText(CreatedMessages.this, "Play " + text, Toast.LENGTH_SHORT).show();
-				    	
 						mQuickAction.dismiss();
+				    	
+						((SMILCloud)CreatedMessages.this.getApplication()).queueDocumentToPlay(messageId);
+						Intent i = new Intent(CreatedMessages.this, SMILPlayer.class);
+						CreatedMessages.this.startActivity(i);
 					}
 				});
 				

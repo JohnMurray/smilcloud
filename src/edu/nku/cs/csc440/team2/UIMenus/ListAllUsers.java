@@ -39,7 +39,17 @@ public class ListAllUsers extends ListActivity {
 			@Override
 			public void onItemClick(AdapterView<?> arg0, View arg1, int position,
 					long id) {
-				
+				final int p = position;
+				new Thread(new Runnable() {
+					@Override
+					public void run() {
+						(new MessageProvider()).sendMessageById(
+								((SMILCloud)ListAllUsers.this.getApplication()).getUserId(), 
+								contactList.get(p).two.intValue(), 
+								((SMILCloud)ListAllUsers.this.getApplication()).getSharedMessageId());
+						((SMILCloud)ListAllUsers.this.getApplication()).setSharedMessageId(null);
+					}
+				}).run();
 				Toast.makeText(ListAllUsers.this, "Shared Message With " + contactList.get(position).one, 
 						Toast.LENGTH_LONG).show();
 				ListAllUsers.this.finish();
