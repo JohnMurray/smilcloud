@@ -154,7 +154,7 @@ public class VideoProperties extends Activity {
 	@Override
 	public void onBackPressed() {
 		/* If all required fields are filled in */
-		if (mBox.getSource() != null) {
+		if (mBox.getSource() != null && mBox.getRegion() != null) {
 			/* Return OK status */
 			setResult(RESULT_OK);
 		} else {

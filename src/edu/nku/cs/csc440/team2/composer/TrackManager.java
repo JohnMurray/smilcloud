@@ -1,7 +1,13 @@
 package edu.nku.cs.csc440.team2.composer;
 
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
 import java.util.LinkedList;
+import java.util.List;
 
+import edu.nku.cs.csc440.team2.SMILCloud;
 import edu.nku.cs.csc440.team2.message.Audio;
 import edu.nku.cs.csc440.team2.message.Body;
 import edu.nku.cs.csc440.team2.message.Image;
@@ -12,11 +18,13 @@ import edu.nku.cs.csc440.team2.message.Sequence;
 import edu.nku.cs.csc440.team2.message.Text;
 import edu.nku.cs.csc440.team2.message.Video;
 import edu.nku.cs.csc440.team2.provider.MediaProvider;
+import edu.nku.cs.csc440.team2.provider.MessageProvider;
 import edu.nku.cs.csc460.team2.R;
 
 import android.content.Context;
 import android.graphics.Canvas;
 import android.graphics.Rect;
+import android.os.Environment;
 
 /**
  * @author William Knauer <knauerw1@nku.edu>
@@ -225,7 +233,7 @@ public class TrackManager {
 			boolean ok = true;
 
 			/* Make sure the desired duration isn't too small */
-			if (duration < 1) {
+			if (duration < 5) {
 				ok = false;
 			}
 
@@ -253,6 +261,8 @@ public class TrackManager {
 				if (!fits) {
 					mBox.setDuration(oldDuration);
 					mTrack.addBox(mBox, mBox.getBegin());
+				} else {
+					mBox.postUpdateLabel();
 				}
 			}
 		}
@@ -298,14 +308,24 @@ public class TrackManager {
 	/** The Context used to get resources and create Tracks */
 	private Context mContext;
 
+	/** The global identifier for the represented Message */
+	private String mId;
+	
+	/** The userId for cloud interaction */
+	private int mUserId;
+
 	/**
 	 * Class constructor.
 	 */
-	public TrackManager() {
+	public TrackManager(String id, int userId) {
 		mBounds = new Rect();
 		mMoveManager = new MoveManager();
 		mResizeManager = new ResizeManager();
 		mTracks = new LinkedList<Track>();
+		setId(id);
+		setUserId(userId);
+		
+		
 		maintain();
 	}
 
@@ -388,6 +408,10 @@ public class TrackManager {
 		return result;
 	}
 
+	public String getId() {
+		return mId;
+	}
+	
 	/**
 	 * Finds all the Boxes whose playback times overlap with a given Box.
 	 * 
@@ -423,7 +447,7 @@ public class TrackManager {
 	public int getMaxX() {
 		int result = 0;
 		for (Box b : getAllBoxes()) {
-			if (b.getEnd() > result) {
+			if (Composer.secToPx(((double) b.getEnd()) / 10.0) > result) {
 				result = Composer.secToPx(((double) b.getEnd()) / 10.0);
 			}
 		}
@@ -476,7 +500,11 @@ public class TrackManager {
 		}
 		return result;
 	}
-
+	
+	public int getUserId() {
+		return mUserId;
+	}
+	
 	/**
 	 * Ensures that there is precisely one empty Track at the bottom of this
 	 * TrackManager.
@@ -551,21 +579,262 @@ public class TrackManager {
 		}
 	}
 	
+	public void setId(String id) {
+		mId = id;
+	}
+	
 	public Message toMessage() {
-		Message m = new Message("someId"); // TODO replace with something from the Application
+		Message m = new Message(getId());
 		
 		Parallel p = new Parallel();
+		int maxTime = -1;
 		for (Box b : getAllBoxes()) {
 			if (b instanceof TextBox) {
-				// TODO upload ((TextBox) b).getName(); to cloud
-				// TODO modify the MediaProvider to make it happen?
+				b.setSource(uploadText(b.getName(), getUserId()));
+			}
+			if (b.getEnd() > maxTime) {
+				maxTime = b.getEnd();
 			}
 			p.addElement(b.toMedia());
 		}
-		
+		p.setBegin(0);
+		p.setEnd(((double) maxTime) / 10.0);
 		m.addElement(p);
 		return m;
 	}
 	
+	public void setUserId(int userId) {
+		mUserId = userId;
+	}
+	
+	public String uploadText(String text, int userId) {
+		String path = Environment.getExternalStorageDirectory() + "/smilcache/";
+		path += java.util.UUID.randomUUID().toString() + ".txt";
+		
+		try {
+			/* Make a file from the text */
+			FileOutputStream fos = new FileOutputStream(new File(path));
+			fos.write(text.getBytes());
+			fos.flush();
+			fos.close();
+			
+			/* Send the file to the network */
+			MediaProvider mp = new MediaProvider();
+			path = mp.saveMedia(path, "text", userId);
+			
+		} catch (FileNotFoundException e) {
+			// do nothing. fail. i don't really care at this point.
+		} catch (IOException e) {
+			// do nothing again.
+		}
+		return path;
+	}
+	
+	public static class Factory {
+		
+		private static TrackManager mTrackManager = null;
+		private static edu.nku.cs.csc440.team2.mediaCloud.Media[] mMedia = null;
+		
+		public static TrackManager create(String messageId, int userId) {
+			/* Set up a new TrackManager */
+			mTrackManager = new TrackManager(messageId, userId);
+			
+			if (messageId != null) {
+				/* Get the Message from network */
+				Message m = new MessageProvider().getMessageById(messageId);
+				
+				/* Get listing of available media from network */
+				MediaProvider mediaProvider = new MediaProvider();
+				mMedia = mediaProvider.getAllMedia(userId);
+				
+				/* Set each text-type media's name to its associated text */
+				for (int i = 0; i < mMedia.length; i ++) {
+					if (mMedia[i].getType().equalsIgnoreCase("text")) {
+						String url = mMedia[i].getMediaUrl();
+						String text = mediaProvider.getText(url);
+						mMedia[i].setName(text);
+					}
+				}
+			
+				/* Add everything from the Message to the TrackManager */
+				for (Body b : m.getBody()) {
+					addElement(b);
+				}
+			}
+			
+			/* Clean up and return */
+			TrackManager result = mTrackManager;
+			mTrackManager = null;
+			mMedia = null;
+			return result;
+		}
+		
+		private static void addElement(Body source) {
+			/* Determine what to do with the Body source */
+			if (source instanceof Sequence) {
+				/* Recursively call this method for every body source has */
+				for (Body b : ((Sequence) source).getBody()) {
+					addElement(b);
+				}
+			} else if (source instanceof Parallel) {
+				/* Recursively call this method for every body source has */
+				for (Body b : ((Parallel) source).getBody()) {
+					addElement(b);
+				}
+			} else if (source instanceof Media) {
+				/* Add a Box representing source to mTrackManager */
+				if (source instanceof Audio) {
+					addAudio((Audio) source);
+				} else if (source instanceof Image) {
+					addImage((Image) source);
+				} else if (source instanceof Text) {
+					addText((Text) source);
+				} else if (source instanceof Video) {
+					addVideo((Video) source);
+				}
+			}
+		}
+		
+		private static void addAudio(Audio audio) {
+			/* Get the Audio's source url */
+			String source = audio.getSrc();
+			
+			/* Find the associated Media in mMedia */
+			edu.nku.cs.csc440.team2.mediaCloud.Media m = find(source);
+			
+			/* If the media exists and is accessible to the user */
+			if (m != null) {
+				/* Determine the Box's parameters */
+				int begin = (int) Math.round(audio.getBegin() * 10);
+				int end = (int) Math.round(audio.getEnd() * 10);
+				int duration = end - begin;
+				int clipDuration = parseMediaDuration(m.getDuration());
+				String name = m.getName();
+				
+				/* Create the Box */
+				AudioBox box = new AudioBox(source,
+						begin, duration, clipDuration);
+				
+				/* Set the Box's name */
+				box.setName(name);
+				
+				/* Add the Box to the TrackManager */
+				mTrackManager.addBox(box, begin);
+			}
+		}
+		
+		private static void addImage(Image image) {
+			/* Get the Image's source url */
+			String source = image.getSrc();
+			
+			/* Find the associated Media in mMedia */
+			edu.nku.cs.csc440.team2.mediaCloud.Media m = find(source);
+			
+			/* If the media exists and is accessible to the user */
+			if (m != null) {
+				/* Determine the Box's parameters */
+				int begin = (int) Math.round(image.getBegin() * 10);
+				int end = (int) Math.round(image.getEnd() * 10);
+				int duration = end - begin;
+				ComposerRegion region = new ComposerRegion(image.getRegion());
+				String name = m.getName();
+				
+				/* Create the Box */
+				ImageBox box = new ImageBox(source, begin, duration, region);
+				
+				/* Set the Box's name */
+				box.setName(name);
+				
+				/* Add the Box to the TrackManager */
+				mTrackManager.addBox(box, begin);
+			}
+		}
+		
+		private static void addText(Text text) {
+			/* Get the Text's source url */
+			String source = text.getSrc();
+			
+			/* Find the associated Media in mMedia */
+			edu.nku.cs.csc440.team2.mediaCloud.Media m = find(source);
+			
+			/* If the media exists and is accessible to the user */
+			if (m != null) {
+				/* Determine the Box's parameters */
+				int begin = (int) Math.round(text.getBegin() * 10);
+				int end = (int) Math.round(text.getEnd() * 10);
+				int duration = end - begin;
+				ComposerRegion region = new ComposerRegion(text.getRegion());
+				String name = m.getName(); // TODO DOWNLOAD THE TEXT AND SET IT TO NAME
+				
+				/* Create the Box */
+				TextBox box = new TextBox(source, begin, duration, region);
+				
+				/* Set the TextBox's name (text) */
+				box.setName(name);
+				
+				/* Add the Box to the TrackManager */
+				mTrackManager.addBox(box, begin);
+			}
+		}
+		
+		private static void addVideo(Video image) {
+			/* Get the Video's source url */
+			String source = image.getSrc();
+			
+			/* Find the associated Media in mMedia */
+			edu.nku.cs.csc440.team2.mediaCloud.Media m = find(source);
+			
+			/* If the media exists and is accessible to the user */
+			if (m != null) {
+				/* Determine the Box's parameters */
+				int begin = (int) Math.round(image.getBegin() * 10);
+				int end = (int) Math.round(image.getEnd() * 10);
+				int duration = end - begin;
+				int clipDuration = parseMediaDuration(m.getDuration());
+				ComposerRegion region = new ComposerRegion(image.getRegion());
+				String name = m.getName();
+				
+				/* Create the Box */
+				VideoBox box = new VideoBox(source, begin, duration,
+						clipDuration, region);
+				
+				/* Set the Box's name */
+				box.setName(name);
+				
+				/* Add the Box to the TrackManager */
+				mTrackManager.addBox(box, begin);
+			}
+		}
+		
+		private static int parseMediaDuration(String mediaDuration) {
+			/* Split by delimiters */
+			String[] firstSplit = mediaDuration.split(":");
+			String[] secondSplit = firstSplit[2].split(".");
+			
+			/* Parse integers from splits */
+			int tenths = Integer.parseInt(secondSplit[1]);
+			int seconds = Integer.parseInt(secondSplit[0]);
+			int minutes = Integer.parseInt(firstSplit[1]);
+			int hours = Integer.parseInt(firstSplit[0]);
+			
+			/* Determine total time in tenth-seconds */
+			minutes += hours * 60;
+			seconds += minutes * 60;
+			tenths += seconds * 10;
+			
+			return tenths;
+		}
+		
+		private static edu.nku.cs.csc440.team2.mediaCloud.Media find(
+				String source) {
+			for (int i = 0; i < mMedia.length; i ++) {
+				if (mMedia[i].getMediaUrl().equals(source)) {
+					return mMedia[i];
+				}
+			}
+			return null;
+		}
+		
+	}
 	
 }

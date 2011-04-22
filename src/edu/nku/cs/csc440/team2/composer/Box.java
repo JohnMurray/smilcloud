@@ -42,8 +42,14 @@ public abstract class Box implements Comparable<Box> {
 	/** The region of the represented Media */
 	private ComposerRegion mRegion;
 	
-	/** A unique human-readable id for this box */
+	/** A unique id for this box */
 	private String mId;
+	
+	/** A single character type identifier for this Box's media */
+	private char mType;
+	
+	/** The generated label to be drawn */
+	private String mLabel;
 
 	/**
 	 * Class constructor.
@@ -60,8 +66,10 @@ public abstract class Box implements Comparable<Box> {
 		mResizeBounds = new Rect();
 		mRegion = null;
 		mId = null;
+		mLabel = null;
 		mName = null;
 		mContext = null;
+		mType = ' ';
 	}
 
 	@Override
@@ -122,14 +130,17 @@ public abstract class Box implements Comparable<Box> {
 			p.setAntiAlias(true);
 			p.setStyle(Style.FILL);
 			canvas.drawRect(getBounds(), p);
-		
+			
 			/* Draw label */
 			p.setColor(fgColor);
 			p.setTextAlign(Align.LEFT);
 			p.setTextSize(mContext.getResources().getInteger(
 					R.integer.box_text_size));
+			if (mLabel == null) {
+				generateLabel(p);
+			}
 			canvas.drawText(
-					getName(),
+					mLabel,
 					getBounds().left + mContext.getResources().getInteger(
 							R.integer.box_text_offset),
 					getBounds().top + (getBounds().height() / 2)
@@ -188,6 +199,10 @@ public abstract class Box implements Comparable<Box> {
 	public String getSource() {
 		return mSource;
 	}
+	
+	public char getType() {
+		return mType;
+	}
 
 	public void setBegin(int begin) {
 		mBegin = begin;
@@ -221,12 +236,59 @@ public abstract class Box implements Comparable<Box> {
 		mSource = source;
 	}
 	
+	public void setType(char type) {
+		mType = type;
+	}
+	
 	/**
 	 * Generates a Media object from this Box.
 	 * 
 	 * @return Returns a new Media object. 
 	 */
 	public abstract Media toMedia();
+	
+	private void generateLabel(Paint p) {
+		StringBuilder s = new StringBuilder();
+		
+		/* Append type indicator to beginning */
+		s.append('(');
+		s.append(getType());
+		s.append(") ");
+		
+		/* Append the human-readable name */
+		s.append(getName());
+		
+		/* See how much space it takes up */
+		int measurement = (int) p.measureText(s.toString());
+		
+		/* Determine how much space we have to work with */
+		int resizeWidth = getContext().getResources().getInteger(R.integer.resize_grip_width);
+		int textOffset = getContext().getResources().getInteger(R.integer.box_text_offset);
+		int available = mBounds.width() - textOffset - resizeWidth;
+		
+		/* Figure out how long the label should be */
+		if (available < 0) {
+			mLabel = new String();
+		} else if (available > measurement) {
+			mLabel = s.toString();
+		} else {
+			s.append("...");
+			while (available <= measurement && s.length() >= 4) {
+				s.deleteCharAt(s.length() - 4);
+				measurement = (int) p.measureText(s.toString()); 
+			}
+			if (available > measurement) {
+				mLabel = s.toString();
+			} else {
+				mLabel = new String();
+			}
+		}
+		
+	}
+	
+	public void postUpdateLabel() {
+		mLabel = null;
+	}
 
 	/**
 	 * Sets the drawing bounds of the resize grip relative to the drawing

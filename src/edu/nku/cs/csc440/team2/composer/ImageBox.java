@@ -12,9 +12,6 @@ import android.graphics.Canvas;
  * @version 2011.0421
  */
 public class ImageBox extends Box {
-	/** A static counter used to generate unique ids */
-	private static int sCount = 1;
-
 	/**
 	 * Class constructor.
 	 * 
@@ -27,8 +24,7 @@ public class ImageBox extends Box {
 			ComposerRegion region) {
 		super(source, begin, duration);
 		setRegion(region);
-		setId("Image " + sCount);
-		sCount++;
+		setType('I');
 	}
 	
 	@Override

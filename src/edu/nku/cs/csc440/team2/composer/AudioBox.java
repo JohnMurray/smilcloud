@@ -12,9 +12,6 @@ import android.graphics.Canvas;
  * @version 2011.0416
  */
 public class AudioBox extends AudioVideoBox {
-	/** A static counter used to generate unique ids */
-	private static int sCount = 1;
-
 	/**
 	 * Class constructor.
 	 * 
@@ -25,8 +22,7 @@ public class AudioBox extends AudioVideoBox {
 	 */
 	public AudioBox(String source, int begin, int duration, int clipDuration) {
 		super(source, begin, duration, clipDuration);
-		setId("Audio " + sCount);
-		sCount++;
+		setType('A');
 	}
 	
 	@Override

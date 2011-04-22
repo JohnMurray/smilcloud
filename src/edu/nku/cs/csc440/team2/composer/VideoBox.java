@@ -12,9 +12,6 @@ import android.graphics.Canvas;
  * @version 2011.0421
  */
 public class VideoBox extends AudioVideoBox {
-	/** A static counter used to generate unique ids */
-	private static int sCount = 1;
-
 	/**
 	 * Class constructor.
 	 * 
@@ -33,8 +30,7 @@ public class VideoBox extends AudioVideoBox {
 			int clipDuration, ComposerRegion region) {
 		super(source, begin, duration, clipDuration);
 		setRegion(region);
-		setId("Video " + sCount);
-		sCount++;
+		setType('V');
 	}
 
 	@Override

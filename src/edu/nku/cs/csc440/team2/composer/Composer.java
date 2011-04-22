@@ -1,7 +1,9 @@
 package edu.nku.cs.csc440.team2.composer;
 
 import edu.nku.cs.csc440.team2.SMILCloud;
+import edu.nku.cs.csc440.team2.message.Message;
 import edu.nku.cs.csc440.team2.player.SMILPlayer;
+import edu.nku.cs.csc440.team2.provider.MessageProvider;
 import edu.nku.cs.csc460.team2.R;
 import android.app.Activity;
 import android.content.Intent;
@@ -19,7 +21,7 @@ import android.view.ViewGroup.LayoutParams;
 
 /**
  * @author William Knauer <knauerw1@nku.edu>
- * @version 2011.0420
+ * @version 2011.0422
  */
 public class Composer extends Activity {
 	public class ComposerView extends View implements OnGestureListener {
@@ -66,7 +68,13 @@ public class Composer extends Activity {
 
 		void create() {
 			mBounds = new Rect();
-			mTrackManager = new TrackManager();
+			
+			/* Get info from Application */
+			String messageId = ((SMILCloud) getApplication()).getQueuedDocumentForEditing();
+			int userId = ((SMILCloud) getApplication()).getUserId();
+			
+			/* Create the trackManager */
+			setTrackManager(TrackManager.Factory.create(messageId, userId));
 			mTrackManager.setContext(getBaseContext());
 			mTimeline = new Timeline(
 					getResources().getColor(R.color.timeline_bg),
@@ -286,7 +294,6 @@ public class Composer extends Activity {
 	}
 
 	private ComposerView mComposerView;
-	private String mId;
 	
 	public void launchAudioBoxProperties() {
 		Intent i = new Intent(this, AudioProperties.class);
@@ -310,7 +317,7 @@ public class Composer extends Activity {
 	
 	public void launchPlayer() {
 		SMILCloud app = (SMILCloud) getApplication();
-		app.queueDocumentToPlay(mId); // TODO finish
+		app.queueDocumentToPlay(mComposerView.getTrackManager().getId()); // TODO finish
 		Intent i = new Intent(this, SMILPlayer.class);
 		startActivity(i);
 	}
@@ -381,8 +388,13 @@ public class Composer extends Activity {
 	}
 
 	private void saveMessage() {
-		// TODO Auto-generated method stub
+		// TODO Open activity to insert message title and return
+		Message m = mComposerView.getTrackManager().toMessage();
+		int userId = mComposerView.getTrackManager().getUserId();
+		String title = java.util.UUID.randomUUID().toString();
 		
+		MessageProvider mp = new MessageProvider();
+		mp.saveMessage(userId, title, m);
 	}
 
 	@Override
