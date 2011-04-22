@@ -2,7 +2,6 @@ package edu.nku.cs.csc440.team2.player;
 
 import android.graphics.Color;
 import android.widget.RelativeLayout;
-import android.widget.RelativeLayout.LayoutParams;
 import android.widget.TextView;
 
 public class TestMedia extends SingleInstancePlayer {

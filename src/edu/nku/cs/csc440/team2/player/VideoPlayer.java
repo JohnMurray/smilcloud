@@ -1,8 +1,6 @@
 package edu.nku.cs.csc440.team2.player;
 
 import android.media.MediaPlayer;
-import android.media.MediaPlayer.OnBufferingUpdateListener;
-import android.media.MediaPlayer.OnCompletionListener;
 import android.util.Log;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;

@@ -1,5 +1,6 @@
 package edu.nku.cs.csc440.team2.UIMenus;
 
+import edu.nku.cs.csc440.team2.SMILCloud;
 import edu.nku.cs.csc440.team2.composer.Composer;
 import edu.nku.cs.csc440.team2.inbox.CreatedMessages;
 import edu.nku.cs.csc440.team2.inbox.Inbox;
@@ -42,6 +43,7 @@ public class MainMenu extends Activity {
     	composeNew.setOnClickListener(new OnClickListener(){
 			@Override
 			public void onClick(View v) {
+				((SMILCloud)MainMenu.this.getApplication()).queueDocumentToEdit(null);
 				MainMenu.this.startActivity(new Intent(
 						MainMenu.this, Composer.class));
 			}

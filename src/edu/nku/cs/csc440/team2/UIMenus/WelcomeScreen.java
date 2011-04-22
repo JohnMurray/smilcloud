@@ -17,6 +17,8 @@ public class WelcomeScreen extends Activity {
 		SMILCloud smilCloud = (SMILCloud) getApplication();
     	if( smilCloud.getUserId() != SMILCloud.NO_USER )
     	{
+    		Intent i = new Intent(this, MainMenu.class);
+    		startActivity(i);
     		this.finish();
     	}
     	

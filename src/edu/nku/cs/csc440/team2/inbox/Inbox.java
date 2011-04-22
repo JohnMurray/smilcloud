@@ -8,7 +8,6 @@ import net.londatiga.android.NewQAAdapter;
 import net.londatiga.android.QuickAction;
 import android.app.Activity;
 import android.content.Intent;
-import android.graphics.Bitmap;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -22,20 +21,14 @@ import android.widget.ListView;
 import android.widget.PopupWindow.OnDismissListener;
 import android.widget.Toast;
 import edu.nku.cs.csc440.team2.SMILCloud;
-import edu.nku.cs.csc440.team2.User;
-import edu.nku.cs.csc440.team2.mediaCloud.Media;
+import edu.nku.cs.csc440.team2.UIMenus.ListAllUsers;
 import edu.nku.cs.csc440.team2.mediaCloud.MessageLite;
-import edu.nku.cs.csc440.team2.mediaCloud.Pair;
 import edu.nku.cs.csc440.team2.player.SMILPlayer;
-import edu.nku.cs.csc440.team2.provider.MediaProvider;
 import edu.nku.cs.csc440.team2.provider.MessageProvider;
-import edu.nku.cs.csc440.team2.provider.UserProvider;
-import edu.nku.cs.csc440.team2.service.SmilService;
 import edu.nku.cs.csc460.team2.R;
 
 public class Inbox extends Activity 
 {
-	
 	private ArrayList<MessageLite> messages;
 
 	/**
@@ -92,22 +85,28 @@ public class Inbox extends Activity
 		delAction.setTitle("Delete");
 		delAction.setIcon(getResources().getDrawable(R.drawable.inbox_delete));
 		
-		final ActionItem edtAction = new ActionItem();
-		
-		edtAction.setTitle("Edit");
-		edtAction.setIcon(getResources().getDrawable(R.drawable.inbox_edit));
-		
 		/*
 		 * Set an onClick listener for the quick action. For each action, define
 		 * a separate action
 		 */
 		mList.setOnItemClickListener(new OnItemClickListener() {
 			public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+				
 				final QuickAction mQuickAction 	= new QuickAction(view);
 				
 				final ImageView mMoreImage 		= (ImageView) view.findViewById(R.id.i_more);
 				
 				final String text				= data[position];
+				
+				String tempId = null;
+				for( MessageLite ml : Inbox.this.messages )
+				{
+					if( ml.getName() == text )
+					{
+						tempId = ml.getUniqueId();
+					}
+				}
+				final String messageId = tempId;
 				
 				mMoreImage.setImageResource(R.drawable.ic_list_more_selected);
 				
@@ -118,7 +117,8 @@ public class Inbox extends Activity
 					@Override
 					public void onClick(View v) {
 						Toast.makeText(Inbox.this, "Share " + text, Toast.LENGTH_SHORT).show();
-				    	
+				    	Intent i = new Intent(Inbox.this, ListAllUsers.class);
+				    	Inbox.this.startActivity(i);
 						mQuickAction.dismiss();
 					}
 				});
@@ -129,9 +129,11 @@ public class Inbox extends Activity
 				plyAction.setOnClickListener(new OnClickListener() {
 					@Override
 					public void onClick(View v) {
-						Toast.makeText(Inbox.this, "Play " + text, Toast.LENGTH_SHORT).show();
-				    	
 						mQuickAction.dismiss();
+				    	
+						((SMILCloud)Inbox.this.getApplication()).queueDocumentToPlay(messageId);
+						Intent i = new Intent(Inbox.this, SMILPlayer.class);
+						Inbox.this.startActivity(i);
 					}
 				});
 				
@@ -141,27 +143,14 @@ public class Inbox extends Activity
 				delAction.setOnClickListener(new OnClickListener() {
 					@Override
 					public void onClick(View v) {
-						Toast.makeText(Inbox.this, "Delete " + text, Toast.LENGTH_SHORT).show();
-				    	
+						Toast.makeText(Inbox.this, text + " deleted.", Toast.LENGTH_SHORT).show();
 						mQuickAction.dismiss();
-					}
-				});
-				
-				/*
-				 * Define a click listener for deletion
-				 */
-				edtAction.setOnClickListener(new OnClickListener() {
-					@Override
-					public void onClick(View v) {
-						Toast.makeText(Inbox.this, "Edit " + text, Toast.LENGTH_SHORT).show();
-						
-						mQuickAction.dismiss();
+						//TODO: call provider to delete this message
 					}
 				});
 				
 				mQuickAction.addActionItem(plyAction);
 				mQuickAction.addActionItem(shrAction);
-				mQuickAction.addActionItem(edtAction);
 				mQuickAction.addActionItem(delAction);
 				
 				mQuickAction.setAnimStyle(QuickAction.ANIM_AUTO);
@@ -206,7 +195,7 @@ public class Inbox extends Activity
     
     private ArrayList<MessageLite> getMessages()
     {
-    	return (new MessageProvider()).getSavedMessages(
+    	return (new MessageProvider()).getAllMessage(
         		((SMILCloud)getApplication()).getUserId());
     }
 	
