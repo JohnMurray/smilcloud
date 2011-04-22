@@ -22,6 +22,7 @@ import android.widget.PopupWindow.OnDismissListener;
 import android.widget.Toast;
 import edu.nku.cs.csc440.team2.SMILCloud;
 import edu.nku.cs.csc440.team2.UIMenus.ListAllUsers;
+import edu.nku.cs.csc440.team2.composer.Composer;
 import edu.nku.cs.csc440.team2.mediaCloud.MessageLite;
 import edu.nku.cs.csc440.team2.player.SMILPlayer;
 import edu.nku.cs.csc440.team2.provider.MessageProvider;
@@ -162,7 +163,9 @@ public class CreatedMessages extends Activity
 					@Override
 					public void onClick(View v) {
 						Toast.makeText(CreatedMessages.this, "Edit " + text, Toast.LENGTH_SHORT).show();
-						
+						((SMILCloud)CreatedMessages.this.getApplication()).queueDocumentToEdit(messageId);
+						Intent i = new Intent(CreatedMessages.this, Composer.class);
+						CreatedMessages.this.startActivity(i);
 						mQuickAction.dismiss();
 					}
 				});

@@ -147,6 +147,13 @@ public class Inbox extends Activity
 						Toast.makeText(Inbox.this, text + " deleted.", Toast.LENGTH_SHORT).show();
 						mQuickAction.dismiss();
 						//TODO: call provider to delete this message
+						new Thread(new Runnable() {
+							
+							@Override
+							public void run() {
+								
+							}
+						}).start();
 					}
 				});
 				
