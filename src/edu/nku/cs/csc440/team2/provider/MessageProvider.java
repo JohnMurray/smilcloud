@@ -24,7 +24,12 @@ public class MessageProvider {
 	
 	private String tempFolder = Environment.getExternalStorageDirectory() + "/smiltemp";
 
-	public MessageProvider() { }
+	public MessageProvider() { 
+		
+		File folder = new File(tempFolder);
+		if(!folder.exists())
+			folder.mkdir();
+	}
 	
 	// Saved Messages
 	public ArrayList<MessageLite> getSavedMessages(int userId){
@@ -186,7 +191,7 @@ String url = "http://nkucloud.dyndns.org:8080/mediacloud/sendMessageById.jsp";
 		
 		data.add(new BasicNameValuePair("userId", senderId + ""));
 		data.add(new BasicNameValuePair("recipient", recipientId + ""));
-		data.add(new BasicNameValuePair("uniqueId", messageId + ""));
+		data.add(new BasicNameValuePair("uniqueId", messageId));
 		
 
 		try {
@@ -205,6 +210,10 @@ String url = "http://nkucloud.dyndns.org:8080/mediacloud/sendMessageById.jsp";
 		String xml = "";
 		// Read SMIL
 		try {
+			File temp = new File(tempFolder + "/temp.smil");
+			if(!temp.exists())
+				temp.createNewFile();
+			
 			File smilFile = msg.toFile(tempFolder + "/temp.smil");
 			
 			// From cache
