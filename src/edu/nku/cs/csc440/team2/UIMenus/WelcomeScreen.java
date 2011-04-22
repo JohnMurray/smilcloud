@@ -15,7 +15,7 @@ public class WelcomeScreen extends Activity {
     public void onCreate(Bundle savedInstanceState) {
 		
 		SMILCloud smilCloud = (SMILCloud) getApplication();
-    	if( smilCloud.getUserId() == SMILCloud.NO_USER )
+    	if( smilCloud.getUserId() != SMILCloud.NO_USER )
     	{
     		this.finish();
     	}
