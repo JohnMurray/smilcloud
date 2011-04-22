@@ -43,18 +43,22 @@ public class UserProvider {
 		return userId;
 	}
 	
-	public ArrayList<Pair<String, String>> getContactList(){
+	/**
+	 * Returns an ArrayList of Pair objects containing the username 
+	 * and the user-id.
+	 * @return
+	 */
+	public ArrayList<Pair<String, Integer>> getContactList(){
 		
 		try {
 			String xml = RequestHelper
 					.makeHttpGetRequest("http://nkucloud.dyndns.org:8080/mediacloud/getUsers.jsp");
 			XStream xstream = new XStream();
-			ArrayList<Pair<String, String>> allUsers = (ArrayList<Pair<String, String>>) xstream.fromXML(xml);
+			ArrayList<Pair<String, Integer>> allUsers = (ArrayList<Pair<String, Integer>>) xstream.fromXML(xml);
 
 			return allUsers;
 
 		} catch (Exception e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 

@@ -16,7 +16,7 @@ public class SMILCloud extends Application {
 	private Box selectedBox;
 	private String queuedDocumentToPlayID = null;
 	private String queueDocumentToEditID = null;
-	private int userID = -1;
+	private int userID = NO_USER;
 
 	public void setTrackManager(TrackManager t) {
 		this.trackManager = t;

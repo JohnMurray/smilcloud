@@ -62,7 +62,15 @@
         		  android:label="@string/app_name"
         		  android:screenOrientation="landscape">
         </activity>
+        <activity android:name="edu.nku.cs.csc440.team2.UIMenus.ListAllUsers"
+        		  android:label="@string/app_name"
+        		  android:screenOrientation="landscape">
+        </activity>
         <activity android:name="edu.nku.cs.csc440.team2.inbox.Inbox"
+        		  android:label="@string/app_name"
+        		  android:screenOrientation="landscape">
+        </activity>
+        <activity android:name="edu.nku.cs.csc440.team2.inbox.CreatedMessages"
         		  android:label="@string/app_name"
         		  android:screenOrientation="landscape">
         </activity>

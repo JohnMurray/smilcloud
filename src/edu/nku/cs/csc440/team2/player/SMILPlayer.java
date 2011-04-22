@@ -1,7 +1,5 @@
 package edu.nku.cs.csc440.team2.player;
 
-import java.io.File;
-
 import java.util.concurrent.Callable;
 
 import android.app.Activity;
@@ -9,7 +7,6 @@ import android.content.Context;
 import android.content.Intent;
 import android.graphics.Color;
 import android.os.Bundle;
-import android.os.Environment;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -24,7 +21,6 @@ import android.view.animation.AnimationUtils;
 import android.widget.ImageButton;
 import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
-import android.widget.SeekBar;
 import android.widget.Toast;
 import edu.nku.cs.csc440.team2.SMILCloud;
 import edu.nku.cs.csc440.team2.inbox.Inbox;
@@ -40,7 +36,7 @@ import edu.nku.cs.csc460.team2.R;
 public class SMILPlayer extends Activity {
     
 	public static final String NO_MEDIA_TO_PLAY = "No media was selected to play.";
-	public static final String MEDIA_NOT_FOUND = "The media  you request was not found.";
+	public static final String MEDIA_NOT_FOUND = "The media  you requested was not found.";
 	public static final String WTF_HAPPENED_MESSAGE = "Whoops, can't play this.";
 	
 	private final int CONTROL_ID = 99999; 
@@ -62,15 +58,6 @@ public class SMILPlayer extends Activity {
      */
     @Override
     public void onCreate(Bundle savedInstanceState) {
-    	
-    	
-		//MediaProvider mp = new MediaProvider();
-    	
-    	//File f = new File(Environment.getExternalStorageDirectory() + "/test2.png");
-    	
-    	//mp.saveMedia(f.getPath(), "image", 1);
-    	
-    	
     	/*
     	 * create the main instance and get the root View
     	 */
@@ -155,7 +142,7 @@ public class SMILPlayer extends Activity {
         
         
         /*
-         * TEST CODE:
+         * TEST CODE:				DON'T REMOVE YET, IT'S A GOOD REFERENCE
          * 		to load a smil message locally and play it. This only uses
          * 		the TestMedia instance now, no actual text, video, etc. 
          */
@@ -306,9 +293,6 @@ public class SMILPlayer extends Activity {
     }
     
     /**
-     * 
-     * @param v
-     * 
      * Add player to a given view (most likely the root view). This should also
      * be applied last, since it will insert an overlaying view. 
      */
@@ -456,11 +440,11 @@ public class SMILPlayer extends Activity {
     }
     
     /**
-     * 
-     * @author john
-     *
      * Define a Callable class to hide controls so that this can be threaded for
      * delayed and timed events.
+     * 
+     * @author John Murray
+     * @version 1.0
      */
     private class HideControls implements Callable<Void>
     {
