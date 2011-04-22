@@ -9,6 +9,7 @@ import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
@@ -211,9 +212,11 @@ public class MediaProvider {
 	 * Save Image/Audio/Video
 	 * 
 	 * @param localPath
+	 * @return 
 	 */
-	public void saveMedia(String localPath, String type, int userId) {
+	public String saveMedia(String localPath, String type, int userId) {
 
+		String returnedUrl = "";
 		File file = new File(localPath);
 
 		HttpClient httpclient = new DefaultHttpClient();
@@ -231,10 +234,24 @@ public class MediaProvider {
 			
 			HttpResponse response = httpclient.execute(httppost);
 			
+			// Get url
+			BufferedReader in = new BufferedReader(new InputStreamReader(response.getEntity()
+					.getContent()));
+			StringBuffer sb = new StringBuffer("");
+			String line = "";
+			String NL = System.getProperty("line.separator");
+			while ((line = in.readLine()) != null) {
+				sb.append(line + NL);
+			}
+			in.close();
+			returnedUrl = sb.toString().trim();
+			
 			int i = 0;
 		} catch (ClientProtocolException e) {
 		} catch (IOException e) {
 		}
+		
+		return returnedUrl;
 	}
 	
 	private void removeCache(){
