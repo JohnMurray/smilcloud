@@ -116,7 +116,8 @@ public class Inbox extends Activity
 				shrAction.setOnClickListener(new OnClickListener() {
 					@Override
 					public void onClick(View v) {
-						Toast.makeText(Inbox.this, "Share " + text, Toast.LENGTH_SHORT).show();
+						((SMILCloud)Inbox.this.getApplication()).setSharedMessageId(
+								messageId);
 				    	Intent i = new Intent(Inbox.this, ListAllUsers.class);
 				    	Inbox.this.startActivity(i);
 						mQuickAction.dismiss();

@@ -178,7 +178,7 @@ public class MessageProvider {
 	 * @param recipientId
 	 * @param messageId
 	 */
-	public void sendMessageById(int senderId, int recipientId, int messageId){
+	public void sendMessageById(int senderId, int recipientId, String messageId){
 		
 String url = "http://nkucloud.dyndns.org:8080/mediacloud/sendMessageById.jsp";
 		
