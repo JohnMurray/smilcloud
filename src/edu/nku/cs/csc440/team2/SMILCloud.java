@@ -24,7 +24,7 @@ public class SMILCloud extends Application {
 
 	public TrackManager getTrackManager() {
 		TrackManager t = this.trackManager;
-		this.trackManager = null; // make sure we crash if I screwed up IPC
+		this.trackManager = null;
 		return t;
 	}
 
@@ -34,7 +34,7 @@ public class SMILCloud extends Application {
 
 	public Box getSelectedBox() {
 		Box b = this.selectedBox;
-		this.selectedBox = null; // make sure we crash if I screwed up IPC
+		this.selectedBox = null;
 		return b;
 	}
 
