@@ -33,7 +33,7 @@ import edu.nku.cs.csc440.team2.provider.UserProvider;
 import edu.nku.cs.csc440.team2.service.SmilService;
 import edu.nku.cs.csc460.team2.R;
 
-public class Inbox extends Activity 
+public class CreatedMessages extends Activity 
 {
 	
 	private ArrayList<MessageLite> messages;
@@ -117,7 +117,7 @@ public class Inbox extends Activity
 				shrAction.setOnClickListener(new OnClickListener() {
 					@Override
 					public void onClick(View v) {
-						Toast.makeText(Inbox.this, "Share " + text, Toast.LENGTH_SHORT).show();
+						Toast.makeText(CreatedMessages.this, "Share " + text, Toast.LENGTH_SHORT).show();
 				    	
 						mQuickAction.dismiss();
 					}
@@ -129,7 +129,7 @@ public class Inbox extends Activity
 				plyAction.setOnClickListener(new OnClickListener() {
 					@Override
 					public void onClick(View v) {
-						Toast.makeText(Inbox.this, "Play " + text, Toast.LENGTH_SHORT).show();
+						Toast.makeText(CreatedMessages.this, "Play " + text, Toast.LENGTH_SHORT).show();
 				    	
 						mQuickAction.dismiss();
 					}
@@ -141,7 +141,7 @@ public class Inbox extends Activity
 				delAction.setOnClickListener(new OnClickListener() {
 					@Override
 					public void onClick(View v) {
-						Toast.makeText(Inbox.this, "Delete " + text, Toast.LENGTH_SHORT).show();
+						Toast.makeText(CreatedMessages.this, "Delete " + text, Toast.LENGTH_SHORT).show();
 				    	
 						mQuickAction.dismiss();
 					}
@@ -153,7 +153,7 @@ public class Inbox extends Activity
 				edtAction.setOnClickListener(new OnClickListener() {
 					@Override
 					public void onClick(View v) {
-						Toast.makeText(Inbox.this, "Edit " + text, Toast.LENGTH_SHORT).show();
+						Toast.makeText(CreatedMessages.this, "Edit " + text, Toast.LENGTH_SHORT).show();
 						
 						mQuickAction.dismiss();
 					}
@@ -207,7 +207,7 @@ public class Inbox extends Activity
     private ArrayList<MessageLite> getMessages()
     {
     	return (new MessageProvider()).getSavedMessages(
-        		((SMILCloud)getApplication()).getUserId());
+    		((SMILCloud)getApplication()).getUserId());
     }
 	
 }
