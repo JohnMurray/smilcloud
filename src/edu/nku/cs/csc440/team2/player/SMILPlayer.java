@@ -5,6 +5,8 @@ import java.io.File;
 import java.util.concurrent.Callable;
 
 import android.app.Activity;
+import android.content.Context;
+import android.content.Intent;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.os.Environment;
@@ -23,8 +25,11 @@ import android.widget.ImageButton;
 import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
 import android.widget.SeekBar;
+import android.widget.Toast;
 import edu.nku.cs.csc440.team2.SMILCloud;
+import edu.nku.cs.csc440.team2.inbox.Inbox;
 import edu.nku.cs.csc440.team2.message.Message;
+import edu.nku.cs.csc440.team2.provider.MessageProvider;
 import edu.nku.cs.csc460.team2.R;
 
 /**
@@ -34,15 +39,19 @@ import edu.nku.cs.csc460.team2.R;
  */
 public class SMILPlayer extends Activity {
     
+	public static final String NO_MEDIA_TO_PLAY = "No media was selected to play.";
+	public static final String MEDIA_NOT_FOUND = "The media  you request was not found.";
+	public static final String WTF_HAPPENED_MESSAGE = "Whoops, can't play this.";
+	
 	private final int CONTROL_ID = 99999; 
-	private RelativeLayout rootView;
-	private SeqPlayer root;
+	
 	private boolean hasBeenTouched = false;
 	private boolean playerControlPause = false;
-	private ProgressBar pb = null;
 	private boolean playbackReset = false;
-	//private ScheduledThreadPoolExecutor scheduledThreadPoolExecutor = new ScheduledThreadPoolExecutor(2);
-	//private ScheduledFuture<Void> scheduledFuture = null;
+	private Thread playbackThread = null;
+	private ProgressBar pb = null;
+	private SeqPlayer root;
+	private RelativeLayout rootView;
 	
 	/**
      * @param savedInstanceState
@@ -82,10 +91,57 @@ public class SMILPlayer extends Activity {
          */
         SMILCloud smilCloud = ((SMILCloud)getApplicationContext());
         String playbackID = smilCloud.getQueuedDocumentForPlayback();
-        if( !(playbackID == null) && playbackID.length() != 0 )
+        smilCloud.queueDocumentToPlay(null);
+        if( playbackID != null && playbackID.length() != 0 )
         {
-        	//TODO: write code to get message and initialize structures
-        }     
+        	//get message and initialize structures
+        	Message message = (new MessageProvider()).getMessageById(playbackID);
+        	if( message == null )
+        	{
+        		//Document was not found... should display a message and not continue
+        		Context context = getApplicationContext();
+        		String toastMessage = SMILPlayer.MEDIA_NOT_FOUND;
+        		Toast.makeText(context, toastMessage, Toast.LENGTH_LONG).show();
+        	}
+        	/*
+        	 * We have a document, so we should probably prepare it and try to play it.
+        	 */
+        	else
+        	{
+        		try
+        		{
+		    		PriceLine pl = new PriceLine(message, this, videoContainer);
+		    		pl.negotiateBigDeal();
+		    		this.root = (SeqPlayer)pl.getDocumentAndNameYourOwnPrice();
+		    		this.preparePlayer();
+		    		
+		    		this.startPlayback();
+        		}
+        		catch( Exception e )
+        		{
+        			/*
+        			 * Ok, something went bad... so we should just let the user think
+        			 * all is going pretty good even though at this point it's really
+        			 * not going that well
+        			 */
+        			Context context = getApplicationContext();
+        			String toastMessage = SMILPlayer.WTF_HAPPENED_MESSAGE;
+        			Toast.makeText(context, toastMessage, Toast.LENGTH_LONG);
+        		}
+	    	}
+        	
+        }
+        else
+        {
+        	/*
+        	 * There was not media selected to play so we should let them know
+        	 * and not do anything. However, I'm not sure how they got to this
+        	 * point. (Scratch head... shrug... dont' think about it anymore)
+        	 */
+        	Context context = getApplicationContext();
+        	String message = SMILPlayer.NO_MEDIA_TO_PLAY;
+        	Toast.makeText(context, message, Toast.LENGTH_LONG).show();
+        }
         
         
         /*
@@ -103,6 +159,7 @@ public class SMILPlayer extends Activity {
          * 		to load a smil message locally and play it. This only uses
          * 		the TestMedia instance now, no actual text, video, etc. 
          */
+        /*
 		File f = new File(Environment.getExternalStorageDirectory() +
 				"/image_only_message.smil");
 		
@@ -122,14 +179,14 @@ public class SMILPlayer extends Activity {
 		this.preparePlayer();
 		
 		this.startPlayback();
-		
+		*/
     }
     
     
     
     private void startPlayback()
     {
-    	new Thread(new Runnable() {
+    	this.playbackThread = new Thread(new Runnable() {
     		public void run() {
     			//get the subject from the root
     			Arbiter subject = root.getSubject();
@@ -189,7 +246,6 @@ public class SMILPlayer extends Activity {
 			    	try {
 						Thread.sleep(100);
 					} catch (InterruptedException e) {
-						// TODO Auto-generated catch block
 						e.printStackTrace();
 					}
 			    	Log.i("SMILPlayer info", "Time Played: " + root.getTimePlayed());
@@ -209,7 +265,8 @@ public class SMILPlayer extends Activity {
 					}
 		    	}
     		}
-    	}).start();
+    	});
+    	this.playbackThread.start();
     }
     
     
@@ -275,9 +332,6 @@ public class SMILPlayer extends Activity {
 				{
 					(new ShowControls(v)).call();
 					Log.i("Main Activity", "control overlay has been touched");
-					// TODO: fix executer so that it actually works... idk?
-					//scheduledFuture = scheduledThreadPoolExecutor.schedule(
-					//		new HideControls(v), 5L, TimeUnit.SECONDS);
 					hasBeenTouched = true;
 				}
 				else
@@ -290,9 +344,7 @@ public class SMILPlayer extends Activity {
 				return false;
 			}
 		});
-    	/*
-    	 * Note: might be able to do this better by specifying the onTouch handlers in XML
-    	 * 
+    	/* 
     	 * Get the references to all the controls we will be using in the Player
     	 */
     	ImageButton play = (ImageButton)(((ViewGroup)ctrl_overlay.getChildAt(0)).getChildAt(0));
@@ -317,8 +369,8 @@ public class SMILPlayer extends Activity {
 				else	
 				{
 					/*
-					 * TODO: add code to implement onTouch listener for
-					 * current control
+					 * Play the video... really I'm just settting a flag and
+					 * hoping that the play-loop code above notices it.
 					 */
 					playerControlPause = false;
 					Log.i("Main Activity", "playPause has been pressed but has already been touched");
@@ -339,8 +391,7 @@ public class SMILPlayer extends Activity {
 				else	
 				{
 					/*
-					 * TODO: add code to implement onTouch listener for
-					 * current control
+					 * reset the video... not a true rewind
 					 */
 					if( root.getTimePlayed() >= root.getDuration() )
 					{
@@ -368,8 +419,8 @@ public class SMILPlayer extends Activity {
 				else	
 				{
 					/*
-					 * TODO: add code to implement onTouch listener for
-					 * current control
+					 * Set the falg to pause and hope that the playloop 
+					 * notices what is going on.
 					 */
 					playerControlPause = true;
 					Log.i("Main Activity", "fastforward has been pressed but has already been touched");
@@ -390,10 +441,9 @@ public class SMILPlayer extends Activity {
 				else	
 				{
 					/*
-					 * TODO: add code to implement onTouch listener for
-					 * current control
+					 * Really don't need to do anything but display
+					 * the controls... so yeah.
 					 */
-					Log.i("Main Activity", "seekBar has been pressed but has already been touched");
 				}
 			}
 		});
@@ -489,6 +539,26 @@ public class SMILPlayer extends Activity {
      */
     private void goToLibrary()
     {
-    	//TODO: write code to launch Library Sub-Activity
+    	//launch Library Sub-Activity
+    	Intent i = new Intent(this, Inbox.class);
+    	startActivity(i);
+    	this.finish();
+    }
+    
+    
+    /**
+     * Pause the player and release all resources before the player 
+     * exits. 
+     */
+    @Override
+    public void finish()
+    {
+    	if( this.playbackThread != null )
+    	{
+    		this.playbackThread.stop();
+    		this.root.pause();
+    		this.root.unRenderAll();
+    	}
+    	super.finish();
     }
 }
