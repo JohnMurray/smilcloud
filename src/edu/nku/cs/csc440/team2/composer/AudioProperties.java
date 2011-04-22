@@ -64,17 +64,18 @@ public class AudioProperties extends Activity {
 					public void onProgressChanged(SeekBar seekBar,
 							int progress, boolean fromUser) {
 						/* Assign new clipBegin time from SeekBar position */
-						double maxClipBegin = mBox.getClipDuration()
+						int maxClipBegin = mBox.getClipDuration()
 								- mBox.getDuration();
-						mBox.setClipBegin(Composer.snapTo(progress
+						mBox.setClipBegin((int) (progress
 								* (1.0 / mClipOffsetBar.getMax())
 								* maxClipBegin));
 						
 						/* Update UI labels */
-						mClipBeginLabel.setText("Clip Begin: "
-								+ mBox.getClipBegin());
+						mClipBeginLabel.setText(
+								"Clip Begin: "
+								+ AudioVideoBox.formatTime(mBox.getClipBegin()));
 						mClipEndLabel.setText("Clip End: "
-								+ mBox.getClipEnd());
+								+ AudioVideoBox.formatTime(mBox.getClipEnd()));
 					}
 
 					@Override
@@ -116,7 +117,7 @@ public class AudioProperties extends Activity {
 			/* Media was successfully chosen */
 			mBox.setName(data.getStringExtra("name"));
 			mBox.setId(data.getStringExtra("id"));
-			mBox.setClipDuration(data.getDoubleExtra("length", 1.0));
+			mBox.setClipDuration(data.getIntExtra("length", 10));
 			mBox.setSource(data.getStringExtra("source"));
 			
 			/* Disallow editing of the media's source if it's already set */
@@ -166,13 +167,13 @@ public class AudioProperties extends Activity {
 		
 		if (mBox == null) {
 			/* Media must be created */
-			mBox = new AudioBox(null, 0.0, 1.0, 1.0);
+			mBox = new AudioBox(null, 0, 10, 10);
 			mTrackManager.addBox(mBox, mBox.getBegin());
 		}
 		
 		/* Initialize the SeekBar */
-		double range = mBox.getClipDuration() - mBox.getDuration();
-		double val = mBox.getClipBegin() / range;
+		int range = mBox.getClipDuration() - mBox.getDuration();
+		double val = ((double) mBox.getClipBegin()) / range;
 		mClipOffsetBar.setProgress((int) (val * mClipOffsetBar.getMax()));
 		
 		/* Disallow editing of the media's source if it's already set */

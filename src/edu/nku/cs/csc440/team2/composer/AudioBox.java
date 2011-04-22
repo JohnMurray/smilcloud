@@ -23,8 +23,7 @@ public class AudioBox extends AudioVideoBox {
 	 * @param duration The duration of the Media.
 	 * @param clipDuration The duration of the source media.
 	 */
-	public AudioBox(String source, double begin, double duration,
-			double clipDuration) {
+	public AudioBox(String source, int begin, int duration, int clipDuration) {
 		super(source, begin, duration, clipDuration);
 		setId("Audio " + sCount);
 		sCount++;
@@ -42,8 +41,12 @@ public class AudioBox extends AudioVideoBox {
 
 	@Override
 	public Media toMedia() {
-		return new Audio(getBegin(), getEnd(), getSource(),
-				getClipBegin(), getClipEnd());
+		return new Audio(
+				((double) getBegin()) / 10.0,
+				((double) getEnd()) / 10.0,
+				getSource(),
+				((double) getClipBegin()) / 10.0,
+				((double) getClipEnd()) / 10.0);
 	}
 	
 }

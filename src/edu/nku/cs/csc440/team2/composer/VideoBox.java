@@ -9,7 +9,7 @@ import android.graphics.Canvas;
  * A VideoBox is a Box that represents an Image object.
  * 
  * @author William Knauer <knauerw1@nku.edu>
- * @version 2011.0416
+ * @version 2011.0421
  */
 public class VideoBox extends AudioVideoBox {
 	/** A static counter used to generate unique ids */
@@ -29,8 +29,8 @@ public class VideoBox extends AudioVideoBox {
 	 * @param region
 	 *            The region of the Media.
 	 */
-	public VideoBox(String source, double begin, double duration,
-			double clipDuration, ComposerRegion region) {
+	public VideoBox(String source, int begin, int duration,
+			int clipDuration, ComposerRegion region) {
 		super(source, begin, duration, clipDuration);
 		setRegion(region);
 		setId("Video " + sCount);
@@ -49,8 +49,13 @@ public class VideoBox extends AudioVideoBox {
 
 	@Override
 	public Media toMedia() {
-		return new Video(getBegin(), getEnd(), getSource(), getRegion()
-				.toRegion(), getClipBegin(), getClipEnd());
+		return new Video(
+				((double) getBegin()) / 10.0,
+				((double) getEnd()) / 10.0,
+				getSource(),
+				getRegion().toRegion(),
+				((double) getClipBegin()) / 10.0,
+				((double) getClipEnd()) / 10.0);
 	}
 
 }

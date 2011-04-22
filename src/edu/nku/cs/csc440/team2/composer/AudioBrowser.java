@@ -30,7 +30,7 @@ import android.widget.Toast;
  * http://softwarepassion.com/android-series-custom-listview-items-and-adapters
  * 
  * @author William Knauer <knauerw1@nku.edu>
- * @version 2011.0420
+ * @version 2011.0421
  */
 public class AudioBrowser extends ListActivity {
 	/**
@@ -186,11 +186,11 @@ public class AudioBrowser extends ListActivity {
 	protected void onListItemClick(ListView l, View v, int position, long id) {
 		Media m = (Media) l.getItemAtPosition(position);
 
-		/* Calculate duration in seconds */
+		/* Calculate duration in tenth-seconds */
 		String[] dur = m.getDuration().split(":");
-		double seconds = Double.parseDouble(dur[2]);
-		seconds += Double.parseDouble(dur[1]) * 60.0;
-		seconds += Double.parseDouble(dur[0]) * 60.0 * 60.0;
+		int seconds = (int) (Double.parseDouble(dur[2]) * 10);
+		seconds += (int) (Double.parseDouble(dur[1]) * 600);
+		seconds += (int) (Double.parseDouble(dur[0]) * 600 * 600);
 		
 		/* Dump data into intent */
 		Intent i = new Intent();

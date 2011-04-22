@@ -14,7 +14,7 @@ import android.graphics.Rect;
  * A Track is the graphical equivalent of a SMIL Sequence player.
  * 
  * @author William Knauer <knauerw1@nku.edu>
- * @version 2011.0417
+ * @version 2011.0421
  */
 public class Track {
 	/** The Context used to get resources */
@@ -46,7 +46,7 @@ public class Track {
 	 *            The begin time.
 	 * @return Returns true if the Box fits.
 	 */
-	public boolean addBox(Box elt, double begin) {
+	public boolean addBox(Box elt, int begin) {
 		boolean added = false;
 		if (fits(elt, begin)) {
 			elt.setBegin(begin);
@@ -92,11 +92,13 @@ public class Track {
 		canvas.drawRect(getBounds(), p);
 
 		/* Draw each box */
-		for (Box mb : mBoxes) {
-			mb.setBounds(Composer.secToPx(mb.getBegin()), getBounds().top
-					+ spacing, Composer.secToPx(mb.getEnd()), getBounds().top
-					+ spacing + height);
-			mb.draw(canvas);
+		for (Box b : mBoxes) {
+			b.setBounds(
+					Composer.secToPx(((double) b.getBegin()) / 10.0),
+					getBounds().top + spacing,
+					Composer.secToPx(((double) b.getEnd()) / 10.0),
+					getBounds().top + spacing + height);
+			b.draw(canvas);
 		}
 	}
 
@@ -110,7 +112,7 @@ public class Track {
 	 *            The specified begin time for the Box.
 	 * @return Returns true if the Box fits in the Track.
 	 */
-	public boolean fits(Box elt, double begin) {
+	public boolean fits(Box elt, int begin) {
 		boolean fits = true;
 		double end = begin + elt.getDuration();
 
@@ -166,29 +168,11 @@ public class Track {
 	 * @return Returns the Box that plays back during the given time. Returns
 	 *         null if no such Box exists.
 	 */
-	public Box getBox(double time) {
+	public Box getBox(int time) {
 		Box result = null;
 		for (Box m : mBoxes) {
 			if (m.containsTime(time)) {
 				result = m;
-			}
-		}
-		return result;
-	}
-
-	/**
-	 * Get the Box whose id matches a given String
-	 * 
-	 * @param id
-	 *            The String to check.
-	 * @return Returns the Box whose id matches the given String. Returns null
-	 *         if no such Box exists.
-	 */
-	public Box getBox(String id) {
-		Box result = null;
-		for (Box b : mBoxes) {
-			if (result == null && b.getId().equals(id)) {
-				result = b;
 			}
 		}
 		return result;
@@ -209,7 +193,7 @@ public class Track {
 	 * @return Returns the Box that plays back at the specified time. Returns
 	 *         null if no such box was found.
 	 */
-	public Box removeBox(double time) {
+	public Box removeBox(int time) {
 		Box result = getBox(time);
 		if (result != null) {
 			mBoxes.remove(result);

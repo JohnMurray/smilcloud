@@ -9,7 +9,7 @@ import android.graphics.Canvas;
  * A TextBox is a Box that represents a Text object.
  * 
  * @author William Knauer <knauerw1@nku.edu>
- * @version 2011.0420
+ * @version 2011.0421
  */
 public class TextBox extends Box {
 	/** A static counter used to generate unique ids */
@@ -23,7 +23,7 @@ public class TextBox extends Box {
 	 * @param duration The duration of the Media.
 	 * @param region The region of the Media.
 	 */
-	public TextBox(String source, double begin, double duration,
+	public TextBox(String source, int begin, int duration,
 			ComposerRegion region) {
 		super(source, begin, duration);
 		setRegion(region);
@@ -43,7 +43,10 @@ public class TextBox extends Box {
 
 	@Override
 	public Media toMedia() {
-		return new Text(getBegin(), getEnd(), getSource(),
+		return new Text(
+				((double) getBegin()) / 10.0,
+				((double) getEnd()) / 10.0,
+				getSource(),
 				getRegion().toRegion());
 	}
 	

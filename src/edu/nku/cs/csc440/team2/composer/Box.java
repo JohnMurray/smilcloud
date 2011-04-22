@@ -15,17 +15,17 @@ import android.graphics.Paint.Style;
  * drawing target. Then draw() will draw this Box to a Canvas. 
  *  
  * @author William Knauer <knauerw1@nku.edu>
- * @version 2011.0420
+ * @version 2011.0421
  */
 public abstract class Box implements Comparable<Box> {
 	/** A Context used to get resources */
 	private Context mContext;
 	
 	/** The absolute begin time of the represented Media */
-	private double mBegin;
+	private int mBegin;
 	
 	/** The absolute duration of the represented Media */
-	private double mDuration;
+	private int mDuration;
 	
 	/** The name of the represented Media */
 	private String mName;
@@ -52,7 +52,7 @@ public abstract class Box implements Comparable<Box> {
 	 * @param begin The absolute begin time of the Media. 
 	 * @param duration The duration of the Media.
 	 */
-	public Box(String source, double begin, double duration) {
+	public Box(String source, int begin, int duration) {
 		mBounds = new Rect();
 		mSource = source;
 		mBegin = begin;
@@ -89,7 +89,7 @@ public abstract class Box implements Comparable<Box> {
 	 * @param time The time to check. 
 	 * @return Returns true if the Media will play during the given time.
 	 */
-	public boolean containsTime(double time) {
+	public boolean containsTime(int time) {
 		boolean contains = false;
 		if (getBegin() <= time && time < getEnd()) {
 			contains = true;
@@ -149,7 +149,7 @@ public abstract class Box implements Comparable<Box> {
 		}
 	}
 
-	public double getBegin() {
+	public int getBegin() {
 		return mBegin;
 	}
 
@@ -161,11 +161,11 @@ public abstract class Box implements Comparable<Box> {
 		return mContext;
 	}
 
-	public double getDuration() {
+	public int getDuration() {
 		return mDuration;
 	}
 
-	public double getEnd() {
+	public int getEnd() {
 		return mBegin + mDuration;
 	}
 
@@ -189,7 +189,7 @@ public abstract class Box implements Comparable<Box> {
 		return mSource;
 	}
 
-	public void setBegin(double begin) {
+	public void setBegin(int begin) {
 		mBegin = begin;
 	}
 	
@@ -201,7 +201,7 @@ public abstract class Box implements Comparable<Box> {
 		mContext = context;
 	}
 
-	public void setDuration(double duration) {
+	public void setDuration(int duration) {
 		mDuration = duration;
 	}
 

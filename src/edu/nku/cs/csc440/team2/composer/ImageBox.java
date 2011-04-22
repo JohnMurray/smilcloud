@@ -9,7 +9,7 @@ import android.graphics.Canvas;
  * An AudioBox is a Box that represents an Audio object.
  * 
  * @author William Knauer <knauerw1@nku.edu>
- * @version 2011.0416
+ * @version 2011.0421
  */
 public class ImageBox extends Box {
 	/** A static counter used to generate unique ids */
@@ -23,7 +23,7 @@ public class ImageBox extends Box {
 	 * @param duration The duration of the Media.
 	 * @param region The region of the Media.
 	 */
-	public ImageBox(String source, double begin, double duration,
+	public ImageBox(String source, int begin, int duration,
 			ComposerRegion region) {
 		super(source, begin, duration);
 		setRegion(region);
@@ -43,7 +43,10 @@ public class ImageBox extends Box {
 
 	@Override
 	public Media toMedia() {
-		return new Image(getBegin(), getEnd(), getSource(),
+		return new Image(
+				((double) getBegin()) / 10.0,
+				((double)getEnd()) / 10.0,
+				getSource(),
 				getRegion().toRegion());
 	}
 	

@@ -232,14 +232,14 @@ public class Composer extends Activity {
 		
 	}
 
-	private static float sScale = 1.5f;
+	private static double sScale = 1.0;
 
 	public static final int REQ_PROPERTIES = 23;
 
 	/**
 	 * @return Returns the current scaling factor.
 	 */
-	public static float getScale() {
+	public static double getScale() {
 		return sScale;
 	}
 
@@ -269,7 +269,7 @@ public class Composer extends Activity {
 	 * @param scale
 	 *            The scaling factor for mapping time to the x-axis.
 	 */
-	public static void setScale(float scale) {
+	public static void setScale(double scale) {
 		sScale = scale;
 	}
 

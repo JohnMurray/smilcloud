@@ -143,7 +143,7 @@ public class ImageProperties extends Activity {
 
 		if (mBox == null) {
 			/* Media must be created */
-			mBox = new ImageBox(null, 0.0, 1.0, null);
+			mBox = new ImageBox(null, 0, 10, null);
 			mTrackManager.addBox(mBox, mBox.getBegin());
 		}
 

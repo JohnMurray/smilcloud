@@ -38,13 +38,13 @@ public class TrackManager {
 		private Track mOldTrack;
 
 		/** The begin time of mBox before the move started */
-		private double mOldBegin;
+		private int mOldBegin;
 
 		/** The Track to move mBox into */
 		private Track mTargetTrack;
 
 		/** The begin time where mBox should be added to its new Track */
-		private double mTargetBegin;
+		private int mTargetBegin;
 
 		/**
 		 * Class constructor.
@@ -109,15 +109,17 @@ public class TrackManager {
 		 */
 		public void offset(int dx, int dy) {
 			/* Offset mBox by (dx, dy) */
-			mBox.setBounds(mBox.getBounds().left + dx, mBox.getBounds().top
-					+ dy, mBox.getBounds().right + dx, mBox.getBounds().bottom
-					+ dy);
+			mBox.setBounds(
+					mBox.getBounds().left + dx,
+					mBox.getBounds().top + dy,
+					mBox.getBounds().right + dx,
+					mBox.getBounds().bottom + dy);
 
 			/* Figure out where mBox is now */
-			double begin = Composer
-					.snapTo(Composer.pxToSec(mBox.getBounds().left));
-			Track track = getTrack(mBox.getBounds().centerX(), mBox.getBounds()
-					.centerY());
+			int begin = (int)(Composer.pxToSec(mBox.getBounds().left) * 10);
+			Track track = getTrack(
+					mBox.getBounds().centerX(),
+					mBox.getBounds().centerY());
 
 			/* Figure out if mBox fits where it is now */
 			if (track != null && track.fits(mBox, begin)) {
@@ -136,9 +138,9 @@ public class TrackManager {
 			mFitsTarget = false;
 			mBox = null;
 			mOldTrack = null;
-			mOldBegin = -1.0;
+			mOldBegin = -1;
 			mTargetTrack = null;
-			mTargetBegin = -1.0;
+			mTargetBegin = -1;
 		}
 
 		/**
@@ -175,7 +177,7 @@ public class TrackManager {
 		private int mStartX;
 
 		/** The duration of mBox when the resize was started */
-		private double mStartDuration;
+		private int mStartDuration;
 
 		/**
 		 * Class constructor.
@@ -216,22 +218,21 @@ public class TrackManager {
 		 */
 		public void resize(int x) {
 			/* Determine the desired duration */
-			double delta = Composer.snapTo(Composer.pxToSec(x - mStartX));
-			double duration = mStartDuration + delta;
+			int delta = (int) (Composer.pxToSec(x - mStartX) * 10);
+			int duration = mStartDuration + delta;
 
 			/* Check if new duration is ok */
 			boolean ok = true;
 
 			/* Make sure the desired duration isn't too small */
-			if (duration < Composer.snapTo(0.1)) {
+			if (duration < 1) {
 				ok = false;
 			}
 
 			/* Make sure the desired duration isn't too large */
 			if (mBox instanceof AudioVideoBox) {
-				double max = ((AudioVideoBox) mBox).getClipDuration();
+				int max = ((AudioVideoBox) mBox).getClipDuration();
 				max -= ((AudioVideoBox) mBox).getClipBegin();
-				max = Composer.snapTo(max);
 				if (duration > max) {
 					ok = false;
 				}
@@ -242,7 +243,7 @@ public class TrackManager {
 				mTrack.removeBox(mBox.getBegin());
 
 				/* Update the box's duration */
-				double oldDuration = mBox.getDuration();
+				int oldDuration = mBox.getDuration();
 				mBox.setDuration(duration);
 
 				/* Attempt to re-add the box */
@@ -316,7 +317,7 @@ public class TrackManager {
 	 * @param begin
 	 *            The time to add the Box.
 	 */
-	public void addBox(Box elt, double begin) {
+	public void addBox(Box elt, int begin) {
 		boolean added = false;
 		for (Track t : mTracks) {
 			if (!added) {
@@ -351,7 +352,7 @@ public class TrackManager {
 	}
 
 	/**
-	 * @return Returns a List containing all the Boxes containted by all the
+	 * @return Returns a List containing all the Boxes contained by all the
 	 *         Tracks in this TrackManager.
 	 */
 	public LinkedList<Box> getAllBoxes() {
@@ -382,7 +383,7 @@ public class TrackManager {
 		Box result = null;
 		Track t = getTrack(targetX, targetY);
 		if (t != null) {
-			result = t.getBox(Composer.snapTo(Composer.pxToSec(targetX)));
+			result = t.getBox((int) (Composer.pxToSec(targetX) * 10));
 		}
 		return result;
 	}
@@ -400,11 +401,15 @@ public class TrackManager {
 		double begin = box.getBegin();
 		double end = box.getEnd();
 		for (Track t : mTracks) {
-			for (Box m : t.getAllBoxes()) {
-				if (m.getBegin() <= begin && begin < m.getEnd()) {
-					concurrent.add(m);
-				} else if (m.getBegin() < end && end <= m.getEnd()) {
-					concurrent.add(m);
+			for (Box b : t.getAllBoxes()) {
+				if (b.getBegin() <= begin && begin < b.getEnd()) {
+					concurrent.add(b);
+				} else if (b.getBegin() < end && end <= b.getEnd()) {
+					concurrent.add(b);
+				} else if (begin <= b.getBegin() && b.getBegin() < end) {
+					concurrent.add(b);
+				} else if (begin < b.getEnd() && b.getEnd() <= end) {
+					concurrent.add(b);
 				}
 			}
 		}
@@ -412,14 +417,14 @@ public class TrackManager {
 	}
 
 	/**
-	 * @return Returns the furthest x-coordinate where this TrackManager needs
+	 * @return Returns the farthest x-coordinate where this TrackManager needs
 	 *         to draw.
 	 */
 	public int getMaxX() {
 		int result = 0;
 		for (Box b : getAllBoxes()) {
 			if (b.getEnd() > result) {
-				result = Composer.secToPx(b.getEnd());
+				result = Composer.secToPx(((double) b.getEnd()) / 10.0);
 			}
 		}
 		if (mMoveManager.isMoving()) {
@@ -562,159 +567,5 @@ public class TrackManager {
 		return m;
 	}
 	
-	public static class Factory {
-		
-		public static TrackManager create(Message m) {
-			TrackManager t = new TrackManager();
-			MediaProvider p = new MediaProvider();
-			edu.nku.cs.csc440.team2.mediaCloud.Media[] allMedia 
-					= p.getAllMedia(1); // TODO replace user id
-			
-			/* Set each text-type Media's name to its associated text */
-			for (int i = 0; i < allMedia.length; i ++) {
-				if (allMedia[i].getType().equalsIgnoreCase("text")) {
-					allMedia[i].setName(p.getText(allMedia[i].getMediaUrl()));
-				}
-			}
-			
-			/* Add everything to the TrackManager */
-			for (Body b : m.getBody()) {
-				addElement(b, t, allMedia);
-			}
-			
-			return t;
-		}
-		
-		private static void addElement(Body source, TrackManager t,
-				edu.nku.cs.csc440.team2.mediaCloud.Media[] allMedia) {
-			if (source instanceof Sequence) {
-				for (Body b : ((Sequence) source).getBody()) {
-					addElement(b, t, allMedia);
-				}
-			} else if (source instanceof Parallel) {
-				for (Body b : ((Parallel) source).getBody()) {
-					addElement(b, t, allMedia);
-				}
-			} else if (source instanceof Media) {
-				if (source instanceof Audio) {
-					addAudio((Audio) source, t, allMedia);
-				} else if (source instanceof Image) {
-					addImage((Image) source, t, allMedia);
-				} else if (source instanceof Text) {
-					addText((Text) source, t, allMedia);
-				} else if (source instanceof Video) {
-					addVideo((Video) source, t, allMedia);
-				}
-			}
-		}
-		
-		private static void addAudio(Audio source, TrackManager t,
-				edu.nku.cs.csc440.team2.mediaCloud.Media[] allMedia) {
-			
-			/* Create the AudioBox */
-			AudioBox box = new AudioBox(
-					source.getSrc(),
-					source.getBegin(),
-					source.getEnd() - source.getBegin(),
-					-1.0);
-			
-			/* Find our Media object */
-			edu.nku.cs.csc440.team2.mediaCloud.Media m;
-			m = find(allMedia, source.getSrc());
-			
-			/* Finish the AudioBox and add it to the TrackManager */
-			if (m != null) {
-				box.setClipDuration(getClipDuration(m.getDuration()));
-				box.setName(m.getName());
-				t.addBox(box, box.getBegin());
-			}
-		}
-		
-		private static void addImage(Image source, TrackManager t,
-				edu.nku.cs.csc440.team2.mediaCloud.Media[] allMedia) {
-			
-			/* Create the ImageBox */
-			ImageBox box = new ImageBox(
-					source.getSrc(),
-					source.getBegin(),
-					source.getEnd() - source.getBegin(),
-					new ComposerRegion(source.getRegion()));
-			
-			/* Find our Media object */
-			edu.nku.cs.csc440.team2.mediaCloud.Media m;
-			m = find(allMedia, source.getSrc());
-			
-			/* Finish the ImageBox and add it to the TrackManager */
-			if (m != null) {
-				box.setName(m.getName());
-				t.addBox(box, box.getBegin());
-			}
-		}
-		
-		private static void addText(Text source, TrackManager t,
-				edu.nku.cs.csc440.team2.mediaCloud.Media[] allMedia) {
-			
-			/* Create the TextBox */
-			TextBox box = new TextBox(
-					null,
-					source.getBegin(),
-					source.getEnd() - source.getBegin(),
-					new ComposerRegion(source.getRegion()));
-			
-			/* Find our Media object */
-			edu.nku.cs.csc440.team2.mediaCloud.Media m;
-			m = find(allMedia, source.getSrc());
-			
-			/* Finish the TextBox and add it to the TrackManager */
-			if (m != null) {
-				box.setName(m.getName()); // TODO wat
-				t.addBox(box, box.getBegin());
-			}
-		}
-		
-		private static void addVideo(Video source, TrackManager t,
-				edu.nku.cs.csc440.team2.mediaCloud.Media[] allMedia) {
-			
-			/* Create the VideoBox */
-			VideoBox box = new VideoBox(
-					source.getSrc(),
-					source.getBegin(),
-					source.getEnd() - source.getBegin(),
-					-1.0,
-					new ComposerRegion(source.getRegion()));
-			
-			/* Find our Media object */
-			edu.nku.cs.csc440.team2.mediaCloud.Media m;
-			m = find(allMedia, source.getSrc());
-			
-			/* Finish the VideoBox and add it to the TrackManager */
-			if (m != null) {
-				box.setClipDuration(getClipDuration(m.getDuration()));
-				box.setName(m.getName());
-				t.addBox(box, box.getBegin());
-			}
-		}
-		
-		private static double getClipDuration(String duration) {
-			/* Calculate duration in seconds */
-			String[] dur = duration.split(":");
-			double seconds = Double.parseDouble(dur[2]);
-			seconds += Double.parseDouble(dur[1]) * 60.0;
-			seconds += Double.parseDouble(dur[0]) * 60.0 * 60.0;
-			return seconds;
-		}
-		
-		private static edu.nku.cs.csc440.team2.mediaCloud.Media find(
-				edu.nku.cs.csc440.team2.mediaCloud.Media[] media,
-				String source) {
-			for (int i = 0; i < media.length; i ++) {
-				if (media[i].getMediaUrl().equals(source)) {
-					return media[i];
-				}
-			}
-			return null;
-		}
-		
-	}
 	
 }
