@@ -65,14 +65,8 @@ public class SMILCloud extends Application {
 	public synchronized void setUserId(int userID) {
 		this.userID = userID;
 	}
-<<<<<<< HEAD
 	
-	public synchronized int getUserId()
-	{
-=======
-
 	public synchronized int getUserId() {
->>>>>>> 97d71cd24de78c0d86b371503ce89b448382cea1
 		return this.userID;
 	}
 }
