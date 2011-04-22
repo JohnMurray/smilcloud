@@ -16,11 +16,6 @@ public class WelcomeScreen extends Activity {
     	super.onCreate(savedInstanceState);
     	setContentView(R.layout.welcome_screen);
     	
-    	/////// TEST
-    	//UserProvider up = new UserProvider();
-    	//int p = up.addUser("user2", "password", "f1", "l1");
-    	//int u = up.login("user2", "password");
-    	
     	Button login = (Button)findViewById(R.id.welcome_login);
     	Button register = (Button)findViewById(R.id.welcome_register);
     	
