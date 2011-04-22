@@ -21,6 +21,7 @@ import android.widget.ListView;
 import android.widget.PopupWindow.OnDismissListener;
 import android.widget.Toast;
 import edu.nku.cs.csc440.team2.SMILCloud;
+import edu.nku.cs.csc440.team2.UIMenus.ListAllUsers;
 import edu.nku.cs.csc440.team2.mediaCloud.MessageLite;
 import edu.nku.cs.csc440.team2.player.SMILPlayer;
 import edu.nku.cs.csc440.team2.provider.MessageProvider;
@@ -120,8 +121,10 @@ public class CreatedMessages extends Activity
 				shrAction.setOnClickListener(new OnClickListener() {
 					@Override
 					public void onClick(View v) {
-						Toast.makeText(CreatedMessages.this, "Share " + text, Toast.LENGTH_SHORT).show();
-				    	
+						((SMILCloud)CreatedMessages.this.getApplication()).setSharedMessageId(
+								messageId);
+				    	Intent i = new Intent(CreatedMessages.this, ListAllUsers.class);
+				    	CreatedMessages.this.startActivity(i);
 						mQuickAction.dismiss();
 					}
 				});
