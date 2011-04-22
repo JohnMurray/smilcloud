@@ -178,7 +178,7 @@ public class MessageProvider {
 	 * @param recipientId
 	 * @param messageId
 	 */
-	public void sendMessageById(int senderId, int recipientId, int messageId){
+	public void sendMessageById(int senderId, int recipientId, String messageId){
 		
 String url = "http://nkucloud.dyndns.org:8080/mediacloud/sendMessageById.jsp";
 		
@@ -186,7 +186,7 @@ String url = "http://nkucloud.dyndns.org:8080/mediacloud/sendMessageById.jsp";
 		
 		data.add(new BasicNameValuePair("userId", senderId + ""));
 		data.add(new BasicNameValuePair("recipient", recipientId + ""));
-		data.add(new BasicNameValuePair("uniqueId", messageId + ""));
+		data.add(new BasicNameValuePair("uniqueId", messageId));
 		
 
 		try {
