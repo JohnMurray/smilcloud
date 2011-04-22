@@ -109,7 +109,7 @@ public class MessageProvider {
 	}
 	
 	
-	public void deleteMessage(int messageId){
+	public void deleteMessage(String messageId){
 		
 		try {
 			RequestHelper.makeHttpGetRequest("http://nkucloud.dyndns.org:8080/mediacloud/deleteMessage?messageId=" + messageId);

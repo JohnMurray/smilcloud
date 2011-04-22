@@ -30,6 +30,8 @@ import edu.nku.cs.csc460.team2.R;
 public class Inbox extends Activity 
 {
 	private ArrayList<MessageLite> messages;
+	private NewQAAdapter adapter;
+	private ListView mList;
 
 	/**
      * @param savedInstanceState
@@ -61,8 +63,8 @@ public class Inbox extends Activity
     	 * Define the list view and adapter and set the data that we
     	 * collected in the section above
     	 */
-    	ListView mList = (ListView) findViewById(R.id.l_list);
-    	NewQAAdapter adapter = new NewQAAdapter(this);
+    	mList = (ListView) findViewById(R.id.l_list);
+    	adapter = new NewQAAdapter(this);
     	
     	adapter.setData(data);
         mList.setAdapter(adapter);
@@ -148,10 +150,15 @@ public class Inbox extends Activity
 						mQuickAction.dismiss();
 						//TODO: call provider to delete this message
 						new Thread(new Runnable() {
-							
 							@Override
 							public void run() {
-								
+								(new MessageProvider()).deleteMessage(messageId);
+								runOnUiThread(new Runnable() {
+									@Override
+									public void run() {
+										Inbox.this.resetData();
+									}
+								});
 							}
 						}).start();
 					}
@@ -174,6 +181,21 @@ public class Inbox extends Activity
 			}
 		});
     	
+    }
+    
+    private void resetData()
+    {
+    	this.messages = this.getMessages();
+    	final String [] data = new String[this.messages.size()];
+    	if( this.messages != null )
+    	{
+	    	for( int i = 0; i < this.messages.size(); i++ )
+	    	{
+	    		data[i] = this.messages.get(i).getName();
+	    	}
+    	}
+    	this.adapter.setData(data);
+    	mList.setAdapter(adapter);
     }
     
     
