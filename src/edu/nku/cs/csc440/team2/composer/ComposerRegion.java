@@ -68,7 +68,7 @@ public class ComposerRegion implements Parcelable {
 	}
 	
 	public ComposerRegion(Region r) {
-		mBounds.set(
+		mBounds = new Rect(
 				r.getOrigin().getWidth(),
 				r.getOrigin().getHeight(),
 				r.getOrigin().getWidth() + r.getDimensions().getWidth(),

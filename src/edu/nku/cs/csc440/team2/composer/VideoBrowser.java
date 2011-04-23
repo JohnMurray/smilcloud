@@ -185,22 +185,51 @@ public class VideoBrowser extends ListActivity {
 	protected void onListItemClick(ListView l, View v, int position, long id) {
 		Media m = (Media) l.getItemAtPosition(position);
 
-		/* Calculate duration in tenth-seconds */
-		String[] dur = m.getDuration().split(":");
-		int seconds = (int) (Double.parseDouble(dur[2]) * 10);
-		seconds += (int) (Double.parseDouble(dur[1]) * 600);
-		seconds += (int) (Double.parseDouble(dur[0]) * 600 * 600);
+		int duration = getMediaDuration(m.getDuration());
 		
 		/* Dump data into intent */
 		Intent i = new Intent();
 		i.putExtra("name", m.getName());
 		i.putExtra("id", m.getMediaId());
-		i.putExtra("length", seconds);
+		i.putExtra("length", duration);
 		i.putExtra("source", m.getMediaUrl());
 		i.putExtra("thumb", m.getThumbUrl());
 
 		/* Return result and finish */
 		setResult(RESULT_OK, i);
 		finish();
+	}
+	
+	private int getMediaDuration(String mediaDuration) {
+		/* Split by delimiters */
+		String[] firstSplit = mediaDuration.split(":");
+		if (firstSplit[2].contains(".")) {
+			String[] secondSplit = firstSplit[2].split(".");
+			
+			/* Parse integers from splits */
+			int tenths = Integer.parseInt(secondSplit[1]);
+			int seconds = Integer.parseInt(secondSplit[0]);
+			int minutes = Integer.parseInt(firstSplit[1]);
+			int hours = Integer.parseInt(firstSplit[0]);
+			
+			/* Determine total time in tenth-seconds */
+			minutes += hours * 60;
+			seconds += minutes * 60;
+			tenths += seconds * 10;
+			
+			return tenths;
+		} else {
+			int tenths = 0;
+			int seconds = Integer.parseInt(firstSplit[2]);
+			int minutes = Integer.parseInt(firstSplit[1]);
+			int hours = Integer.parseInt(firstSplit[0]);
+			
+			/* Determine total time in tenth-seconds */
+			minutes += hours * 60;
+			seconds += minutes * 60;
+			tenths += seconds * 10;
+			
+			return tenths;
+		}
 	}
 }

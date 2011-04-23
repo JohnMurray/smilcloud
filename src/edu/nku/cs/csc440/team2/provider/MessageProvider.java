@@ -120,8 +120,9 @@ public class MessageProvider {
 		}
 	}
 	
-	public void saveMessage(int userId, String messageTitle, Message msg) {
+	public String saveMessage(int userId, String messageTitle, Message msg) {
 		
+		String result = "";
 		String xml = getSmil(msg);
 
 		String url = "http://nkucloud.dyndns.org:8080/mediacloud/storeMessage.jsp";
@@ -137,11 +138,13 @@ public class MessageProvider {
 		try {
 
 			// Make POST request
-			RequestHelper.makeHttpPostRequest(url, data);
+			result = RequestHelper.makeHttpPostRequest(url, data);
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
+		
+		return result.trim();
 	}
 	
 

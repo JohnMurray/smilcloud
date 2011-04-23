@@ -1,6 +1,7 @@
 package edu.nku.cs.csc440.team2.composer;
 
 import edu.nku.cs.csc440.team2.SMILCloud;
+import edu.nku.cs.csc440.team2.UIMenus.ListAllUsers;
 import edu.nku.cs.csc440.team2.message.Message;
 import edu.nku.cs.csc440.team2.player.SMILPlayer;
 import edu.nku.cs.csc440.team2.provider.MessageProvider;
@@ -314,13 +315,6 @@ public class Composer extends Activity {
 		Intent i = new Intent(this, VideoProperties.class);
 		startActivityForResult(i, REQ_PROPERTIES);
 	}
-	
-	public void launchPlayer() {
-		SMILCloud app = (SMILCloud) getApplication();
-		app.queueDocumentToPlay(mComposerView.getTrackManager().getId()); // TODO finish
-		Intent i = new Intent(this, SMILPlayer.class);
-		startActivity(i);
-	}
 
 	@Override
 	public void onActivityResult(int requestCode, int resultCode, Intent data) {
@@ -369,7 +363,7 @@ public class Composer extends Activity {
 			launchVideoBoxProperties();
 			return true;
 		case R.id.preview:
-			launchPlayer();
+			previewMessage();
 			return true;
 		case R.id.save:
 			saveMessage();
@@ -381,20 +375,36 @@ public class Composer extends Activity {
 			return super.onOptionsItemSelected(item);
 		}
 	}
-
-	private void sendMessage() {
-		// TODO Auto-generated method stub
+	
+	private void previewMessage() {
+		/* Delete the old message */
+		//MessageProvider mp = new MessageProvider();
+		//mp.
+		SMILCloud app = (SMILCloud) getApplication();
+		String messageId = saveMessage();
+		app.queueDocumentToPlay(messageId);
 		
+		/* Start the player */
+		Intent i = new Intent(this, SMILPlayer.class);
+		startActivity(i);
 	}
 
-	private void saveMessage() {
+	private void sendMessage() {
+		String id = saveMessage();
+		((SMILCloud)this.getApplication()).setSharedMessageId(id);
+		Intent i = new Intent(this, ListAllUsers.class);
+		startActivity(i);
+	}
+
+	private String saveMessage() {
 		// TODO Open activity to insert message title and return
 		Message m = mComposerView.getTrackManager().toMessage();
 		int userId = mComposerView.getTrackManager().getUserId();
 		String title = java.util.UUID.randomUUID().toString();
 		
 		MessageProvider mp = new MessageProvider();
-		mp.saveMessage(userId, title, m);
+		String messageId = mp.saveMessage(userId, title, m);
+		return messageId;
 	}
 
 	@Override

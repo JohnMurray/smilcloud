@@ -777,9 +777,9 @@ public class TrackManager {
 			}
 		}
 		
-		private static void addVideo(Video image) {
+		private static void addVideo(Video video) {
 			/* Get the Video's source url */
-			String source = image.getSrc();
+			String source = video.getSrc();
 			
 			/* Find the associated Media in mMedia */
 			edu.nku.cs.csc440.team2.mediaCloud.Media m = find(source);
@@ -787,11 +787,11 @@ public class TrackManager {
 			/* If the media exists and is accessible to the user */
 			if (m != null) {
 				/* Determine the Box's parameters */
-				int begin = (int) Math.round(image.getBegin() * 10);
-				int end = (int) Math.round(image.getEnd() * 10);
+				int begin = (int) Math.round(video.getBegin() * 10);
+				int end = (int) Math.round(video.getEnd() * 10);
 				int duration = end - begin;
 				int clipDuration = parseMediaDuration(m.getDuration());
-				ComposerRegion region = new ComposerRegion(image.getRegion());
+				ComposerRegion region = new ComposerRegion(video.getRegion());
 				String name = m.getName();
 				
 				/* Create the Box */
@@ -809,20 +809,34 @@ public class TrackManager {
 		private static int parseMediaDuration(String mediaDuration) {
 			/* Split by delimiters */
 			String[] firstSplit = mediaDuration.split(":");
-			String[] secondSplit = firstSplit[2].split(".");
-			
-			/* Parse integers from splits */
-			int tenths = Integer.parseInt(secondSplit[1]);
-			int seconds = Integer.parseInt(secondSplit[0]);
-			int minutes = Integer.parseInt(firstSplit[1]);
-			int hours = Integer.parseInt(firstSplit[0]);
-			
-			/* Determine total time in tenth-seconds */
-			minutes += hours * 60;
-			seconds += minutes * 60;
-			tenths += seconds * 10;
-			
-			return tenths;
+			if (firstSplit[2].contains(".")) {
+				String[] secondSplit = firstSplit[2].split(".");
+				
+				/* Parse integers from splits */
+				int tenths = Integer.parseInt(secondSplit[1]);
+				int seconds = Integer.parseInt(secondSplit[0]);
+				int minutes = Integer.parseInt(firstSplit[1]);
+				int hours = Integer.parseInt(firstSplit[0]);
+				
+				/* Determine total time in tenth-seconds */
+				minutes += hours * 60;
+				seconds += minutes * 60;
+				tenths += seconds * 10;
+				
+				return tenths;
+			} else {
+				int tenths = 0;
+				int seconds = Integer.parseInt(firstSplit[2]);
+				int minutes = Integer.parseInt(firstSplit[1]);
+				int hours = Integer.parseInt(firstSplit[0]);
+				
+				/* Determine total time in tenth-seconds */
+				minutes += hours * 60;
+				seconds += minutes * 60;
+				tenths += seconds * 10;
+				
+				return tenths;
+			}
 		}
 		
 		private static edu.nku.cs.csc440.team2.mediaCloud.Media find(
