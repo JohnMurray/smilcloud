@@ -11,15 +11,17 @@ public class VideoPlayer extends SingleInstancePlayer implements
 		MediaPlayer.OnCompletionListener
 {
 	private MediaPlayer mMediaPlayer;
+	private double mOffsetInto;
 	private SurfaceView sfView;
 	private SurfaceHolder sfHolder;
 	private boolean videoRendered = false;
 	
-	public VideoPlayer(String resource, double begin, double duration)
+	public VideoPlayer(String resource, double begin, double duration, double offsetInto)
 	{
 		this.resourceURL = resource;
 		this.start = begin;
 		this.duration = duration;
+		this.mOffsetInto = offsetInto;
 	}
 
 	public void play()
@@ -109,7 +111,7 @@ public class VideoPlayer extends SingleInstancePlayer implements
 			this.mMediaPlayer.reset();
 			this.mMediaPlayer.setDataSource(this.resourceURL);
 			this.mMediaPlayer.setOnPreparedListener(this);
-			this.subject.notifyBufferingWithoutPause();
+			this.subject.notifyBuffering();
 			this.mMediaPlayer.prepareAsync();
 		}
 		catch(Exception e)
@@ -127,13 +129,14 @@ public class VideoPlayer extends SingleInstancePlayer implements
 				//sfView.setVisibility(View.INVISIBLE);
 			}
 		});
-		this.subject.notifyBufferingWithoutPause();
+		this.subject.notifyBuffering();
 	}
 	
 	@Override
 	public void onPrepared(MediaPlayer mp)
 	{
-		this.subject.notifyDoneBufferingWithoutRestart();
+		this.mMediaPlayer.seekTo((int)(this.mOffsetInto * 100));
+		this.subject.notifyDoneBuffering();
 		Log.w("Video", "Prepared video");
 	}
 
@@ -145,7 +148,7 @@ public class VideoPlayer extends SingleInstancePlayer implements
 	 */
 	@Override
 	public void surfaceCreated(SurfaceHolder holder) {
-		this.subject.notifyDoneBufferingWithoutRestart();
+		this.subject.notifyDoneBuffering();
 		Log.w("Video", "Surface is ready for rendering!");
 	}
 
@@ -174,10 +177,13 @@ public class VideoPlayer extends SingleInstancePlayer implements
 	public void onBufferingUpdate(MediaPlayer mp, int percent) {}
 	
 	
+	/**
+	 * Reset the video for playback
+	 */
 	@Override
 	public void reset()
 	{
-		this.mMediaPlayer.seekTo(0);
+		this.prepare();
 		super.reset();
 	}
 	

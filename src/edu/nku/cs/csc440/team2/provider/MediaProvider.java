@@ -216,7 +216,7 @@ public class MediaProvider {
 	 */
 	public String saveMedia(String localPath, String type, int userId) {
 
-		String returnedUrl = "";
+		String returnedUrl = null;
 		File file = new File(localPath);
 
 		HttpClient httpclient = new DefaultHttpClient();

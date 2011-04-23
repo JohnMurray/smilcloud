@@ -109,10 +109,10 @@ public class MessageProvider {
 	}
 	
 	
-	public void deleteMessage(int messageId){
+	public void deleteMessage(String messageId){
 		
 		try {
-			RequestHelper.makeHttpGetRequest("http://nkucloud.dyndns.org:8080/mediacloud/deleteMessage?messageId=" + messageId);
+			RequestHelper.makeHttpGetRequest("http://nkucloud.dyndns.org:8080/mediacloud/deleteMessage.jsp?messageId=" + messageId);
 
 		} catch (Exception e) {
 			// TODO Auto-generated catch block

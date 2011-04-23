@@ -8,12 +8,14 @@ public class AudioPlayer extends SingleInstancePlayer implements
 {
 	
 	private MediaPlayer mMediaPlayer;
+	private double mOffsetInto;
 	
-	public AudioPlayer(String resource, double start, double duration)
+	public AudioPlayer(String resource, double start, double duration, double offsetInto)
 	{
 		this.resourceURL = resource;
 		this.start = start;
 		this.duration = duration;
+		this.mOffsetInto = offsetInto;
 	}
 
 	public void play()
@@ -85,7 +87,7 @@ public class AudioPlayer extends SingleInstancePlayer implements
 			this.mMediaPlayer.setDataSource(this.resourceURL);
 			this.mMediaPlayer.setOnPreparedListener(this);
 			this.mMediaPlayer.prepareAsync();
-			this.subject.notifyBufferingWithoutPause();
+			this.subject.notifyBuffering();
 		
 		}
 		catch(Exception e) {
@@ -95,14 +97,15 @@ public class AudioPlayer extends SingleInstancePlayer implements
 
 	@Override
 	public void onPrepared(MediaPlayer mp) {
-		this.subject.notifyDoneBufferingWithoutRestart();
+		this.mMediaPlayer.seekTo((int)(this.mOffsetInto * 100));
+		this.subject.notifyDoneBuffering();
 		Log.e("AUDIO", "I'm done buffering and ready to play!");
 	}
 	
 	@Override
 	public void reset()
 	{
-		this.mMediaPlayer.seekTo(0);
+		this.prepare();
 		super.reset();
 	}
 	

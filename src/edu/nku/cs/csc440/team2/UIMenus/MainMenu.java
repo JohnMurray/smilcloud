@@ -4,6 +4,7 @@ import edu.nku.cs.csc440.team2.SMILCloud;
 import edu.nku.cs.csc440.team2.composer.Composer;
 import edu.nku.cs.csc440.team2.inbox.CreatedMessages;
 import edu.nku.cs.csc440.team2.inbox.Inbox;
+import edu.nku.cs.csc440.team2.uploader.Uploader;
 import edu.nku.cs.csc460.team2.R;
 import android.app.Activity;
 import android.content.Intent;
@@ -22,6 +23,8 @@ public class MainMenu extends Activity {
     	Button inbox = (Button)findViewById(R.id.main_menu_inbox);
     	Button createdMessage = (Button)findViewById(R.id.main_menu_created_messages);
     	Button composeNew = (Button)findViewById(R.id.main_menu_compose_messages);
+    	Button uploadMedia = (Button)findViewById(R.id.main_menu_upload_media);
+    	Button logout = (Button)findViewById(R.id.main_menu_logout);
     	Button exit = (Button)findViewById(R.id.main_menu_exit);
     	
     	inbox.setOnClickListener(new OnClickListener(){
@@ -48,6 +51,24 @@ public class MainMenu extends Activity {
 						MainMenu.this, Composer.class));
 			}
     	});
+    	
+    	uploadMedia.setOnClickListener(new OnClickListener() {
+			@Override
+			public void onClick(View v) {
+				Intent i = new Intent(MainMenu.this, Uploader.class);
+				MainMenu.this.startActivity(i);
+			}
+		});
+    	
+    	logout.setOnClickListener(new OnClickListener() {
+			@Override
+			public void onClick(View v) {
+				((SMILCloud)MainMenu.this.getApplication()).setUserId(SMILCloud.NO_USER);
+				Intent i = new Intent(MainMenu.this, WelcomeScreen.class);
+				i.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+				MainMenu.this.startActivity(i);
+			}
+		});
     	
     	exit.setOnClickListener(new OnClickListener(){
 			@Override
