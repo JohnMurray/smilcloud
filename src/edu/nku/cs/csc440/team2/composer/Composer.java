@@ -76,7 +76,7 @@ public class Composer extends Activity {
 			
 			/* Create the trackManager */
 			setTrackManager(TrackManager.Factory.create(messageId, userId));
-			mTrackManager.setContext(getBaseContext());
+			mTrackManager.setContext(getApplicationContext());
 			mTimeline = new Timeline(
 					getResources().getColor(R.color.timeline_bg),
 					getResources().getColor(R.color.timeline_fg));
@@ -92,7 +92,7 @@ public class Composer extends Activity {
 				mTrackManager = ((SMILCloud) getApplication()).getTrackManager();
 				((SMILCloud) getApplication()).getSelectedBox(); // nullify
 			}
-			mTrackManager.setContext(getBaseContext());
+			mTrackManager.setContext(getApplicationContext());
 			mTrackManager.maintain();
 			mTimeline = new Timeline(
 					getResources().getColor(R.color.timeline_bg),
@@ -234,7 +234,7 @@ public class Composer extends Activity {
 
 		void setTrackManager(TrackManager tm) {
 			mTrackManager = tm;
-			mTrackManager.setContext(getBaseContext());
+			mTrackManager.setContext(getApplicationContext());
 			mTrackManager.maintain();
 			invalidate();
 		}
@@ -377,11 +377,11 @@ public class Composer extends Activity {
 	}
 	
 	private void previewMessage() {
-		/* Delete the old message */
-		//MessageProvider mp = new MessageProvider();
-		//mp.
+		/* Save the message */
 		SMILCloud app = (SMILCloud) getApplication();
 		String messageId = saveMessage();
+		
+		/* Add message to play queue */
 		app.queueDocumentToPlay(messageId);
 		
 		/* Start the player */

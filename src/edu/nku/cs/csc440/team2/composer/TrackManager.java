@@ -764,7 +764,7 @@ public class TrackManager {
 				int end = (int) Math.round(text.getEnd() * 10);
 				int duration = end - begin;
 				ComposerRegion region = new ComposerRegion(text.getRegion());
-				String name = m.getName(); // TODO DOWNLOAD THE TEXT AND SET IT TO NAME
+				String name = m.getName().trim();
 				
 				/* Create the Box */
 				TextBox box = new TextBox(source, begin, duration, region);
