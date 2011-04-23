@@ -11,15 +11,17 @@ public class VideoPlayer extends SingleInstancePlayer implements
 		MediaPlayer.OnCompletionListener
 {
 	private MediaPlayer mMediaPlayer;
+	private double mOffsetInto;
 	private SurfaceView sfView;
 	private SurfaceHolder sfHolder;
 	private boolean videoRendered = false;
 	
-	public VideoPlayer(String resource, double begin, double duration)
+	public VideoPlayer(String resource, double begin, double duration, double offsetInto)
 	{
 		this.resourceURL = resource;
 		this.start = begin;
 		this.duration = duration;
+		this.mOffsetInto = offsetInto;
 	}
 
 	public void play()
@@ -133,6 +135,7 @@ public class VideoPlayer extends SingleInstancePlayer implements
 	@Override
 	public void onPrepared(MediaPlayer mp)
 	{
+		this.mMediaPlayer.seekTo((int)(this.mOffsetInto * 100));
 		this.subject.notifyDoneBuffering();
 		Log.w("Video", "Prepared video");
 	}

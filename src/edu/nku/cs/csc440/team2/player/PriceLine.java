@@ -139,7 +139,8 @@ public class PriceLine
 					 * and add it to the container instance
 					 */
 					media = new AudioPlayer(((Audio) b).getSrc(),
-							b.getBegin(), b.getEnd() - b.getBegin());
+							b.getBegin(), b.getEnd() - b.getBegin(),
+							((Audio)b).getClipBegin());
 				}
 				else // b instanceof Video
 				{
@@ -148,7 +149,8 @@ public class PriceLine
 					 * and add it to the container instance
 					 */
 					media = new VideoPlayer(((Video) b).getSrc(),
-							b.getBegin(), b.getEnd() - b.getBegin());
+							b.getBegin(), b.getEnd() - b.getBegin(),
+							((Video)b).getClipBegin());
 				}
 				
 				/*
