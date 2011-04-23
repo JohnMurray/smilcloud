@@ -27,6 +27,11 @@
     	android:layout_width="match_parent" 
     	android:layout_height="wrap_content">
     </Button>
+    <Button android:text="Upload New Media" 
+    	android:id="@+id/main_menu_upload_media" 
+    	android:layout_width="match_parent" 
+    	android:layout_height="wrap_content">
+    </Button>
     <Button android:text="Logout of SMILCloud" 
     	android:id="@+id/main_menu_logout" 
     	android:layout_width="match_parent" 
