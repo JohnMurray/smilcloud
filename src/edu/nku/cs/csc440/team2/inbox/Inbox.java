@@ -32,6 +32,7 @@ public class Inbox extends Activity
 	private ArrayList<MessageLite> messages;
 	private NewQAAdapter adapter;
 	private ListView mList;
+	private String [] data;
 
 	/**
      * @param savedInstanceState
@@ -49,7 +50,7 @@ public class Inbox extends Activity
     	 * Get the list of messages and put the names into a string
     	 */
     	this.messages = this.getMessages();
-    	final String [] data = new String[this.messages.size()];
+    	this.data = new String[this.messages.size()];
     	if( this.messages != null )
     	{
 	    	for( int i = 0; i < this.messages.size(); i++ )
@@ -98,7 +99,7 @@ public class Inbox extends Activity
 				
 				final ImageView mMoreImage 		= (ImageView) view.findViewById(R.id.i_more);
 				
-				final String text				= data[position];
+				final String text				= Inbox.this.data[position];
 				
 				String tempId = null;
 				for( MessageLite ml : Inbox.this.messages )
@@ -186,7 +187,7 @@ public class Inbox extends Activity
     private void resetData()
     {
     	this.messages = this.getMessages();
-    	final String [] data = new String[this.messages.size()];
+    	this.data = new String[this.messages.size()];
     	if( this.messages != null )
     	{
 	    	for( int i = 0; i < this.messages.size(); i++ )
