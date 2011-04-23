@@ -22,6 +22,7 @@ public class MainMenu extends Activity {
     	Button inbox = (Button)findViewById(R.id.main_menu_inbox);
     	Button createdMessage = (Button)findViewById(R.id.main_menu_created_messages);
     	Button composeNew = (Button)findViewById(R.id.main_menu_compose_messages);
+    	Button logout = (Button)findViewById(R.id.main_menu_logout);
     	Button exit = (Button)findViewById(R.id.main_menu_exit);
     	
     	inbox.setOnClickListener(new OnClickListener(){
@@ -48,6 +49,16 @@ public class MainMenu extends Activity {
 						MainMenu.this, Composer.class));
 			}
     	});
+    	
+    	logout.setOnClickListener(new OnClickListener() {
+			@Override
+			public void onClick(View v) {
+				((SMILCloud)MainMenu.this.getApplication()).setUserId(SMILCloud.NO_USER);
+				Intent i = new Intent(MainMenu.this, WelcomeScreen.class);
+				i.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+				MainMenu.this.startActivity(i);
+			}
+		});
     	
     	exit.setOnClickListener(new OnClickListener(){
 			@Override
