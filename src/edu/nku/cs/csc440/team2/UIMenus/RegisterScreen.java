@@ -10,7 +10,6 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
 import edu.nku.cs.csc440.team2.SMILCloud;
-import edu.nku.cs.csc440.team2.User;
 import edu.nku.cs.csc440.team2.provider.UserProvider;
 import edu.nku.cs.csc460.team2.R;
 
