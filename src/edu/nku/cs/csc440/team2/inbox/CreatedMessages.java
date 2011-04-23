@@ -32,6 +32,9 @@ public class CreatedMessages extends Activity
 {
 	
 	private ArrayList<MessageLite> messages;
+	private NewQAAdapter adapter;
+	private ListView mList;
+	private String [] data;
 
 	/**
      * @param savedInstanceState
@@ -49,7 +52,7 @@ public class CreatedMessages extends Activity
     	 * Get the list of messages and put the names into a string
     	 */
     	this.messages = this.getMessages();
-    	final String [] data = new String[this.messages.size()];
+    	data = new String[this.messages.size()];
     	if( this.messages != null )
     	{
 	    	for( int i = 0; i < this.messages.size(); i++ )
@@ -63,8 +66,8 @@ public class CreatedMessages extends Activity
     	 * Define the list view and adapter and set the data that we
     	 * collected in the section above
     	 */
-    	ListView mList = (ListView) findViewById(R.id.l_list);
-    	NewQAAdapter adapter = new NewQAAdapter(this);
+    	mList = (ListView) findViewById(R.id.l_list);
+    	adapter = new NewQAAdapter(this);
     	
     	adapter.setData(data);
         mList.setAdapter(adapter);
@@ -150,9 +153,21 @@ public class CreatedMessages extends Activity
 				delAction.setOnClickListener(new OnClickListener() {
 					@Override
 					public void onClick(View v) {
-						Toast.makeText(CreatedMessages.this, "Delete " + text, Toast.LENGTH_SHORT).show();
-				    	
+						Toast.makeText(CreatedMessages.this, "Deleted " + text, Toast.LENGTH_SHORT).show();
 						mQuickAction.dismiss();
+						//call provider to delete this message asynchronously
+						new Thread(new Runnable() {
+							@Override
+							public void run() {
+								(new MessageProvider()).deleteMessage(messageId);
+								runOnUiThread(new Runnable() {
+									@Override
+									public void run() {
+										CreatedMessages.this.resetData();
+									}
+								});
+							}
+						}).start();;
 					}
 				});
 				
@@ -188,6 +203,22 @@ public class CreatedMessages extends Activity
 			}
 		});
     	
+    }
+    
+    
+    private void resetData()
+    {
+    	this.messages = this.getMessages();
+    	this.data = new String[this.messages.size()];
+    	if( this.messages != null )
+    	{
+	    	for( int i = 0; i < this.messages.size(); i++ )
+	    	{
+	    		data[i] = this.messages.get(i).getName();
+	    	}
+    	}
+    	this.adapter.setData(data);
+    	mList.setAdapter(adapter);
     }
     
     

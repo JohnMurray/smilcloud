@@ -147,7 +147,7 @@ public class Inbox extends Activity
 				delAction.setOnClickListener(new OnClickListener() {
 					@Override
 					public void onClick(View v) {
-						Toast.makeText(Inbox.this, text + " deleted.", Toast.LENGTH_SHORT).show();
+						Toast.makeText(Inbox.this, "Deleted " + text, Toast.LENGTH_SHORT).show();
 						mQuickAction.dismiss();
 						//TODO: call provider to delete this message
 						new Thread(new Runnable() {
