@@ -85,7 +85,7 @@ public class AudioPlayer extends SingleInstancePlayer implements
 			this.mMediaPlayer.setDataSource(this.resourceURL);
 			this.mMediaPlayer.setOnPreparedListener(this);
 			this.mMediaPlayer.prepareAsync();
-			this.subject.notifyBufferingWithoutPause();
+			this.subject.notifyBuffering();
 		
 		}
 		catch(Exception e) {
@@ -95,7 +95,7 @@ public class AudioPlayer extends SingleInstancePlayer implements
 
 	@Override
 	public void onPrepared(MediaPlayer mp) {
-		this.subject.notifyDoneBufferingWithoutRestart();
+		this.subject.notifyDoneBuffering();
 		Log.e("AUDIO", "I'm done buffering and ready to play!");
 	}
 	
