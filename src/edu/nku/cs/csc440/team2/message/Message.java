@@ -147,6 +147,7 @@ public class Message {
 
 		// <region background-color="" fit="" height="" id="" left="" top=""
 		// width="" z-index=""/>
+		try {
 		NodeList regionList = doc.getElementsByTagName("region");
 		NamedNodeMap nnm = regionList.item(regionList.getLength() - 1)
 				.getAttributes();
@@ -182,6 +183,9 @@ public class Message {
 			regions[index] = new Region(new SmilDimension(width, height),
 					backgroundColor, new SmilDimension(left, top), fit, id,
 					zIndex);
+		}
+		} catch (Exception e) {
+			
 		}
 
 		parse(doc.getElementsByTagName("body").item(0), bodyImpSeq);
