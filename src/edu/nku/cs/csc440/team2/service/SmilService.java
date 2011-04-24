@@ -60,36 +60,38 @@ public class SmilService extends Service {
 
 			ArrayList<MessageLite> serverList = mp.getAllMessage(userId);
 			ArrayList<MessageLite> appList = app.getMessages();
-			
-			for( MessageLite m : serverList )
-			{
-				if( appList != null && ! appList.contains(m) )
-				{
-					CharSequence text = "New message " + m.getName() + " from: " + m.getSender();
 
-					// Set the icon, scrolling text and timestamp
-					Notification notification = new Notification(
-							R.drawable.sym_action_email, "You've got SMIL!",
-							System.currentTimeMillis());
+			if (serverList != null) {
+				for (MessageLite m : serverList) {
+					if (appList != null && !appList.contains(m)) {
+						CharSequence text = "New message " + m.getName()
+								+ " from: " + m.getSender();
 
-					// The PendingIntent to launch our activity if the user selects this
-					// notification
-					PendingIntent contentIntent = PendingIntent.getActivity(this, 0,
-							new Intent(this, Inbox.class), 0);
+						// Set the icon, scrolling text and timestamp
+						Notification notification = new Notification(
+								R.drawable.sym_action_email,
+								"You've got SMIL!", System.currentTimeMillis());
 
-					// Set the info for the views that show in the notification panel.
-					notification.setLatestEventInfo(this, "New SMIL Message", text,
-							contentIntent);
+						// The PendingIntent to launch our activity if the user
+						// selects this
+						// notification
+						PendingIntent contentIntent = PendingIntent
+								.getActivity(this, 0, new Intent(this,
+										Inbox.class), 0);
 
-					// Send the notification.
-					mNM.notify(R.string.yes, notification);
+						// Set the info for the views that show in the
+						// notification panel.
+						notification.setLatestEventInfo(this,
+								"New SMIL Message", text, contentIntent);
+
+						// Send the notification.
+						mNM.notify(R.string.yes, notification);
+					}
 				}
-			}
-			
-			
-			app.setMessages(serverList);
 
-			
+				app.setMessages(serverList);
+
+			}
 		}
 	}
 }
