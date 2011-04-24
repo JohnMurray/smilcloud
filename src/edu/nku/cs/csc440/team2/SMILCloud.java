@@ -3,8 +3,6 @@ package edu.nku.cs.csc440.team2;
 import java.util.ArrayList;
 
 import android.app.Application;
-import edu.nku.cs.csc440.team2.composer.Box;
-import edu.nku.cs.csc440.team2.composer.TrackManager;
 import edu.nku.cs.csc440.team2.mediaCloud.MessageLite;
 
 /**
@@ -50,66 +48,14 @@ public class SMILCloud extends Application {
 	private String queueDocumentToEditID = null;
 	
 	/**
-	 * The currenlty selected box in teh composer.  
-	 */
-	private Box selectedBox;
-	
-	/**
 	 * The id of a message that is about to be shared.
 	 */
 	private String shareMessageID = null;
 	
 	/**
-	 * The current trackManager in use.
-	 */
-	private TrackManager trackManager;
-	
-	/**
 	 * The current user id, initially set to the NO_USER constant until login.
 	 */
 	private int userID = NO_USER;
-
-	/**
-	 * Store the current TrackManager
-	 * 
-	 * @param t
-	 * 			TrackManager to be stored
-	 */
-	public synchronized void setTrackManager(TrackManager t) {
-		this.trackManager = t;
-	}
-
-	/**
-	 * Retrieves the stored TrackManager
-	 * 
-	 * @return the last set TrackManager
-	 */
-	public synchronized TrackManager getTrackManager() {
-		TrackManager t = this.trackManager;
-		this.trackManager = null;
-		return t;
-	}
-
-	/**
-	 * Stores a Box object.
-	 * 
-	 * @param b
-	 * 			Box to store
-	 */
-	public synchronized void setSelectedBox(Box b) {
-		this.selectedBox = b;
-	}
-
-	/**
-	 * Retreives a box object
-	 * 
-	 * @return a Box object
-	 */
-	public synchronized Box getSelectedBox() {
-		Box b = this.selectedBox;
-		this.selectedBox = null;
-		return b;
-	}
 
 	/**
 	 * Stores the id of a SMIL document. Usually used for playback.

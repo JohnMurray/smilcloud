@@ -85,7 +85,8 @@ public class Composer extends Activity {
 		}
 
 		void load(Bundle bundle) {
-			mBounds = bundle.getParcelable("mBounds");
+			mBounds = bundle.getParcelable("bounds");
+			mTrackManager = bundle.getParcelable("track_manager");
 			mTrackManager.maintain();
 			mTimeline = new Timeline();
 			invalidate();
@@ -210,13 +211,12 @@ public class Composer extends Activity {
 				mTrackManager.getResizeManager().finish();
 				invalidate();
 			}
-			((SMILCloud) getApplication()).getSelectedBox();
 			return true;
 		}
 
 		void save(Bundle bundle) {
-			bundle.putParcelable("mBounds", mBounds);
-			((SMILCloud) getApplication()).setTrackManager(mTrackManager);
+			bundle.putParcelable("bounds", mBounds);
+			bundle.putParcelable("track_manager", mTrackManager);
 		}
 
 		void setTrackManager(TrackManager tm) {
@@ -230,6 +230,12 @@ public class Composer extends Activity {
 	private static double sScale = 1.0;
 
 	public static final int REQ_PROPERTIES = 23;
+	public static final int REQ_NAME_MESSAGE = 24;
+	public static final int REQ_SAVE_AND_EXIT = 25;
+	
+	public static final int MODE_SAVE = 1;
+	public static final int MODE_SEND = 2;
+	public static final int MODE_PREVIEW = 3;
 
 	/**
 	 * @return Returns the current scaling factor.
@@ -282,6 +288,10 @@ public class Composer extends Activity {
 
 	private ComposerView mComposerView;
 	
+	private int mSaveMode;
+	
+	private String mMessageName;
+	
 	public void launchAudioProperties(String id) {
 		Intent i = new Intent(this, AudioProperties.class);
 		i.putExtra("track_manager", mComposerView.getTrackManager());
@@ -320,12 +330,42 @@ public class Composer extends Activity {
 			} else if (resultCode == RESULT_CANCELED) {
 				// do nothing
 			}
+		} else if (requestCode == REQ_NAME_MESSAGE) {
+			if (resultCode == RESULT_OK) {
+				mMessageName = data.getStringExtra("name");
+				if (mSaveMode == MODE_SAVE) {
+					saveMessage(mMessageName);
+				} else if (mSaveMode == MODE_SEND) {
+					sendMessage(mMessageName);
+				} else if (mSaveMode == MODE_PREVIEW) {
+					previewMessage(mMessageName);
+				}
+			} else {
+				// do nothing
+			}
+		} else if (requestCode == REQ_SAVE_AND_EXIT) {
+			if (resultCode == RESULT_OK) {
+				mMessageName = data.getStringExtra("name");
+				saveMessage(mMessageName);
+				finish();
+			} else if (resultCode == RESULT_CANCELED) {
+				finish();
+			}
 		}
+	}
+	
+	@Override
+	public void onBackPressed() {
+		Intent i = new Intent(this, MessageNamePrompt.class);
+		i.putExtra("name", mMessageName);
+		startActivityForResult(i, REQ_SAVE_AND_EXIT);
 	}
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
+		mSaveMode = -1;
+		mMessageName = "Unfinished Message";
 		mComposerView = new ComposerView(this);
 		if (savedInstanceState == null) {
 			mComposerView.create();
@@ -359,23 +399,34 @@ public class Composer extends Activity {
 			launchVideoProperties(null);
 			return true;
 		case R.id.preview:
-			previewMessage();
+			mSaveMode = MODE_PREVIEW;
+			previewMessage(mMessageName);
 			return true;
 		case R.id.save:
-			saveMessage();
+			mSaveMode = MODE_SAVE;
+			launchMessageNamePrompt(mMessageName);
 			return true;
 		case R.id.send:
-			sendMessage();
+			mSaveMode = MODE_SEND;
+			launchMessageNamePrompt(mMessageName);
 			return true;
 		default:
 			return super.onOptionsItemSelected(item);
 		}
 	}
 	
-	private void previewMessage() {
+	private void launchMessageNamePrompt(String name) {
+		Intent i = new Intent(this, MessageNamePrompt.class);
+		if (name != null) {
+			i.putExtra("name", name);
+		}
+		startActivityForResult(i, REQ_NAME_MESSAGE);
+	}
+	
+	private void previewMessage(String title) {
 		/* Save the message */
 		SMILCloud app = (SMILCloud) getApplication();
-		String messageId = saveMessage();
+		String messageId = saveMessage(title);
 		
 		/* Add message to play queue */
 		app.queueDocumentToPlay(messageId);
@@ -386,14 +437,14 @@ public class Composer extends Activity {
 		startActivity(i);
 	}
 
-	private void sendMessage() {
-		String id = saveMessage();
+	private void sendMessage(String title) {
+		String id = saveMessage(title);
 		((SMILCloud)this.getApplication()).setSharedMessageId(id);
 		Intent i = new Intent(this, ListAllUsers.class);
 		startActivity(i);
 	}
 
-	private String saveMessage() {
+	private String saveMessage(String title) {
 		/* Set message provider */
 		MessageProvider mp = new MessageProvider();
 		
@@ -410,7 +461,6 @@ public class Composer extends Activity {
 		// TODO Open activity to insert message title and return
 		Message m = mComposerView.getTrackManager().toMessage();
 		int userId = mComposerView.getTrackManager().getUserId();
-		String title = java.util.UUID.randomUUID().toString();
 		
 		String messageId = mp.saveMessage(userId, title, m);
 		return messageId;
