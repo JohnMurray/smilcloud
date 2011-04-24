@@ -28,20 +28,43 @@ import edu.nku.cs.csc440.team2.player.SMILPlayer;
 import edu.nku.cs.csc440.team2.provider.MessageProvider;
 import edu.nku.cs.csc460.team2.R;
 
+/**
+ * Activity that shows the user's created messages. Utilizes the QuickAction
+ * notfications. Offers options to create, edit, share, delete, and edit
+ * messages. 
+ * 
+ * @author John Murray
+ * @version 1.0 4/24/11
+ */
 public class CreatedMessages extends Activity 
 {
 	
+	/**
+	 * The list of messages shown by the activity
+	 */
 	private ArrayList<MessageLite> messages;
+	
+	/**
+	 * The adapter for hte menu items
+	 */
 	private NewQAAdapter adapter;
+	
+	/**
+	 * the list view that will be populated with data
+	 */
 	private ListView mList;
+	
+	/**
+	 * The titles of the items in the list
+	 */
 	private String [] data;
 
 	/**
+	 * Call when Activity is first created
+	 * 
      * @param savedInstanceState
      * @return void
      * @note Activity should run in landscape mode.
-     * 
-     * Call when Activity is first created
      */
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -205,7 +228,9 @@ public class CreatedMessages extends Activity
     	
     }
     
-    
+    /**
+     * Reload the data in the list
+     */
     private void resetData()
     {
     	this.messages = this.getMessages();
@@ -222,6 +247,9 @@ public class CreatedMessages extends Activity
     }
     
     
+    /**
+     * Load the menu into the Activity
+     */
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         MenuInflater inflater = getMenuInflater();
@@ -230,6 +258,9 @@ public class CreatedMessages extends Activity
     }
     
     
+    /**
+     * Define what happens when itmes are selected
+     */
     @Override
     public boolean onOptionsItemSelected(MenuItem item) 
     {
@@ -248,11 +279,20 @@ public class CreatedMessages extends Activity
     	}
     }
     
-    
+    /**
+     * Get a list of messages to show.
+     * @return
+     * 			The list of messages to show
+     */
     private ArrayList<MessageLite> getMessages()
     {
-    	return (new MessageProvider()).getSavedMessages(
+    	ArrayList<MessageLite> m =  (new MessageProvider()).getSavedMessages(
     		((SMILCloud)getApplication()).getUserId());
+    	if( m == null )
+    	{
+    		return new ArrayList<MessageLite>();
+    	}
+    	return m;
     }
 	
 }

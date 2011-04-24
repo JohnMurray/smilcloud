@@ -3,6 +3,14 @@ package edu.nku.cs.csc440.team2.player;
 import java.util.ArrayList;
 import java.util.Stack;
 
+/**
+ * Acts as a general notifier. Was intented to work in the sense of the
+ * Subscriber pattern. Ended up being used more like a shared data-
+ * structure.
+ * 
+ * @author John Murray
+ * @version 1.0 4/24/11
+ */
 public class Arbiter 
 {
 

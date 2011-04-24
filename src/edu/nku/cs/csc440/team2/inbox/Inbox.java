@@ -30,14 +30,43 @@ import edu.nku.cs.csc440.team2.player.SMILPlayer;
 import edu.nku.cs.csc440.team2.provider.MessageProvider;
 import edu.nku.cs.csc460.team2.R;
 
+/**
+ * Activity that shows the user's shared messages. Utilizes the QuickAction
+ * notfications. Offers options to create, edit, share, delete, and edit
+ * messages. 
+ * 
+ * @author John Murray
+ * @version 1.0 4/24/11
+ */
 public class Inbox extends Activity 
 {
+	/**
+	 * The list of messages shown by the activity
+	 */
 	private ArrayList<MessageLite> messages;
+	/**
+	 * The adapter for hte menu items
+	 */
 	private NewQAAdapter adapter;
+	
+	/**
+	 * the list view that will be populated with data
+	 */
 	private ListView mList;
+	
+	/**
+	 * The titles of the items in the list
+	 */
 	private String [] data;
+	
+	/**
+	 * Timer to check for updates at a set interval
+	 */
 	private Timer mPoller = new Timer();
 	
+	/**
+	 * The thread to update the data in the background
+	 */
 	private Runnable mResetData = new Runnable() {
 		@Override
 		public void run() {
@@ -201,6 +230,9 @@ public class Inbox extends Activity
     	
     }
     
+    /**
+     * Reload the data in the list
+     */
     private void resetData()
     {    		    		
     	this.messages = this.getMessages();
@@ -217,6 +249,9 @@ public class Inbox extends Activity
     }
     
     
+    /**
+     * Load the menu into the Activity
+     */
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         MenuInflater inflater = getMenuInflater();
@@ -224,7 +259,9 @@ public class Inbox extends Activity
         return true;
     }
     
-    
+    /**
+     * Define what happens when itmes are selected
+     */
     @Override
     public boolean onOptionsItemSelected(MenuItem item) 
     {
@@ -243,7 +280,11 @@ public class Inbox extends Activity
     	}
     }
     
-    
+    /**
+     * Get a list of messages to show.
+     * @return
+     * 			The list of messages to show
+     */
     private ArrayList<MessageLite> getMessages()
     {
     	/* get the local messages first */
