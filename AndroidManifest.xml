@@ -50,6 +50,10 @@
                   android:label="@string/app_name"
                   android:screenOrientation="landscape" >
         </activity>
+        <activity android:name="edu.nku.cs.csc440.team2.composer.MessageNamePrompt"
+                  android:label="@string/app_name"
+                  android:screenOrientation="landscape" >
+        </activity>
         <activity android:name="edu.nku.cs.csc440.team2.UIMenus.RegisterScreen"
         		  android:label="@string/app_name"
         		  android:screenOrientation="landscape">
