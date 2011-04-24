@@ -65,7 +65,7 @@ public class SmilService extends Service {
 			{
 				if( appList != null && ! appList.contains(m) )
 				{
-					CharSequence text = "You've got SMIL: " + m.getName();
+					CharSequence text = "New message " + m.getName() + " from: " + m.getSender();
 
 					// Set the icon, scrolling text and timestamp
 					Notification notification = new Notification(
@@ -78,13 +78,14 @@ public class SmilService extends Service {
 							new Intent(this, Inbox.class), 0);
 
 					// Set the info for the views that show in the notification panel.
-					notification.setLatestEventInfo(this, getText(R.string.no), text,
+					notification.setLatestEventInfo(this, "New SMIL Message", text,
 							contentIntent);
 
 					// Send the notification.
 					mNM.notify(R.string.yes, notification);
 				}
 			}
+			
 			
 			app.setMessages(serverList);
 

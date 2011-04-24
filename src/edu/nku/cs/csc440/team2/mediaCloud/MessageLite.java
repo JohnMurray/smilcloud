@@ -90,8 +90,9 @@ public class MessageLite {
 		return inbox.toArray(inboxArray);
 	}
 	
-	public boolean equals(MessageLite m)
+	public boolean equals(Object other)
 	{
+		MessageLite m = (MessageLite) other;
 		return (m.getName().equals(this.name) &&
 				m.getUniqueId().equals(this.uniqueId) &&
 				m.getSender().equals(this.sender) &&
