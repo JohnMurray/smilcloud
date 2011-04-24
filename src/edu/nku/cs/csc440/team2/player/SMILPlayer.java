@@ -3,9 +3,9 @@ package edu.nku.cs.csc440.team2.player;
 import java.util.concurrent.Callable;
 
 import android.app.Activity;
+import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
-import android.graphics.Color;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -50,6 +50,15 @@ public class SMILPlayer extends Activity {
 	private SeqPlayer root;
 	private RelativeLayout rootView;
 	
+	private ProgressDialog mProgressDialog;
+	
+	private Runnable mDismissProgressDialog = new Runnable() {
+		@Override
+		public void run() {
+			SMILPlayer.this.mProgressDialog.dismiss();
+		}
+	};
+	
 	private Runnable mDonePlaying = new Runnable() {
 		@Override
 		public void run() {
@@ -65,7 +74,7 @@ public class SMILPlayer extends Activity {
      * 
      * Call when Activity is first created
      */
-    @Override
+	@Override
     public void onCreate(Bundle savedInstanceState) {
     	/*
     	 * create the main instance and get the root View
@@ -73,6 +82,9 @@ public class SMILPlayer extends Activity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.player_main);
         this.rootView = (RelativeLayout)findViewById(R.id.player_root_layout);
+        
+        this.mProgressDialog = ProgressDialog.show(this, "Please wait...", 
+        		"Preparing your video...");
         
         RelativeLayout videoContainer = this.loadVideoContainer();
         
@@ -95,6 +107,7 @@ public class SMILPlayer extends Activity {
         	if( message == null )
         	{
         		//Document was not found... should display a message and not continue
+        		this.mProgressDialog.dismiss();
         		Context context = getApplicationContext();
         		String toastMessage = SMILPlayer.MEDIA_NOT_FOUND;
         		Toast.makeText(context, toastMessage, Toast.LENGTH_LONG).show();
@@ -120,6 +133,7 @@ public class SMILPlayer extends Activity {
         			 * all is going pretty good even though at this point it's really
         			 * not going that well
         			 */
+        			this.mProgressDialog.dismiss();
         			Context context = getApplicationContext();
         			String toastMessage = SMILPlayer.WTF_HAPPENED_MESSAGE;
         			Toast.makeText(context, toastMessage, Toast.LENGTH_LONG);
@@ -134,6 +148,7 @@ public class SMILPlayer extends Activity {
         	 * and not do anything. However, I'm not sure how they got to this
         	 * point. (Scratch head... shrug... dont' think about it anymore)
         	 */
+        	this.mProgressDialog.dismiss();
         	Context context = getApplicationContext();
         	String message = SMILPlayer.NO_MEDIA_TO_PLAY;
         	Toast.makeText(context, message, Toast.LENGTH_LONG).show();
@@ -168,9 +183,12 @@ public class SMILPlayer extends Activity {
 					e1.printStackTrace();
 				}
 				
+				/*
+				 * Wait for any initial buffering. This is excluded from the
+				 * main loop so that we can dismiss the ProgressDialog once.
+				 */
 				if( ! subject.isBufferQueueEmpty() )
 				{
-					/* TODO update the UI to display the buffering info*/
 					while( ! subject.isBufferQueueEmpty() )
 					{
 						try {
@@ -180,6 +198,7 @@ public class SMILPlayer extends Activity {
 						}
 					}
 				}
+				runOnUiThread(SMILPlayer.this.mDismissProgressDialog);
 				/*
     			 * Initialize the progress bar to its max value for updating later on
     			 */
@@ -242,8 +261,6 @@ public class SMILPlayer extends Activity {
      * preparation of the data-structure is done... we might
      * want to display some type of wait-thing on the UI thread,
      * but I guess that will come later.
-     * 
-     * TODO: add waiting bar/loader thing to the UI while preparing
      */
     private void preparePlayer()
     {
@@ -267,7 +284,6 @@ public class SMILPlayer extends Activity {
         		RelativeLayout.LayoutParams.MATCH_PARENT);
         lp.setMargins(0, 0, 0, 0);
         videoContainer.setLayoutParams(lp);
-        videoContainer.setBackgroundColor(Color.CYAN);
         this.rootView.addView(videoContainer);
         return videoContainer;
     }

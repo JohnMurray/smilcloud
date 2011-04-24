@@ -46,7 +46,7 @@ public class CreatedMessages extends Activity
     @Override
     public void onCreate(Bundle savedInstanceState) {
     	super.onCreate(savedInstanceState);
-    	setContentView(R.layout.inbox_main);
+    	setContentView(R.layout.created_messages_main);
     	
     	/*
     	 * Get the list of messages and put the names into a string

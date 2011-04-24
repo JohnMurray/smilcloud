@@ -1,14 +1,14 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-	<string name="app_name">smilcloud</string>
+	<string name="app_name">SMILCloud</string>
 	
     <!-- menu stuff -->
     <string name="library_menu">My Library</string>
     <string name="exit_player_menu">Exit</string>
     <string name="create_message">Create New Video</string>
     
-    <string name="hello">Hello World, NewQA!</string>
-    <string name="inbox_title">smilCloud Inbox</string>
+    <string name="created_messages_title">Created Messages</string>
+    <string name="inbox_title">Inbox</string>
     
     <!-- composer menu strings -->
     <string name="add_audio_menu">Add Audio</string>

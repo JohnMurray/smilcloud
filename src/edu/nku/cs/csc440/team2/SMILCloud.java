@@ -56,8 +56,8 @@ public class SMILCloud extends Application {
 		return this.queueDocumentToEditID;
 	}
 
-	public synchronized void addMessage(MessageLite message) {
-		this.messages.add(message);
+	public synchronized void setMessages(ArrayList<MessageLite> a) {
+		this.messages = a;
 	}
 
 	public synchronized ArrayList<MessageLite> getMessages() {

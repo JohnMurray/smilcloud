@@ -27,16 +27,8 @@ public class SeqPlayer extends ContainerPlayer
 		this.timePlayed += Player.PLAYBACK_INTERVAL;
 	}
 	
-	//TODO: EXTRA -- implement seek forward sometime
-	public void seekForward()
-	{
-		
-	}
-	
-	//TODO: EXTRA -- implement seek backward sometime
-	public void seekBackward()
-	{
-		
-	}
+	//not implemented at the moment (perhaps in version 2)
+	public void seekForward(){}
+	public void seekBackward(){}
 	
 }

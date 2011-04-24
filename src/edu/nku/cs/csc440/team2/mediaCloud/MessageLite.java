@@ -89,5 +89,13 @@ public class MessageLite {
 		MessageLite[] inboxArray = new MessageLite[inbox.size()];
 		return inbox.toArray(inboxArray);
 	}
+	
+	public boolean equals(MessageLite m)
+	{
+		return (m.getName() == this.name &&
+				m.getUniqueId() == this.uniqueId &&
+				m.getSender() == this.sender &&
+				m.getDate() == this.date);
+	}
 
 }
