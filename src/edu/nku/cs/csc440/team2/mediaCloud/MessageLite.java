@@ -92,10 +92,10 @@ public class MessageLite {
 	
 	public boolean equals(MessageLite m)
 	{
-		return (m.getName() == this.name &&
-				m.getUniqueId() == this.uniqueId &&
-				m.getSender() == this.sender &&
-				m.getDate() == this.date);
+		return (m.getName().equals(this.name) &&
+				m.getUniqueId().equals(this.uniqueId) &&
+				m.getSender().equals(this.sender) &&
+				m.getDate().equals(this.date) );
 	}
 
 }

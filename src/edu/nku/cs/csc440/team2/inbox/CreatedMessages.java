@@ -236,6 +236,9 @@ public class CreatedMessages extends Activity
     	switch(item.getItemId())
     	{
     	case R.id.create_message:
+    		((SMILCloud)CreatedMessages.this.getApplication()).queueDocumentToEdit(null);
+    		CreatedMessages.this.startActivity(new Intent(
+    				CreatedMessages.this, Composer.class));
     		return true;
     	case R.id.exit_player:
     		finish();

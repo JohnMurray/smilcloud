@@ -39,7 +39,7 @@ public class SmilService extends Service {
 			public void run() {
 				showNotification();
 			}
-		}, 0, 15000);
+		}, 0, SMILCloud.UPDATE_INTERVAL_MILLISEC);
 	}
 
 	@Override

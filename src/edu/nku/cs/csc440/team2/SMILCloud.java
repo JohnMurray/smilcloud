@@ -10,6 +10,7 @@ import edu.nku.cs.csc440.team2.mediaCloud.MessageLite;
 public class SMILCloud extends Application {
 	
 	public final static int NO_USER = -1;
+	public final static int UPDATE_INTERVAL_MILLISEC = 15000;
 
 	private ArrayList<MessageLite> messages;
 	private String previewMessageId;

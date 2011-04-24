@@ -2,6 +2,8 @@ package edu.nku.cs.csc440.team2.inbox;
 
 
 import java.util.ArrayList;
+import java.util.Timer;
+import java.util.TimerTask;
 
 import net.londatiga.android.ActionItem;
 import net.londatiga.android.NewQAAdapter;
@@ -22,6 +24,7 @@ import android.widget.PopupWindow.OnDismissListener;
 import android.widget.Toast;
 import edu.nku.cs.csc440.team2.SMILCloud;
 import edu.nku.cs.csc440.team2.UIMenus.ListAllUsers;
+import edu.nku.cs.csc440.team2.composer.Composer;
 import edu.nku.cs.csc440.team2.mediaCloud.MessageLite;
 import edu.nku.cs.csc440.team2.player.SMILPlayer;
 import edu.nku.cs.csc440.team2.provider.MessageProvider;
@@ -33,6 +36,14 @@ public class Inbox extends Activity
 	private NewQAAdapter adapter;
 	private ListView mList;
 	private String [] data;
+	private Timer mPoller = new Timer();
+	
+	private Runnable mResetData = new Runnable() {
+		@Override
+		public void run() {
+			Inbox.this.resetData();
+		}
+	};
 
 	/**
      * @param savedInstanceState
@@ -154,12 +165,7 @@ public class Inbox extends Activity
 							@Override
 							public void run() {
 								(new MessageProvider()).deleteMessage(messageId);
-								runOnUiThread(new Runnable() {
-									@Override
-									public void run() {
-										Inbox.this.resetData();
-									}
-								});
+								runOnUiThread(Inbox.this.mResetData);
 							}
 						}).start();
 					}
@@ -181,11 +187,22 @@ public class Inbox extends Activity
 				mQuickAction.show();
 			}
 		});
+		
+		/*
+		 * Set up the timer to contiunally update the list of 
+		 * messages in the Inbox every so many seconds.
+		 */
+		this.mPoller.scheduleAtFixedRate(new TimerTask() {
+			@Override
+			public void run() {
+				runOnUiThread(Inbox.this.mResetData);
+			}
+		}, 0, SMILCloud.UPDATE_INTERVAL_MILLISEC);
     	
     }
     
     private void resetData()
-    {
+    {    		    		
     	this.messages = this.getMessages();
     	this.data = new String[this.messages.size()];
     	if( this.messages != null )
@@ -214,6 +231,9 @@ public class Inbox extends Activity
     	switch(item.getItemId())
     	{
     	case R.id.create_message:
+    		((SMILCloud)Inbox.this.getApplication()).queueDocumentToEdit(null);
+    		Inbox.this.startActivity(new Intent(
+    				Inbox.this, Composer.class));
     		return true;
     	case R.id.exit_player:
     		finish();
@@ -226,8 +246,26 @@ public class Inbox extends Activity
     
     private ArrayList<MessageLite> getMessages()
     {
-    	return (new MessageProvider()).getAllMessage(
-        		((SMILCloud)getApplication()).getUserId());
+    	/* get the local messages first */
+    	SMILCloud app = (SMILCloud) getApplication();
+    	ArrayList<MessageLite> msgs = app.getMessages();
+    	
+    	/*if there are no local messages, go to the cloud*/	
+    	if( msgs == null )
+    	{
+    		msgs = (new MessageProvider()).getAllMessage(
+    				((SMILCloud)getApplication()).getUserId());
+    	}
+    	
+    	/* if we still don't have any messages, then just set it to
+    	 * and empty array and return that. 
+    	 */
+    	if( msgs == null )
+    	{
+    		msgs = new ArrayList<MessageLite>();
+    	}
+    	
+    	return msgs;
     }
 	
 }
