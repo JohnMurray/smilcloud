@@ -1,6 +1,5 @@
 package edu.nku.cs.csc440.team2.composer;
 
-import edu.nku.cs.csc440.team2.SMILCloud;
 import edu.nku.cs.csc460.team2.R;
 import android.app.Activity;
 import android.content.Intent;
@@ -99,11 +98,11 @@ public class AudioProperties extends Activity {
 			public void onClick(View v) {
 				/* Delete the media from the data structure */
 				mTrackManager.removeBox(mBox);
-				mBox = null;
 
 				/* Return the data structure and deletion status */
-				setResult(RESULT_OK);
-				save();
+				Intent i = new Intent();
+				i.putExtra("track_manager", mTrackManager);
+				setResult(RESULT_OK, i);
 				finish();
 			}
 
@@ -116,7 +115,6 @@ public class AudioProperties extends Activity {
 		if (resultCode == RESULT_OK) {
 			/* Media was successfully chosen */
 			mBox.setName(data.getStringExtra("name"));
-			mBox.setId(data.getStringExtra("id"));
 			mBox.setClipDuration(data.getIntExtra("length", 10));
 			mBox.setSource(data.getStringExtra("source"));
 			
@@ -133,15 +131,13 @@ public class AudioProperties extends Activity {
 		/* If all required fields are filled in */
 		if (mBox.getSource() != null) {
 			/* Return OK status */
-			setResult(RESULT_OK);
+			Intent i = new Intent();
+			i.putExtra("track_manager", mTrackManager);
+			setResult(RESULT_OK, i);
 		} else {
-			/* Return canceled status */
-			mTrackManager.removeBox(mBox);
-			mBox = null;
 			setResult(RESULT_CANCELED);
 		}
 		
-		save();
 		finish();
 	}
 
@@ -150,26 +146,22 @@ public class AudioProperties extends Activity {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.audio_properties);
 		loadWidgetsFromView();
-	}
-
-	@Override
-	protected void onSaveInstanceState(Bundle outState) {
-		save();
-	}
-	
-	@Override
-	protected void onStart() {
-		super.onStart();
-
-		/* Load from Application */
-		mTrackManager = ((SMILCloud) getApplication()).getTrackManager();
-		mBox = (AudioBox) ((SMILCloud) getApplication()).getSelectedBox();
+		
+		/* Load from Intent */
+		mTrackManager = getIntent().getParcelableExtra("track_manager");
+		String boxId = getIntent().getStringExtra("box_id");
+		mBox = (AudioBox) mTrackManager.getBox(boxId);
 		
 		if (mBox == null) {
 			/* Media must be created */
 			mBox = new AudioBox(null, 0, 10, 10);
 			mTrackManager.addBox(mBox, mBox.getBegin());
 		}
+	}
+	
+	@Override
+	protected void onStart() {
+		super.onStart();
 		
 		/* Initialize the SeekBar */
 		int range = mBox.getClipDuration() - mBox.getDuration();
@@ -181,15 +173,6 @@ public class AudioProperties extends Activity {
 			mSetSourceButton.setEnabled(false);
 			mSetSourceButton.setText(mBox.getName());
 		}
-	}
-	
-	/**
-	 * Saves the TrackManager and Box to the Application.
-	 */
-	private void save() {
-		/* Save to Application */
-		((SMILCloud) getApplication()).setTrackManager(mTrackManager);
-		((SMILCloud) getApplication()).setSelectedBox(mBox);
 	}
 
 }

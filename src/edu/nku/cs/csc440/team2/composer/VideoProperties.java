@@ -1,6 +1,5 @@
 package edu.nku.cs.csc440.team2.composer;
 
-import edu.nku.cs.csc440.team2.SMILCloud;
 import edu.nku.cs.csc460.team2.R;
 import android.app.Activity;
 import android.content.Intent;
@@ -107,6 +106,8 @@ public class VideoProperties extends Activity {
 			@Override
 			public void onClick(View v) {
 				Intent i = new Intent(getBaseContext(), RegionEditor.class);
+				i.putExtra("track_manager", mTrackManager);
+				i.putExtra("box_id", mBox.getId());
 				startActivityForResult(i, REQ_REGION);
 			}
 
@@ -119,11 +120,11 @@ public class VideoProperties extends Activity {
 			public void onClick(View v) {
 				/* Delete the media from the data structure */
 				mTrackManager.removeBox(mBox);
-				mBox = null;
 
 				/* Return the data structure and deletion status */
-				setResult(RESULT_OK);
-				save();
+				Intent i = new Intent();
+				i.putExtra("track_manager", mTrackManager);
+				setResult(RESULT_OK, i);
 				finish();
 			}
 
@@ -134,20 +135,22 @@ public class VideoProperties extends Activity {
 	protected void onActivityResult(int requestCode, int resultCode, Intent data) {
 		if (resultCode == RESULT_OK) {
 			if (requestCode == REQ_SOURCE) {
-				/* Media was successfully chosen */
+				/* Set Box info from intent */
 				mBox.setName(data.getStringExtra("name"));
-				mBox.setId(data.getStringExtra("id"));
 				mBox.setClipDuration(data.getIntExtra("length", 10));
 				mBox.setSource(data.getStringExtra("source"));
+	
 			} else if (requestCode == REQ_REGION) {
-				// do nothing
+				mTrackManager = data.getParcelableExtra("track_manager");
+				String boxId = data.getStringExtra("box_id");
+				mBox = (VideoBox) mTrackManager.getBox(boxId);
 			}
-		}
-		
-		/* Disallow editing of the media's source if it's already set */
-		if (mBox.getSource() != null) {
-			mSetSourceButton.setEnabled(false);
-			mSetSourceButton.setText(mBox.getName());
+			
+			/* Disallow editing of the media's source if it's already set */
+			if (mBox.getSource() != null) {
+				mSetSourceButton.setEnabled(false);
+				mSetSourceButton.setText(mBox.getName());
+			}
 		}
 	}
 
@@ -156,15 +159,13 @@ public class VideoProperties extends Activity {
 		/* If all required fields are filled in */
 		if (mBox.getSource() != null && mBox.getRegion() != null) {
 			/* Return OK status */
-			setResult(RESULT_OK);
+			Intent i = new Intent();
+			i.putExtra("track_manager", mTrackManager);
+			setResult(RESULT_OK, i);
 		} else {
-			/* Return canceled status */
-			mTrackManager.removeBox(mBox);
-			mBox = null;
 			setResult(RESULT_CANCELED);
 		}
 		
-		save();
 		finish();
 	}
 
@@ -173,26 +174,22 @@ public class VideoProperties extends Activity {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.video_properties);
 		loadWidgetsFromView();
-	}
-
-	@Override
-	protected void onSaveInstanceState(Bundle outState) {
-		save();
-	}
-	
-	@Override
-	protected void onStart() {
-		super.onStart();
 		
-		/* Load from Application */
-		mTrackManager = ((SMILCloud) getApplication()).getTrackManager();
-		mBox = (VideoBox) ((SMILCloud) getApplication()).getSelectedBox();
+		/* Load from Intent */
+		mTrackManager = getIntent().getParcelableExtra("track_manager");
+		String boxId = getIntent().getStringExtra("box_id");
+		mBox = (VideoBox) mTrackManager.getBox(boxId);
 		
 		if (mBox == null) {
 			/* Media must be created */
 			mBox = new VideoBox(null, 0, 10, 10, null);
 			mTrackManager.addBox(mBox, mBox.getBegin());
 		}
+	}
+	
+	@Override
+	protected void onStart() {
+		super.onStart();
 		
 		/* Initialize the SeekBar */
 		int range = mBox.getClipDuration() - mBox.getDuration();
@@ -206,13 +203,4 @@ public class VideoProperties extends Activity {
 		}
 	}
 	
-	/**
-	 * Saves the TrackManager and Box to the Application.
-	 */
-	private void save() {
-		/* Save to Application */
-		((SMILCloud) getApplication()).setTrackManager(mTrackManager);
-		((SMILCloud) getApplication()).setSelectedBox(mBox);
-	}
-
 }

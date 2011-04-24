@@ -1,13 +1,12 @@
 package edu.nku.cs.csc440.team2.composer;
 
 import edu.nku.cs.csc440.team2.message.Media;
-import edu.nku.cs.csc460.team2.R;
-import android.content.Context;
 import android.graphics.Canvas;
 import android.graphics.Paint;
 import android.graphics.Rect;
 import android.graphics.Paint.Align;
 import android.graphics.Paint.Style;
+import android.os.Parcel;
 
 /**
  * A Box is a graphical representation of a message.Media object. Before being
@@ -15,11 +14,13 @@ import android.graphics.Paint.Style;
  * drawing target. Then draw() will draw this Box to a Canvas. 
  *  
  * @author William Knauer <knauerw1@nku.edu>
- * @version 2011.0421
+ * @version 2011.0423
  */
 public abstract class Box implements Comparable<Box> {
-	/** A Context used to get resources */
-	private Context mContext;
+	public static final int TEXT_OFFSET = 5;
+	public static final int RESIZE_WIDTH = 35;
+	public static final int SPACING = 7;
+	public static final int HEIGHT = 40;
 	
 	/** The absolute begin time of the represented Media */
 	private int mBegin;
@@ -51,6 +52,18 @@ public abstract class Box implements Comparable<Box> {
 	/** The generated label to be drawn */
 	private String mLabel;
 
+	public Box(Parcel in) {
+		mBegin = in.readInt();
+		mDuration = in.readInt();
+		mName = in.readString();
+		mSource = in.readString();
+		mBounds = in.readParcelable(Rect.class.getClassLoader());
+		mResizeBounds = in.readParcelable(Rect.class.getClassLoader());
+		mRegion = in.readParcelable(ComposerRegion.class.getClassLoader());
+		mId = in.readString();
+		mType = (char) in.readInt();
+		mLabel = in.readString();
+	}
 	/**
 	 * Class constructor.
 	 * 
@@ -68,7 +81,6 @@ public abstract class Box implements Comparable<Box> {
 		mId = null;
 		mLabel = null;
 		mName = null;
-		mContext = null;
 		mType = ' ';
 	}
 
@@ -121,43 +133,38 @@ public abstract class Box implements Comparable<Box> {
 	 * @param resizeColor The color of the resize grip.
 	 */
 	public void draw(
-			Canvas canvas, int bgColor, int fgColor, int resizeColor) {
-		if (mContext != null) {
-			Paint p = new Paint();
-			
-			/* Draw background */
-			p.setColor(bgColor);
-			p.setAntiAlias(true);
-			p.setStyle(Style.FILL);
-			canvas.drawRect(getBounds(), p);
-			
-			/* Draw label */
-			p.setColor(fgColor);
-			p.setTextAlign(Align.LEFT);
-			p.setTextSize(mContext.getResources().getInteger(
-					R.integer.box_text_size));
-			if (mLabel == null) {
-				generateLabel(p);
-			}
-			canvas.drawText(
-					mLabel,
-					getBounds().left + mContext.getResources().getInteger(
-							R.integer.box_text_offset),
-					getBounds().top + (getBounds().height() / 2)
-							+ p.getFontMetrics().descent, p);
+		Canvas canvas, int bgColor, int fgColor, int resizeColor) {
+		Paint p = new Paint();
 		
-			/* Draw resize grip */
-			updateResizeBounds();
-			p.setColor(resizeColor);
-			canvas.drawRect(getResizeBounds(), p);
+		/* Draw background */
+		p.setColor(bgColor);
+		p.setAntiAlias(true);
+		p.setStyle(Style.FILL);
+		canvas.drawRect(getBounds(), p);
 		
-			/* Draw border */
-			p.setColor(fgColor);
-			p.setStyle(Style.STROKE);
-			p.setStrokeWidth(mContext.getResources().getInteger(
-					R.integer.box_border_width));
-			canvas.drawRect(getBounds(), p);
+		/* Draw label */
+		p.setColor(fgColor);
+		p.setTextAlign(Align.LEFT);
+		p.setTextSize(16.0f);
+		if (mLabel == null) {
+			generateLabel(p);
 		}
+		canvas.drawText(
+				mLabel,
+				getBounds().left + TEXT_OFFSET,
+				getBounds().top + (getBounds().height() / 2)
+						+ p.getFontMetrics().descent, p);
+	
+		/* Draw resize grip */
+		updateResizeBounds();
+		p.setColor(resizeColor);
+		canvas.drawRect(getResizeBounds(), p);
+	
+		/* Draw border */
+		p.setColor(fgColor);
+		p.setStyle(Style.STROKE);
+		p.setStrokeWidth(2.0f);
+		canvas.drawRect(getBounds(), p);
 	}
 
 	public int getBegin() {
@@ -166,10 +173,6 @@ public abstract class Box implements Comparable<Box> {
 
 	public Rect getBounds() {
 		return mBounds;
-	}
-	
-	public Context getContext() {
-		return mContext;
 	}
 
 	public int getDuration() {
@@ -211,16 +214,12 @@ public abstract class Box implements Comparable<Box> {
 	public void setBounds(int left, int top, int right, int bottom) {
 		mBounds.set(left, top, right, bottom);
 	}
-	
-	public void setContext(Context context) {
-		mContext = context;
-	}
 
 	public void setDuration(int duration) {
 		mDuration = duration;
 	}
 
-	public void setId(String id) {
+	protected void setId(String id) {
 		mId = id;
 	}
 
@@ -236,7 +235,7 @@ public abstract class Box implements Comparable<Box> {
 		mSource = source;
 	}
 	
-	public void setType(char type) {
+	protected void setType(char type) {
 		mType = type;
 	}
 	
@@ -262,9 +261,7 @@ public abstract class Box implements Comparable<Box> {
 		int measurement = (int) p.measureText(s.toString());
 		
 		/* Determine how much space we have to work with */
-		int resizeWidth = getContext().getResources().getInteger(R.integer.resize_grip_width);
-		int textOffset = getContext().getResources().getInteger(R.integer.box_text_offset);
-		int available = mBounds.width() - textOffset - resizeWidth;
+		int available = mBounds.width() - TEXT_OFFSET - RESIZE_WIDTH;
 		
 		/* Figure out how long the label should be */
 		if (available < 0) {
@@ -297,8 +294,20 @@ public abstract class Box implements Comparable<Box> {
 	protected void updateResizeBounds() {
 		mResizeBounds.set(getBounds());
 		mResizeBounds.left = mResizeBounds.right;
-		mResizeBounds.left -= mContext.getResources().getInteger(
-				R.integer.resize_grip_width);
+		mResizeBounds.left -= RESIZE_WIDTH;
+	}
+
+	public void writeToParcel(Parcel out, int flags) {
+		out.writeInt(mBegin);
+		out.writeInt(mDuration);
+		out.writeString(mName);
+		out.writeString(mSource);
+		out.writeParcelable(mBounds, 0);
+		out.writeParcelable(mResizeBounds, 0);
+		out.writeParcelable(mRegion, 0);
+		out.writeString(mId);
+		out.writeInt(mType);
+		out.writeString(mLabel);
 	}
 	
 }

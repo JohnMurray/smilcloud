@@ -5,9 +5,7 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.LinkedList;
-import java.util.List;
 
-import edu.nku.cs.csc440.team2.SMILCloud;
 import edu.nku.cs.csc440.team2.message.Audio;
 import edu.nku.cs.csc440.team2.message.Body;
 import edu.nku.cs.csc440.team2.message.Image;
@@ -19,18 +17,19 @@ import edu.nku.cs.csc440.team2.message.Text;
 import edu.nku.cs.csc440.team2.message.Video;
 import edu.nku.cs.csc440.team2.provider.MediaProvider;
 import edu.nku.cs.csc440.team2.provider.MessageProvider;
-import edu.nku.cs.csc460.team2.R;
 
-import android.content.Context;
 import android.graphics.Canvas;
 import android.graphics.Rect;
 import android.os.Environment;
+import android.os.Parcel;
+import android.os.Parcelable;
 
 /**
  * @author William Knauer <knauerw1@nku.edu>
  * @version 2011.0421
  */
-public class TrackManager {
+public class TrackManager implements Parcelable {
+	
 	/**
 	 * A MoveManager helps to facilitate the moving of a Box from one Track to
 	 * another or from one location in a Track to another within the same Track.
@@ -305,14 +304,21 @@ public class TrackManager {
 	/** The drawing bounds */
 	private Rect mBounds;
 
-	/** The Context used to get resources and create Tracks */
-	private Context mContext;
-
 	/** The global identifier for the represented Message */
 	private String mId;
 	
 	/** The userId for cloud interaction */
 	private int mUserId;
+	
+	public TrackManager(Parcel in) {
+		mTracks = new LinkedList<Track>();
+		in.readTypedList(mTracks, Track.CREATOR);
+		mMoveManager = new MoveManager();
+		mResizeManager = new ResizeManager();
+		mBounds = in.readParcelable(Rect.class.getClassLoader());
+		mId = in.readString();
+		mUserId = in.readInt();
+	}
 
 	/**
 	 * Class constructor.
@@ -354,21 +360,16 @@ public class TrackManager {
 	 *            The Canvas to draw on.
 	 */
 	public void draw(Canvas canvas) {
-		if (mContext != null) {
-			int height = mContext.getResources().getInteger(
-					R.integer.track_height);
-
-			/* Draw tracks */
-			int y = getBounds().top;
-			for (Track t : mTracks) {
-				t.setBounds(0, y, mBounds.width(), y + height);
-				t.draw(canvas);
-				y += height;
-			}
-
-			/* Draw moving box (if any) */
-			mMoveManager.draw(canvas);
+		/* Draw tracks */
+		int y = getBounds().top;
+		for (Track t : mTracks) {
+			t.setBounds(0, y, mBounds.width(), y + Track.HEIGHT);
+			t.draw(canvas);
+			y += Track.HEIGHT;
 		}
+
+		/* Draw moving box (if any) */
+		mMoveManager.draw(canvas);
 	}
 
 	/**
@@ -406,6 +407,15 @@ public class TrackManager {
 			result = t.getBox((int) (Composer.pxToSec(targetX) * 10));
 		}
 		return result;
+	}
+	
+	public Box getBox(String id) {
+		for (Box b : getAllBoxes()) {
+			if (b.getId().equals(id)) {
+				return b;
+			}
+		}
+		return null;
 	}
 
 	public String getId() {
@@ -512,7 +522,6 @@ public class TrackManager {
 	public void maintain() {
 		if (mTracks.isEmpty() || !mTracks.getLast().isEmpty()) {
 			Track t = new Track();
-			t.setContext(mContext);
 			mTracks.addLast(t);
 		} else {
 			if (mTracks.size() >= 2) {
@@ -536,10 +545,7 @@ public class TrackManager {
 	 * @return Returns the estimated height.
 	 */
 	public int measureHeight() {
-		return (mContext.getResources().getInteger(R.integer.track_height) * mTracks
-				.size())
-				+ (2 * mContext.getResources()
-						.getInteger(R.integer.box_spacing));
+		return Track.HEIGHT*mTracks.size() + 2*Box.SPACING; 
 	}
 
 	/**
@@ -570,13 +576,6 @@ public class TrackManager {
 	 */
 	public void setBounds(int l, int t, int r, int b) {
 		mBounds.set(l, t, r, b);
-	}
-
-	public void setContext(Context context) {
-		mContext = context;
-		for (Track t : mTracks) {
-			t.setContext(mContext);
-		}
 	}
 	
 	public void setId(String id) {
@@ -850,5 +849,34 @@ public class TrackManager {
 		}
 		
 	}
+
+	@Override
+	public int describeContents() {
+		// TODO Auto-generated method stub
+		return 0;
+	}
+
+	@Override
+	public void writeToParcel(Parcel dest, int flags) {
+		dest.writeTypedList(mTracks);
+		dest.writeParcelable(mBounds, 0);
+		dest.writeString(mId);
+		dest.writeInt(mUserId);
+	}
+	
+	/** Used to generate instances of this class from a Parcel */
+	public static final Parcelable.Creator<TrackManager> CREATOR = new Parcelable.Creator<TrackManager>() {
+
+		@Override
+		public TrackManager createFromParcel(Parcel source) {
+			return new TrackManager(source);
+		}
+
+		@Override
+		public TrackManager[] newArray(int size) {
+			return new TrackManager[size];
+		}
+
+	};
 	
 }

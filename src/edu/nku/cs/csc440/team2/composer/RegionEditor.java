@@ -3,11 +3,11 @@ package edu.nku.cs.csc440.team2.composer;
 import java.util.Collections;
 import java.util.LinkedList;
 
-import edu.nku.cs.csc440.team2.SMILCloud;
 import edu.nku.cs.csc460.team2.R;
 
 import android.app.Activity;
 import android.content.Context;
+import android.content.Intent;
 import android.graphics.Canvas;
 import android.graphics.Paint;
 import android.graphics.Paint.Style;
@@ -369,8 +369,10 @@ public class RegionEditor extends Activity {
 	
 	@Override
 	public void onBackPressed() {
-		setResult(RESULT_OK);
-		save();
+		Intent i = new Intent();
+		i.putExtra("track_manager", mTrackManager);
+		i.putExtra("box_id", mBox.getId());
+		setResult(RESULT_OK, i);
 		finish();
 	}
 
@@ -378,9 +380,10 @@ public class RegionEditor extends Activity {
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		
-		/* Load from the Application */
-		mTrackManager = ((SMILCloud) getApplication()).getTrackManager();
-		mBox = ((SMILCloud) getApplication()).getSelectedBox();
+		/* Load from Intent */
+		mTrackManager = getIntent().getParcelableExtra("track_manager");
+		String boxId = getIntent().getStringExtra("box_id");
+		mBox = mTrackManager.getBox(boxId);
 		
 		/* Create a region for mBox if we must */
 		if (mBox.getRegion() == null) {
@@ -417,19 +420,6 @@ public class RegionEditor extends Activity {
 		}
 
 		return result;
-	}
-
-	@Override
-	public void onSaveInstanceState(Bundle outState) {
-		save();
-	}
-	
-	/**
-	 * Saves the TrackManager and Box to the Application.
-	 */
-	private void save() {
-		((SMILCloud) getApplication()).setTrackManager(mTrackManager);
-		((SMILCloud) getApplication()).setSelectedBox(mBox);
 	}
 	
 }

@@ -1,11 +1,13 @@
 package edu.nku.cs.csc440.team2.composer;
 
+import android.os.Parcel;
+
 /**
  * An AudioVideoBox is a Box with additional fields specific to Audio and Video
  * objects, such as clip begin and clip duration times.
  * 
  * @author William Knauer <knauerw1@nku.edu>
- * @version 2011.0421
+ * @version 2011.0423
  */
 public abstract class AudioVideoBox extends Box {
 	/** The offset into the source media where playback should begin */
@@ -13,6 +15,12 @@ public abstract class AudioVideoBox extends Box {
 	
 	/** The duration of the source media */
 	private int mClipDuration;
+	
+	public AudioVideoBox(Parcel in) {
+		super(in);
+		mClipBegin = in.readInt();
+		mClipDuration = in.readInt();
+	}
 	
 	/**
 	 * Class constructor.
@@ -76,6 +84,12 @@ public abstract class AudioVideoBox extends Box {
 	
 	public void setClipDuration(int clipDuration) {
 		mClipDuration = clipDuration;
+	}
+	
+	public void writeToParcel(Parcel out, int flags) {
+		super.writeToParcel(out, flags);
+		out.writeInt(mClipBegin);
+		out.writeInt(mClipDuration);
 	}
 	
 }
