@@ -21,12 +21,12 @@ import edu.nku.cs.csc440.team2.message.Text;
 import edu.nku.cs.csc440.team2.message.Video;
 
 /**
- * 
- * @author john
- * 
  * Negotiate between the classes of the messenger package and the 
  * classes of the player package. (of the edu.nku.cs.csc440.team2 
  * namespace)
+ * 
+ * @author John Murray
+ * @version 1.0 4/24/11
  */
 public class PriceLine 
 {
@@ -39,11 +39,11 @@ public class PriceLine
 	private Arbiter subject = new Arbiter();
 
 	/**
+	 * instantiate the translator with the messenger classes
+	 * 
 	 * @param m
 	 * @param context
 	 * @param rvg
-	 * 
-	 * instantiate the translator with the messenger classes
 	 */
 	public PriceLine(Message m, Context context, RelativeLayout rvg)
 	{
@@ -70,14 +70,13 @@ public class PriceLine
 	}
 	
 	/**
-	 * 
-	 * @param body
-	 * @param parent
-	 * 
 	 * Helper method for negotiateBigDeal method. Builds a hash of Region
 	 * objects that will later be translated into RelativeView (Android-
 	 * specific) objects and the player package's internal reperesentation
 	 * of the media objects.
+	 * 
+	 * @param body
+	 * @param parent
 	 */
 	private void makePrivateDeal(LinkedList<Body> body, ContainerPlayer parent)
 	{
@@ -278,10 +277,11 @@ public class PriceLine
 	}
 	
 	/**
-	 * @param id
-	 * 
 	 * Return the RelativeLayout ViewGroup from the internal data-structure
 	 * given the ID to the layout (generated from the SMIL message)
+	 * 
+	 * @param id
+	 * 			ID of the viewgroup
 	 */
 	private RelativeLayout findViewById(String id)
 	{
@@ -296,11 +296,13 @@ public class PriceLine
 	}
 	
 	/**
-	 * @param cp
-	 * 
 	 * The current structure for the root (implicit Sequence object) is sorted
 	 * by the ID (String value) and I need to sort them by the playback start-
 	 * time... so we need to do some sorting here. (and eat raw deals of course)
+	 * 
+	 * @param cp
+	 * 			The container player to sort
+	 * 
 	 */
 	private void sortSequenceAndEatRawDealForBreakfast(SeqPlayer cp)
 	{
@@ -331,11 +333,11 @@ public class PriceLine
 	
 	
 	/**
-	 * 
-	 * @author john
-	 *
 	 * Define a struct-like class just to hold some data for
 	 * a brief period of time.
+	 * 
+	 * @author John Murray
+	 * @version 1.0 4/24/11
 	 */
 	private class RegionData {
 		public SmilDimension origin;
@@ -351,13 +353,15 @@ public class PriceLine
 	
 	
 	/**
+	 * Define a Pair (or 2-tuple) since Java refuses to do so... :-(
 	 * 
-	 * @author john
+	 * @author John Murray
+	 * @version 1.0 4/24/11
 	 *
 	 * @param <T>
+	 * 			Generic Parameter
 	 * @param <V>
-	 * 
-	 * Define a Pair (or 2-tuple) since Java refuses to do so... :-(
+	 * 			Generic Parameter
 	 */
 	private class Pair<T, V>
 	{

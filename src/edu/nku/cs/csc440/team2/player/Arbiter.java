@@ -127,6 +127,10 @@ public class Arbiter
 		return this.totalPlaybackTime;
 	}
 	
+	/**
+	 * reset the playback time to 0. The subject holds not other state that
+	 * can be reset to pre-playback.
+	 */
 	public void reset()
 	{
 		this.totalPlaybackTime = 0.0;

@@ -13,21 +13,48 @@ import edu.nku.cs.csc440.team2.SMILCloud;
 import edu.nku.cs.csc440.team2.provider.UserProvider;
 import edu.nku.cs.csc460.team2.R;
 
-
+/**
+ * Activity to handle authentication against the cloud.
+ * 
+ * 
+ * @author John Murray
+ * @version 1.0 4/24/11
+ *
+ */
 public class AuthenticateScreen extends Activity {
 	
+	/**
+	 * Constant message to display if the username or password are left blank"
+	 */
 	public static final String INVALID_INPUT_MSG = "Username and password required.";
+	/**
+	 * Constant message to display if we are unable to connect to the cloud (network error)
+	 */
 	public static final String NETWORK_ERROR_MSG = "Unable to connect to the cloud.";
+	/**
+	 * Constant message to display if we are unable to login with given creds.
+	 */
 	public static final String INVALID_CREDS = "Authentication failed with given username and password";
 	
-	
+	/**
+	 * Instance data to hold the username
+	 */
 	private String username = null;
+	/**
+	 * Instance data to hold password
+	 */
 	private String password = null;
+	/**
+	 * Instance data to hold the user id
+	 */
 	private Integer userId = null;
 	
+	/**
+	 * Progress dialog to show when connecting to the cloud
+	 */
 	private ProgressDialog mProgressDialog;
 	
-	/*
+	/**
 	 * Thread to run authentication in the background so that
 	 * the UI does not "appear" to be slow or sluggish
 	 */
@@ -65,6 +92,10 @@ public class AuthenticateScreen extends Activity {
 		}
 	};
 	
+	/**
+	 * Message to show the user when they didn't provide both username
+	 * and password
+	 */
 	private Runnable mInvalidInput = new Runnable() {
 		@Override
 		public void run() {
@@ -75,6 +106,9 @@ public class AuthenticateScreen extends Activity {
 		}
 	};
 	
+	/**
+	 * Message to show the user when they provide invalid credentials
+	 */
 	private Runnable mInvalidCreds = new Runnable() {
 		@Override
 		public void run() {
@@ -85,6 +119,9 @@ public class AuthenticateScreen extends Activity {
 		}
 	};
 	
+	/**
+	 * Message to show the user when there has been a network error
+	 */
 	private Runnable mNetworkError = new Runnable() {
 		@Override
 		public void run() {
@@ -95,6 +132,9 @@ public class AuthenticateScreen extends Activity {
 		}
 	};
 	
+	/**
+	 * Message to show the user when they authenticate successfully
+	 */
 	private Runnable mSuccessfulLogin = new Runnable() {
 		@Override
 		public void run() {
@@ -107,6 +147,10 @@ public class AuthenticateScreen extends Activity {
 		}
 	};
 	
+	/**
+	 * Start the activity and display the login form and handle the actions
+	 * when the user presses submit. 
+	 */
 	@Override
     public void onCreate(Bundle savedInstanceState) {
     	super.onCreate(savedInstanceState);

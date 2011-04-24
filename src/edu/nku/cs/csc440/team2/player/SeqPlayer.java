@@ -2,9 +2,20 @@ package edu.nku.cs.csc440.team2.player;
 
 import android.util.Log;
 
+/**
+ * A ContainerPlayer that holds Player objects and plays them
+ * sequentially. 
+ * 
+ * @author John Murray
+ * @version 1.0 4/24/11
+ *
+ */
 public class SeqPlayer extends ContainerPlayer
 {
-	
+	/**
+	 * Play the objects in sequence, and undrender Player ojbects
+	 * that have already been completed. 
+	 */
 	public void play()
 	{
 		for( Player p : this.components )
@@ -27,8 +38,13 @@ public class SeqPlayer extends ContainerPlayer
 		this.timePlayed += Player.PLAYBACK_INTERVAL;
 	}
 	
-	//not implemented at the moment (perhaps in version 2)
+	/**
+	 * not implemented at the moment (perhaps in version 2)
+	 */
 	public void seekForward(){}
+	/**
+	 * not implemented at the moment (perhaps in version 2)
+	 */
 	public void seekBackward(){}
 	
 }

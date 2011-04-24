@@ -9,8 +9,20 @@ import android.widget.Button;
 import edu.nku.cs.csc440.team2.SMILCloud;
 import edu.nku.cs.csc460.team2.R;
 
+/**
+ * The welcome screen. The first thing you see when
+ * you start the application.
+ * 
+ * @author John Murray
+ * @version 1.0 4/24/11
+ *
+ */
 public class WelcomeScreen extends Activity {
 	
+	/**
+	 * Display the welcome screen and set the event handlers
+	 * for your two actions, login or register.
+	 */
 	@Override
     public void onCreate(Bundle savedInstanceState) {
 		

@@ -14,20 +14,46 @@ import edu.nku.cs.csc440.team2.SMILCloud;
 import edu.nku.cs.csc440.team2.provider.MediaProvider;
 import edu.nku.cs.csc460.team2.R;
 
+/**
+ * The Android activity for uploading media to the cloud. 
+ * 
+ * @author John Murray
+ * @version 1.0 4/24/11
+ *
+ */
 public class Uploader extends Activity 
 {
-	/*
-	 * Static strings for output.
+	/**
+	 * Constant message to show when the media is invalid
 	 */
 	public static final String BAD_MEDIA = "File is not a valid/accepted media file.";
+	/**
+	 * Constant message to show when the upload failed by network connection
+	 * or uneccessary problems. 
+	 */
 	public static final String FAILED_UPLOAD = "Upload could not be completed at this time.\nUnable to Connect";
+	/**
+	 * Constant messagge to show when the uplaod succeeded. 
+	 */
 	public static final String GOOD_UPLOAD = "File successfully uploaded.";
 
+	/**
+	 * The Uri of the file to upload.
+	 */
 	private Uri uri;
+	/**
+	 * The textbox that contains the path to the file
+	 */
 	private EditText fileLocation;
+	/**
+	 * The text contained within the fileLocation
+	 */
 	private String fileLocationText;
+	/**
+	 * The progress dialog to show when uploading media
+	 */
 	private ProgressDialog mProgressDialog;
-	/*
+	/**
 	 * The background activity for uploading media
 	 */
 	private Runnable mUploadMedia = new Runnable() {
@@ -59,7 +85,7 @@ public class Uploader extends Activity
 		}
 	};
 	
-	/*
+	/**
 	 * The Runnable for clearing the EditText box
 	 */
 	private Runnable mClearEditText = new Runnable() {
@@ -70,14 +96,18 @@ public class Uploader extends Activity
 		}
 	};
 	
+	/**
+	 * The message that shows upon various dismissal dialogs
+	 */
 	private String mDismissMessage;
 	
 	/**
+	 * Create the Uploader Activity and set the event handlers for the 
+	 * buttons. 
+	 * 
      * @param savedInstanceState
      * @return void
      * @note Activity should run in landscape mode.
-     * 
-     * Call when Activity is first created
      */
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -108,6 +138,9 @@ public class Uploader extends Activity
 		});
     }
 
+    /**
+     * Accept data from the file manager (the path)
+     */
 	@Override
     public void onActivityResult(int requestCode, int resultCode, Intent data)
     {
@@ -124,6 +157,13 @@ public class Uploader extends Activity
     	}
     }
     
+	/**
+	 * Determine the type of the file
+	 * @param ext
+	 * 			The extension fo the file type
+	 * @return
+	 * 			The file type
+	 */
     protected String determineType(String ext) {
 		String type = null;
 		if( ext.equals("mp3") || ext.equals("wav") || ext.equals("ogg") )
@@ -142,6 +182,11 @@ public class Uploader extends Activity
 		return type;
 	}
     
+    /**
+     * Dismiss the notification and show a toast message
+     * @param message
+     * 				The message to toast
+     */
     public void dismissAndNotify(String message)
     {
     	this.mDismissMessage = message;

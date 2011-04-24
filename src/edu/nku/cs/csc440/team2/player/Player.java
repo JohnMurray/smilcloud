@@ -2,7 +2,8 @@ package edu.nku.cs.csc440.team2.player;
 
 /**
  * 
- * @author john
+ * @author John Murray
+ * @version 1.0 4/24/11
  *
  * Represents and abstract Player object that has the ability
  * to render itself on the canvas (by getting it's layout from
@@ -15,34 +16,34 @@ public abstract class Player {
 	
 	public static final double PLAYBACK_INTERVAL = 0.1f;
 	
-	/*
+	/**
 	 * Used in the subscriber pattern to receive notifications/
 	 * commands from in case of a buffer issued by either an
 	 * audio or media player object.
 	 */
 	protected Arbiter subject;
 	
-	/*
+	/**
 	 * Determines the start time for the object in a double
 	 * type. However, the precision of the time should not
 	 * exceed 1 tenth. The time is represented in seconds.
 	 */
 	protected double start;
 	
-	/*
+	/**
 	 * Determines how long the media object should remain on
 	 * the canvas 
 	 */
 	protected double duration;
 	
-	/*
+	/**
 	 * Determines how much of the media object has been played.
 	 * Can be used along with duration to determine when the
 	 * media object should be removed from the canvas. 
 	 */
 	protected double timePlayed = 0;
 	
-	/*
+	/**
 	 * Flag to determine (quickly) if playback has started without
 	 * having to calculate time and what not.
 	 */

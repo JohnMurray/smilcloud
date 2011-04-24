@@ -29,29 +29,76 @@ import edu.nku.cs.csc440.team2.provider.MessageProvider;
 import edu.nku.cs.csc460.team2.R;
 
 /**
+ * This is the main player class and controls playback as well as
+ * presents controls for controlling the movie. 
  * 
- * @author john
+ * @author John Murray
+ * @version 1.0 4/24/11
  *
  */
 public class SMILPlayer extends Activity {
-    
+    /**
+     * Constant message to show when the player is done playing.
+     */
 	public static final String DONE_PLAYING = "Done playing SMIL message.";
+	/**
+	 * Constant message to show when there was no ID passed in to the player
+	 */
 	public static final String NO_MEDIA_TO_PLAY = "No media was selected to play.";
-	public static final String MEDIA_NOT_FOUND = "The media  you requested was not found.";
+	/**
+	 * Constant message to show when the player cannot find the id
+	 * of the message selected. 
+	 */
+	public static final String MEDIA_NOT_FOUND = "The media you requested was not found.";
+	/**
+	 * Constant message to show when something unexpected happened.  
+	 */
 	public static final String WTF_HAPPENED_MESSAGE = "Whoops, can't play this.";
 	
+	/**
+	 * Control ID for the controls overlay 
+	 */
 	private final int CONTROL_ID = 99999; 
 	
+	/**
+	 * Flag to check if the control-overlay has been touched.
+	 */
 	private boolean hasBeenTouched = false;
+	/**
+	 * Flag to see if the player has been paused
+	 */
 	private boolean playerControlPause = false;
+	/**
+	 * Flag to check to see if the player has been reset
+	 */
 	private boolean playbackReset = false;
+	/**
+	 * Thread that the playback will operate in
+	 */
 	private Thread playbackThread = null;
+	/**
+	 * Progress bar for showing the progress of the palyer
+	 */
 	private ProgressBar pb = null;
+	/**
+	 * The root object for the player instance (tree-like structure)
+	 */
 	private SeqPlayer root;
+	/**
+	 * The root view into which all other views for the player will
+	 * go into.
+	 */
 	private RelativeLayout rootView;
 	
+	/**
+	 * The progress dialog that gets used when the player if preparing
+	 * and buffering
+	 */
 	private ProgressDialog mProgressDialog;
 	
+	/**
+	 * The runnable that will dismiss the progress dialog when needed. 
+	 */
 	private Runnable mDismissProgressDialog = new Runnable() {
 		@Override
 		public void run() {
@@ -59,6 +106,10 @@ public class SMILPlayer extends Activity {
 		}
 	};
 	
+	/**
+	 * The runnable that will execute on the UI Thread when the document
+	 * is done playing.
+	 */
 	private Runnable mDonePlaying = new Runnable() {
 		@Override
 		public void run() {
@@ -68,11 +119,11 @@ public class SMILPlayer extends Activity {
 	};
 	
 	/**
+	 * Call when Activity is first created
+	 * 
      * @param savedInstanceState
      * @return void
      * @note Activity should run in landscape mode.
-     * 
-     * Call when Activity is first created
      */
 	@Override
     public void onCreate(Bundle savedInstanceState) {
@@ -164,7 +215,10 @@ public class SMILPlayer extends Activity {
     }
     
     
-    
+    /**
+     * Start the playback thread that will start and control the playback
+     * of the document.
+     */
     private void startPlayback()
     {
     	this.playbackThread = new Thread(new Runnable() {
@@ -459,11 +513,11 @@ public class SMILPlayer extends Activity {
     }
     
     /**
-     * 
-     * @author john
-     * 
      * Define a Callable class to show controls so that this can be threaded for
      * delayed and timed events
+     * 
+     * @author John Murray
+     * @version 1.0 4/24/11
      */
     private class ShowControls implements Callable<Void>
     {
@@ -512,9 +566,6 @@ public class SMILPlayer extends Activity {
     
     
     /**
-     * @author john
-     * @return void
-     * 
      * Launch the Library Sub-Activity
      */
     private void goToLibrary()

@@ -1,15 +1,31 @@
 package edu.nku.cs.csc440.team2.player;
 
-
+/**
+ * Is a ContainerPlayer that allows the simultaneous playback of
+ * multiple Player objects.
+ * @author John Murray
+ * @version 1.0 4/24/11
+ */
 public class ParPlayer extends ContainerPlayer
 {
 	
+	/**
+	 * Generate a new ParPlayer object. 
+	 * @param start
+	 * 			The start time for the par player
+	 * @param end
+	 * 			The end time for the par player
+	 */
 	public ParPlayer(double start, double end)
 	{
 		this.start = start;
 		this.duration = end - start;
 	}
 	
+	/**
+	 * Play each component that should be playing at this particular
+	 * instance. Also unrender any objects that are done playing.
+	 */
 	public void play()
 	{
 		for( Player p : this.components )
@@ -36,7 +52,10 @@ public class ParPlayer extends ContainerPlayer
 		this.timePlayed += Player.PLAYBACK_INTERVAL;
 	}
 	
-	
+	/**
+	 * Get the duraction of all of the components and cache them. Return
+	 * the cache if one has already been generated.
+	 */
 	@Override
 	public double getDuration()
 	{
@@ -58,8 +77,13 @@ public class ParPlayer extends ContainerPlayer
 		return this.duration;
 	}
 	
-	//not implemented at the moment (perhaps in version 2)
+	/**
+	 * not implemented at the moment (perhaps in version 2)
+	 */
 	public void seekForward(){}
+	/**
+	 * not implemented at the moment (perhaps in version 2)
+	 */
 	public void seekBackward(){}
 	
 }
