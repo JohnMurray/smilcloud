@@ -1,6 +1,7 @@
 package edu.nku.cs.csc440.team2.composer;
 
 import android.graphics.Canvas;
+import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Paint.Align;
 import android.graphics.Rect;
@@ -15,8 +16,6 @@ import android.graphics.Rect;
 public class Timeline {
 	public static final int HEIGHT = 20;
 	private Rect mBounds;
-	private int mBgColor;
-	private int mFgColor;
 
 	/**
 	 * Class constructor.
@@ -24,10 +23,8 @@ public class Timeline {
 	 * @param length
 	 *            The total length of the message.
 	 */
-	public Timeline(int bgColor, int fgColor) {
+	public Timeline() {
 		mBounds = new Rect();
-		mBgColor = bgColor;
-		mFgColor = fgColor;
 	}
 
 	public void draw(Canvas canvas) {
@@ -35,11 +32,11 @@ public class Timeline {
 		
 		/* Draw background */
 		p.setAntiAlias(true);
-		p.setColor(mBgColor);
+		p.setColor(Color.argb(255, 247, 233, 142));
 		canvas.drawRect(getBounds(), p);
 
 		/* Draw markings */
-		p.setColor(mFgColor);
+		p.setColor(Color.argb(255, 0, 0, 0));
 		p.setTextSize(16.0f);
 		p.setTextAlign(Align.CENTER);
 		double length = Composer.pxToSec(mBounds.width());

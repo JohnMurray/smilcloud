@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+	xmlns:android="http://schemas.android.com/apk/res/android"
+	android:layout_width="match_parent"
+	android:layout_height="match_parent">
+	
+	<RelativeLayout
+		android:layout_width="match_parent"
+		android:layout_height="wrap_content"
+		android:layout_gravity="center" >
+		
+		<TextView
+			android:id="@+id/name_msg_prompt"
+			android:layout_width="match_parent"
+			android:layout_height="wrap_content"
+			android:text="@string/name_msg_prompt" />
+		
+		<EditText
+			android:id="@+id/name_msg_edittext"
+			android:layout_width="match_parent"
+			android:layout_height="wrap_content"
+			android:layout_below="@id/name_msg_prompt"
+			android:layout_alignLeft="@id/name_msg_prompt" />
+		
+		<Button
+			android:id="@+id/name_msg_acceptbtn"
+			android:text="@string/name_msg_accept"
+			android:layout_width="wrap_content"
+			android:layout_height="wrap_content"
+			android:layout_below="@id/name_msg_edittext"
+			android:layout_alignRight="@id/name_msg_edittext" />
+		
+		<Button
+			android:id="@+id/name_msg_cancelbtn"
+			android:text="@string/name_msg_cancel"
+			android:layout_width="wrap_content"
+			android:layout_height="wrap_content"
+			android:layout_below="@id/name_msg_edittext"
+			android:layout_toLeftOf="@id/name_msg_acceptbtn" />
+			
+	</RelativeLayout>
+  
+</LinearLayout>

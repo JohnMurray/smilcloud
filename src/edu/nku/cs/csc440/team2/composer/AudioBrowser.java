@@ -12,9 +12,12 @@ import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
+import android.view.ContextMenu;
 import android.view.LayoutInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ImageView;
 import android.widget.ListView;
@@ -171,6 +174,7 @@ public class AudioBrowser extends ListActivity {
 		mAudioListAdapter = new AudioListAdapter(this,
 				R.layout.audio_browser_row, mMedia);
 		setListAdapter(mAudioListAdapter);
+		registerForContextMenu(getListView());
 
 		/*
 		 * Load Media from cloud in a separate thread while displaying a
@@ -180,6 +184,25 @@ public class AudioBrowser extends ListActivity {
 		thread.start();
 		mProgressDialog = ProgressDialog.show(AudioBrowser.this,
 				"Please wait...", "Retrieving list...", true);
+	}
+	
+	@Override
+	public void onCreateContextMenu (ContextMenu menu, View v,
+			ContextMenu.ContextMenuInfo menuInfo) {
+		menu.setHeaderTitle("Media Options");
+		menu.add(0, v.getId(), 0, "Delete");
+	}
+	
+	@Override
+	public boolean onContextItemSelected (MenuItem item) {
+		AdapterView.AdapterContextMenuInfo info
+				= (AdapterView.AdapterContextMenuInfo) item.getMenuInfo();
+		Media m = (Media) getListAdapter().getItem(info.position);
+		MediaProvider mp = new MediaProvider();
+		mp.deleteMedia(Integer.parseInt(m.getMediaId()));
+		mMedia.remove(m);
+		mAudioListAdapter.notifyDataSetChanged();
+		return true;
 	}
 
 	@Override

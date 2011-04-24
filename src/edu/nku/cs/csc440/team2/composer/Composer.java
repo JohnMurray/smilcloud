@@ -9,6 +9,7 @@ import edu.nku.cs.csc460.team2.R;
 import android.app.Activity;
 import android.content.Intent;
 import android.graphics.Canvas;
+import android.graphics.Color;
 import android.graphics.Rect;
 import android.os.Bundle;
 import android.view.GestureDetector;
@@ -76,9 +77,7 @@ public class Composer extends Activity {
 			
 			/* Create the trackManager */
 			setTrackManager(TrackManager.Factory.create(messageId, userId));
-			mTimeline = new Timeline(
-					getResources().getColor(R.color.timeline_bg),
-					getResources().getColor(R.color.timeline_fg));
+			mTimeline = new Timeline();
 		}
 
 		TrackManager getTrackManager() {
@@ -87,14 +86,8 @@ public class Composer extends Activity {
 
 		void load(Bundle bundle) {
 			mBounds = bundle.getParcelable("mBounds");
-			if (mTrackManager == null) {
-				mTrackManager = ((SMILCloud) getApplication()).getTrackManager();
-				((SMILCloud) getApplication()).getSelectedBox(); // nullify
-			}
 			mTrackManager.maintain();
-			mTimeline = new Timeline(
-					getResources().getColor(R.color.timeline_bg),
-					getResources().getColor(R.color.timeline_fg));
+			mTimeline = new Timeline();
 			invalidate();
 		}
 
@@ -114,7 +107,7 @@ public class Composer extends Activity {
 		@Override
 		protected void onDraw(Canvas canvas) {
 			/* Repaint our background */
-			canvas.drawColor(getResources().getColor(R.color.composer_bg));
+			canvas.drawColor(Color.argb(255, 0, 0, 0));
 			
 			/* Reset our bounds */
 			mBounds.set(
