@@ -14,8 +14,19 @@ import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.Button;
 
+/**
+ * Display the main menu for the application (post-authentication)
+ * @author John Murray
+ * @version 1.0 4/24/11
+ *
+ */
 public class MainMenu extends Activity {
 	
+	/**
+	 * Define and display the interface that launches all of the activites
+	 * in the application (inbox, created messages, compose, edit, watch,
+	 * etc.) and offer them the abiliity to logout of their current user. 
+	 */
 	@Override
     public void onCreate(Bundle savedInstanceState) {
     	super.onCreate(savedInstanceState);

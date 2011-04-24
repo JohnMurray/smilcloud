@@ -13,8 +13,20 @@ import edu.nku.cs.csc440.team2.SMILCloud;
 import edu.nku.cs.csc440.team2.provider.UserProvider;
 import edu.nku.cs.csc460.team2.R;
 
+/**
+ * Show the registreation screen for the application. 
+ * @author John Murray
+ * @version 1.0 4/24/11
+ *
+ */
 public class RegisterScreen extends Activity {
 	
+	/**
+	 * Display the registration screen and setup all the event handlers
+	 * for the specified actions (register). Also define code that will
+	 * handle the registration process and error/success messages as well
+	 * as launching the authenticated part of the application.
+	 */
 	@Override
     public void onCreate(Bundle savedInstanceState) {
     	super.onCreate(savedInstanceState);

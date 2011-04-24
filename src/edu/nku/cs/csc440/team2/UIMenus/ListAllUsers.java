@@ -16,8 +16,20 @@ import edu.nku.cs.csc440.team2.provider.MessageProvider;
 import edu.nku.cs.csc440.team2.provider.UserProvider;
 import edu.nku.cs.csc460.team2.R;
 
+/**
+ * Show the list of all users. Allows the retreival of user id's of
+ * other users of the system.  
+ * @author John Murray
+ * @version 1.0 4/24/11
+ *
+ */
 public class ListAllUsers extends ListActivity {
 	
+	/**
+	 * List all possible users. When a user is selected, store their user
+	 * id into the shared application object and finish the activity. This
+	 * may be used in whatever context is needed. 
+	 */
 	@Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
