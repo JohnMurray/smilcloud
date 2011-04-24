@@ -12,9 +12,12 @@ import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
+import android.view.ContextMenu;
 import android.view.LayoutInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ImageView;
 import android.widget.ListView;
@@ -167,6 +170,7 @@ public class ImageBrowser extends ListActivity {
 		mImageListAdapter = new ImageListAdapter(this,
 				R.layout.image_browser_row, mMedia);
 		setListAdapter(mImageListAdapter);
+		registerForContextMenu(getListView());
 
 		/*
 		 * Load Media from cloud in a separate thread while displaying a
@@ -178,6 +182,25 @@ public class ImageBrowser extends ListActivity {
 				"Please wait...", "Retrieving list...", true);
 	}
 
+	@Override
+	public void onCreateContextMenu (ContextMenu menu, View v,
+			ContextMenu.ContextMenuInfo menuInfo) {
+		menu.setHeaderTitle("Media Options");
+		menu.add(0, v.getId(), 0, "Delete");
+	}
+	
+	@Override
+	public boolean onContextItemSelected (MenuItem item) {
+		AdapterView.AdapterContextMenuInfo info
+				= (AdapterView.AdapterContextMenuInfo) item.getMenuInfo();
+		Media m = (Media) getListAdapter().getItem(info.position);
+		MediaProvider mp = new MediaProvider();
+		mp.deleteMedia(Integer.parseInt(m.getMediaId()));
+		mMedia.remove(m);
+		mImageListAdapter.notifyDataSetChanged();
+		return true;
+	}
+	
 	@Override
 	protected void onListItemClick(ListView l, View v, int position, long id) {
 		Media m = (Media) l.getItemAtPosition(position);
@@ -193,4 +216,5 @@ public class ImageBrowser extends ListActivity {
 		setResult(RESULT_OK, i);
 		finish();
 	}
+	
 }
