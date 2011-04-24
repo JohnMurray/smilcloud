@@ -35,6 +35,7 @@ import edu.nku.cs.csc460.team2.R;
  */
 public class SMILPlayer extends Activity {
     
+	public static final String DONE_PLAYING = "Done playing SMIL message.";
 	public static final String NO_MEDIA_TO_PLAY = "No media was selected to play.";
 	public static final String MEDIA_NOT_FOUND = "The media  you requested was not found.";
 	public static final String WTF_HAPPENED_MESSAGE = "Whoops, can't play this.";
@@ -48,6 +49,14 @@ public class SMILPlayer extends Activity {
 	private ProgressBar pb = null;
 	private SeqPlayer root;
 	private RelativeLayout rootView;
+	
+	private Runnable mDonePlaying = new Runnable() {
+		@Override
+		public void run() {
+			Toast.makeText(SMILPlayer.this, SMILPlayer.DONE_PLAYING, 
+					Toast.LENGTH_SHORT);
+		}
+	};
 	
 	/**
      * @param savedInstanceState
@@ -137,36 +146,6 @@ public class SMILPlayer extends Activity {
          * at least a little control over things. 
          */
         this.addControls();
-        
-        
-        
-        
-        /*
-         * TEST CODE:				DON'T REMOVE YET, IT'S A GOOD REFERENCE
-         * 		to load a smil message locally and play it. This only uses
-         * 		the TestMedia instance now, no actual text, video, etc. 
-         */
-        /*
-		File f = new File(Environment.getExternalStorageDirectory() +
-				"/image_only_message.smil");
-		
-		Message message = null;
-		try 
-		{
-			message = new Message(f);
-		} 
-		catch (Exception e) 
-		{
-			e.printStackTrace();
-		}
-		
-		PriceLine pl = new PriceLine(message, this, videoContainer);
-		pl.negotiateBigDeal();
-		this.root = (SeqPlayer)pl.getDocumentAndNameYourOwnPrice();
-		this.preparePlayer();
-		
-		this.startPlayback();
-		*/
     }
     
     
@@ -240,6 +219,7 @@ public class SMILPlayer extends Activity {
 					if( root.getTimePlayed() >= root.getDuration() )
 					{
 						root.unRenderAll();
+						runOnUiThread(SMILPlayer.this.mDonePlaying);
 						break;
 					}
 					if( playbackReset )
