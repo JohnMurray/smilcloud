@@ -379,6 +379,7 @@ public class Composer extends Activity {
 		
 		/* Add message to play queue */
 		app.queueDocumentToPlay(messageId);
+		app.setPreviewDocumentId(messageId);
 		
 		/* Start the player */
 		Intent i = new Intent(this, SMILPlayer.class);
@@ -393,12 +394,24 @@ public class Composer extends Activity {
 	}
 
 	private String saveMessage() {
+		/* Set message provider */
+		MessageProvider mp = new MessageProvider();
+		
+		/* Check to see if an old message exists, and if so
+		 * delete it before previewing again.
+		 */
+		SMILCloud app = (SMILCloud) getApplication();
+		if( app.getPreviewDocumentId() != null )
+		{
+			mp.deleteMessage(app.getPreviewDocumentId());
+			app.setPreviewDocumentId(null);
+		}
+		
 		// TODO Open activity to insert message title and return
 		Message m = mComposerView.getTrackManager().toMessage();
 		int userId = mComposerView.getTrackManager().getUserId();
 		String title = java.util.UUID.randomUUID().toString();
 		
-		MessageProvider mp = new MessageProvider();
 		String messageId = mp.saveMessage(userId, title, m);
 		return messageId;
 	}

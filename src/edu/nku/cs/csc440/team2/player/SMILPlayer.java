@@ -54,7 +54,7 @@ public class SMILPlayer extends Activity {
 		@Override
 		public void run() {
 			Toast.makeText(SMILPlayer.this, SMILPlayer.DONE_PLAYING, 
-					Toast.LENGTH_SHORT);
+					Toast.LENGTH_SHORT).show();
 		}
 	};
 	
@@ -226,7 +226,7 @@ public class SMILPlayer extends Activity {
 					{
 						root.pause();
 						root.reset();
-						root.getSubject().reset();
+						subject.reset();
 						if( !playerControlPause ) { root.play(); }
 						playbackReset = false;
 					}

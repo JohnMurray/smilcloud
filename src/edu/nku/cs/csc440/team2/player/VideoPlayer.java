@@ -4,6 +4,7 @@ import android.media.MediaPlayer;
 import android.util.Log;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
+import android.view.ViewGroup.LayoutParams;
 
 public class VideoPlayer extends SingleInstancePlayer implements
 		MediaPlayer.OnPreparedListener, SurfaceHolder.Callback,
@@ -15,13 +16,19 @@ public class VideoPlayer extends SingleInstancePlayer implements
 	private SurfaceView sfView;
 	private SurfaceHolder sfHolder;
 	private boolean videoRendered = false;
+	private boolean surfaceRendered = false;
+	private int mVideoWidth;
+	private int mVideoHeight;
 	
-	public VideoPlayer(String resource, double begin, double duration, double offsetInto)
+	public VideoPlayer(String resource, double begin, double duration, double offsetInto,
+			int width, int height)
 	{
 		this.resourceURL = resource;
 		this.start = begin;
 		this.duration = duration;
 		this.mOffsetInto = offsetInto;
+		this.mVideoWidth = width;
+		this.mVideoHeight = height;
 	}
 
 	public void play()
@@ -30,13 +37,16 @@ public class VideoPlayer extends SingleInstancePlayer implements
 		{
 			this.render();
 		}
-		try
+		else
 		{
-			this.mMediaPlayer.start();
-		}
-		catch(IllegalStateException e)
-		{
-			e.printStackTrace();
+			try
+			{
+				this.mMediaPlayer.start();
+			}
+			catch(IllegalStateException e)
+			{
+				e.printStackTrace();
+			}
 		}
 		this.isPlaying = true;
 		this.incrementPlaybackTime();
@@ -44,7 +54,7 @@ public class VideoPlayer extends SingleInstancePlayer implements
 	
 	public void pause()
 	{
-		if( this.isPlaying )
+		if( this.isPlaying && this.surfaceRendered )
 		{
 			try
 			{
@@ -72,15 +82,15 @@ public class VideoPlayer extends SingleInstancePlayer implements
 		Log.w("Video", "Rendering the video");
 		this.layout.post(new Runnable() {
 			public void run() {
+				layout.addView(sfView);
 				//layout.setVisibility(View.VISIBLE);
 				//sfView.setMinimumHeight(mMediaPlayer.getVideoHeight());
 				//sfView.setMinimumWidth(mMediaPlayer.getVideoWidth());
 				sfHolder.setFixedSize(mMediaPlayer.getVideoWidth(), mMediaPlayer.getVideoHeight());
-				mMediaPlayer.setDisplay(sfHolder);
-				//layout.addView(sfView);
 			}
 		});
 		this.videoRendered = true;
+		this.subject.notifyBuffering();
 	}
 	
 	public void unRender()
@@ -102,6 +112,7 @@ public class VideoPlayer extends SingleInstancePlayer implements
 				}
 			});
 		}
+		this.mMediaPlayer.release();
 	}
 	
 	public void prepare()
@@ -122,14 +133,13 @@ public class VideoPlayer extends SingleInstancePlayer implements
 			@Override
 			public void run() {
 				sfView = new SurfaceView(layout.getContext());
-				layout.addView(sfView);
+				sfView.setLayoutParams(new LayoutParams(VideoPlayer.this.mVideoWidth, 
+						VideoPlayer.this.mVideoHeight));
 				sfHolder = sfView.getHolder();
 				sfHolder.addCallback(VideoPlayer.this);
 				sfHolder.setType(SurfaceHolder.SURFACE_TYPE_PUSH_BUFFERS);
-				//sfView.setVisibility(View.INVISIBLE);
 			}
 		});
-		this.subject.notifyBuffering();
 	}
 	
 	@Override
@@ -148,8 +158,10 @@ public class VideoPlayer extends SingleInstancePlayer implements
 	 */
 	@Override
 	public void surfaceCreated(SurfaceHolder holder) {
+		mMediaPlayer.setDisplay(sfHolder);
 		this.subject.notifyDoneBuffering();
 		Log.w("Video", "Surface is ready for rendering!");
+		this.surfaceRendered = true;
 	}
 
 	@Override
