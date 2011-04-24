@@ -5,38 +5,40 @@ import android.util.Log;
 
 /**
  * Implements playback features for Audio
+ * 
  * @author John Murray
  * @version 1.0 4/24/11
  */
 public class AudioPlayer extends SingleInstancePlayer implements
-			MediaPlayer.OnPreparedListener
-{
-	
+		MediaPlayer.OnPreparedListener {
+
 	/**
 	 * The media player object that will be used to stream the media
 	 */
 	private MediaPlayer mMediaPlayer;
-	
+
 	/**
 	 * The offset that the audio will start playback at.
+	 * 
 	 * @note This will work on a per-device basis as it is hardware and platform
-	 * dependent.
+	 *       dependent.
 	 */
 	private double mOffsetInto;
-	
+
 	/**
 	 * Initialize the AudioPlayer object
+	 * 
 	 * @param resource
-	 * 			The URI to the Audio object
+	 *            The URI to the Audio object
 	 * @param start
-	 * 			The time in the document when the media should start
+	 *            The time in the document when the media should start
 	 * @param duration
-	 * 			How long the media should play
+	 *            How long the media should play
 	 * @param offsetInt
-	 * 			The offset at which the audio should start playback
+	 *            The offset at which the audio should start playback
 	 */
-	public AudioPlayer(String resource, double start, double duration, double offsetInto)
-	{
+	public AudioPlayer(String resource, double start, double duration,
+			double offsetInto) {
 		this.resourceURL = resource;
 		this.start = start;
 		this.duration = duration;
@@ -46,88 +48,70 @@ public class AudioPlayer extends SingleInstancePlayer implements
 	/**
 	 * Start playing the audio object in the document
 	 */
-	public void play()
-	{
-		try
-		{
+	public void play() {
+		try {
 			this.mMediaPlayer.start();
 			Log.w("AUDIO PLAYER", "just started playing");
-		}
-		catch(IllegalStateException e)
-		{
+		} catch (IllegalStateException e) {
 			e.printStackTrace();
 		}
 		this.isPlaying = true;
 		this.incrementPlaybackTime();
 	}
-	
+
 	/**
 	 * Pause the audio object in the document.
 	 */
-	public void pause()
-	{
-		if( this.isPlaying )
-		{
-			try
-			{
+	public void pause() {
+		if (this.isPlaying) {
+			try {
 				this.mMediaPlayer.pause();
-			}
-			catch(IllegalStateException e)
-			{
+			} catch (IllegalStateException e) {
 				e.printStackTrace();
 			}
 		}
 	}
-	
+
 	/**
 	 * Not implemented
 	 */
-	public void seekForward()
-	{
-		
+	public void seekForward() {
+
 	}
-	
+
 	/**
 	 * Not implemented
 	 */
-	public void seekBackward()
-	{
-		
+	public void seekBackward() {
+
 	}
-	
+
 	/**
 	 * Does nothing... encforced method.
 	 */
-	public void render()
-	{
-		//do nothing... as we should
+	public void render() {
+		// do nothing... as we should
 	}
-	
+
 	/**
 	 * Release the mediaPlayer object that is being used to wrap the audio
 	 * object.
 	 */
-	public void unRender()
-	{
-		if( this.isPlaying )
-		{
-			try
-			{
+	public void unRender() {
+		if (this.isPlaying) {
+			try {
 				this.mMediaPlayer.stop();
 				Log.w("AUDIO PLAYER", "should have just stopped");
-			}
-			catch(IllegalStateException e)
-			{
+			} catch (IllegalStateException e) {
 				e.printStackTrace();
 			}
 		}
 	}
-	
+
 	/**
 	 * Prepare and the audio object. Start stream and set necessary callbacks.
 	 */
-	public void prepare()
-	{
+	public void prepare() {
 		this.mMediaPlayer = new MediaPlayer();
 		try {
 			this.mMediaPlayer.reset();
@@ -135,9 +119,8 @@ public class AudioPlayer extends SingleInstancePlayer implements
 			this.mMediaPlayer.setOnPreparedListener(this);
 			this.mMediaPlayer.prepareAsync();
 			this.subject.notifyBuffering();
-		
-		}
-		catch(Exception e) {
+
+		} catch (Exception e) {
 			e.printStackTrace();
 		}
 	}
@@ -147,19 +130,18 @@ public class AudioPlayer extends SingleInstancePlayer implements
 	 */
 	@Override
 	public void onPrepared(MediaPlayer mp) {
-		this.mMediaPlayer.seekTo((int)(this.mOffsetInto * 100));
+		this.mMediaPlayer.seekTo((int) (this.mOffsetInto * 100));
 		this.subject.notifyDoneBuffering();
 		Log.e("AUDIO", "I'm done buffering and ready to play!");
 	}
-	
+
 	/**
-	 * Reset the media for another playback. 
+	 * Reset the media for another playback.
 	 */
 	@Override
-	public void reset()
-	{
+	public void reset() {
 		this.prepare();
 		super.reset();
 	}
-	
+
 }

@@ -14,77 +14,77 @@ import edu.nku.cs.csc440.team2.provider.UserProvider;
 import edu.nku.cs.csc460.team2.R;
 
 /**
- * Show the registreation screen for the application. 
+ * Show the registreation screen for the application.
+ * 
  * @author John Murray
  * @version 1.0 4/24/11
- *
+ * 
  */
 public class RegisterScreen extends Activity {
-	
+
 	/**
-	 * Display the registration screen and setup all the event handlers
-	 * for the specified actions (register). Also define code that will
-	 * handle the registration process and error/success messages as well
-	 * as launching the authenticated part of the application.
+	 * Display the registration screen and setup all the event handlers for the
+	 * specified actions (register). Also define code that will handle the
+	 * registration process and error/success messages as well as launching the
+	 * authenticated part of the application.
 	 */
 	@Override
-    public void onCreate(Bundle savedInstanceState) {
-    	super.onCreate(savedInstanceState);
-    	setContentView(R.layout.register_main);
-    	
-    	Button register = (Button)findViewById(R.id.register_register);
-    	
-    	register.setOnClickListener(new OnClickListener() {
+	public void onCreate(Bundle savedInstanceState) {
+		super.onCreate(savedInstanceState);
+		setContentView(R.layout.register_main);
+
+		Button register = (Button) findViewById(R.id.register_register);
+
+		register.setOnClickListener(new OnClickListener() {
 
 			@Override
 			public void onClick(View v) {
-				//get value from the content fields and make a call
-				//to the server to create and authenticate the user.
-				
+				// get value from the content fields and make a call
+				// to the server to create and authenticate the user.
+
 				String firstName;
 				String lastName;
 				String userName;
 				String password;
-				
-				EditText fn = (EditText)findViewById(R.id.register_first_name);
+
+				EditText fn = (EditText) findViewById(R.id.register_first_name);
 				firstName = fn.getText().toString();
-				
-				EditText ln = (EditText)findViewById(R.id.register_last_name);
+
+				EditText ln = (EditText) findViewById(R.id.register_last_name);
 				lastName = ln.getText().toString();
-				
-				EditText un = (EditText)findViewById(R.id.register_username);
+
+				EditText un = (EditText) findViewById(R.id.register_username);
 				userName = un.getText().toString();
-				
-				EditText pd = (EditText)findViewById(R.id.register_password);
+
+				EditText pd = (EditText) findViewById(R.id.register_password);
 				password = pd.getText().toString();
-				
-				int newUser = (new UserProvider()).addUser(userName, password, firstName, lastName);
-				if( newUser == -1 )
-				{
-					//the user was not created.. do something about this
+
+				int newUser = (new UserProvider()).addUser(userName, password,
+						firstName, lastName);
+				if (newUser == -1) {
+					// the user was not created.. do something about this
 					Context context = getApplicationContext();
 					CharSequence text = "Unable to register. Try again.";
-					Toast toast = Toast.makeText(context, text, Toast.LENGTH_LONG);
+					Toast toast = Toast.makeText(context, text,
+							Toast.LENGTH_LONG);
 					toast.show();
-				}
-				else if( newUser == -2 )
-				{
-					//the user was not created(non-unique).. do something about this
+				} else if (newUser == -2) {
+					// the user was not created(non-unique).. do something about
+					// this
 					Context context = getApplicationContext();
 					CharSequence text = "User already exists, please log in.";
-					Toast toast = Toast.makeText(context, text, Toast.LENGTH_LONG);
+					Toast toast = Toast.makeText(context, text,
+							Toast.LENGTH_LONG);
 					toast.show();
-				}
-				else
-				{
+				} else {
 					((SMILCloud) getApplication()).setUserId(newUser);
-					//launch the "Main Menu" activity
+					// launch the "Main Menu" activity
 					Intent i = new Intent(RegisterScreen.this, MainMenu.class);
 					startActivity(i);
 					RegisterScreen.this.finish();
 				}
 			}
-    		
-    	});
-    }
+
+		});
+	}
 }

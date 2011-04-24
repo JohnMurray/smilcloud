@@ -7,21 +7,19 @@ import android.view.SurfaceView;
 import android.view.ViewGroup.LayoutParams;
 
 /**
- * Player object responsible for streaming and displaying video from the
- * cloud in the SMIL document.
+ * Player object responsible for streaming and displaying video from the cloud
+ * in the SMIL document.
  * 
  * @author John Murray
  * @version 1.0 4/24/11
- *
+ * 
  */
 public class VideoPlayer extends SingleInstancePlayer implements
 		MediaPlayer.OnPreparedListener, SurfaceHolder.Callback,
-		MediaPlayer.OnBufferingUpdateListener, 
-		MediaPlayer.OnCompletionListener, MediaPlayer.OnSeekCompleteListener
-{
+		MediaPlayer.OnBufferingUpdateListener,
+		MediaPlayer.OnCompletionListener, MediaPlayer.OnSeekCompleteListener {
 	/**
-	 * The wrapper class that will handle streaming and decoding of the
-	 * video.
+	 * The wrapper class that will handle streaming and decoding of the video.
 	 */
 	private MediaPlayer mMediaPlayer;
 	/**
@@ -43,8 +41,8 @@ public class VideoPlayer extends SingleInstancePlayer implements
 	private boolean videoRendered = false;
 	/**
 	 * Flag to tell if the surface on which the video will play has been
-	 * rendered or not. It is required that the surface in rendered before
-	 * the video can be rendered. 
+	 * rendered or not. It is required that the surface in rendered before the
+	 * video can be rendered.
 	 */
 	private boolean surfaceRendered = false;
 	/**
@@ -55,25 +53,26 @@ public class VideoPlayer extends SingleInstancePlayer implements
 	 * The width of the vieo (as it should be rendered)
 	 */
 	private int mVideoHeight;
-	
+
 	/**
 	 * Initialization for the video palyer
+	 * 
 	 * @param resource
-	 * 				The URI for the video resource to be streamed.
+	 *            The URI for the video resource to be streamed.
 	 * @param begin
-	 * 				The time that the resource should be started in the SMIL document
+	 *            The time that the resource should be started in the SMIL
+	 *            document
 	 * @param duration
-	 * 				The time it sould play in the SMIL document
+	 *            The time it sould play in the SMIL document
 	 * @param offsetInto
-	 * 				The time at which playback should start within the video
+	 *            The time at which playback should start within the video
 	 * @param width
-	 * 				The width of the rendered video
+	 *            The width of the rendered video
 	 * @param height
-	 * 				The height of the rendered video
+	 *            The height of the rendered video
 	 */
-	public VideoPlayer(String resource, double begin, double duration, double offsetInto,
-			int width, int height)
-	{
+	public VideoPlayer(String resource, double begin, double duration,
+			double offsetInto, int width, int height) {
 		this.resourceURL = resource;
 		this.start = begin;
 		this.duration = duration;
@@ -83,118 +82,97 @@ public class VideoPlayer extends SingleInstancePlayer implements
 	}
 
 	/**
-	 * Play the document, if it is already playing, then continue playing.
-	 * If it has not been rendered, then render it. This may cause the
-	 * document to buffer and the video to become out of sync by a tenth
-	 * of a second.
+	 * Play the document, if it is already playing, then continue playing. If it
+	 * has not been rendered, then render it. This may cause the document to
+	 * buffer and the video to become out of sync by a tenth of a second.
 	 */
-	public void play()
-	{
-		if( ! this.videoRendered )
-		{
+	public void play() {
+		if (!this.videoRendered) {
 			this.render();
-		}
-		else
-		{
-			try
-			{
+		} else {
+			try {
 				this.mMediaPlayer.start();
-			}
-			catch(IllegalStateException e)
-			{
+			} catch (IllegalStateException e) {
 				e.printStackTrace();
 			}
 		}
 		this.isPlaying = true;
 		this.incrementPlaybackTime();
 	}
-	
+
 	/**
 	 * Pause the video
 	 */
-	public void pause()
-	{
-		if( this.isPlaying && this.surfaceRendered )
-		{
-			try
-			{
+	public void pause() {
+		if (this.isPlaying && this.surfaceRendered) {
+			try {
 				this.mMediaPlayer.pause();
-			}
-			catch(IllegalStateException e)
-			{
+			} catch (IllegalStateException e) {
 				e.printStackTrace();
 			}
 		}
 	}
-	
+
 	/**
 	 * Not implemented
 	 */
-	public void seekForward()
-	{
-		
+	public void seekForward() {
+
 	}
+
 	/**
 	 * Not implemented
 	 */
-	public void seekBackward()
-	{
-		
+	public void seekBackward() {
+
 	}
-	
+
 	/**
-	 * Render the surface of the video the the screen. Once that surface is
-	 * done rendering, the video will render. 
+	 * Render the surface of the video the the screen. Once that surface is done
+	 * rendering, the video will render.
 	 */
-	public void render()
-	{
+	public void render() {
 		Log.w("Video", "Rendering the video");
 		this.layout.post(new Runnable() {
 			public void run() {
 				layout.addView(sfView);
-				//layout.setVisibility(View.VISIBLE);
-				//sfView.setMinimumHeight(mMediaPlayer.getVideoHeight());
-				//sfView.setMinimumWidth(mMediaPlayer.getVideoWidth());
-				sfHolder.setFixedSize(mMediaPlayer.getVideoWidth(), mMediaPlayer.getVideoHeight());
+				// layout.setVisibility(View.VISIBLE);
+				// sfView.setMinimumHeight(mMediaPlayer.getVideoHeight());
+				// sfView.setMinimumWidth(mMediaPlayer.getVideoWidth());
+				sfHolder.setFixedSize(mMediaPlayer.getVideoWidth(),
+						mMediaPlayer.getVideoHeight());
 			}
 		});
 		this.videoRendered = true;
 		this.subject.notifyBuffering();
 	}
-	
+
 	/**
-	 * Remove the video from the canvas and release the
-	 * video resources. At this point, if we want to play
-	 * the video again, we must re-prepare the video player
-	 * object
+	 * Remove the video from the canvas and release the video resources. At this
+	 * point, if we want to play the video again, we must re-prepare the video
+	 * player object
 	 */
-	public void unRender()
-	{
-		if( this.isPlaying )
-		{
+	public void unRender() {
+		if (this.isPlaying) {
 			this.layout.post(new Runnable() {
 				public void run() {
 					layout.removeView(sfView);
-					try
-					{
+					try {
 						mMediaPlayer.stop();
-					}
-					catch(IllegalStateException e)
-					{
+					} catch (IllegalStateException e) {
 						e.printStackTrace();
 					}
-					//layout.setVisibility(View.INVISIBLE);				
+					// layout.setVisibility(View.INVISIBLE);
 				}
 			});
 		}
 		this.mMediaPlayer.release();
 	}
-	
+
 	/**
 	 * Load the video resources and prepare the the mediaplayer.
 	 */
-	public void prepare()
-	{
+	public void prepare() {
 		this.mMediaPlayer = new MediaPlayer();
 		try {
 			this.mMediaPlayer.reset();
@@ -202,16 +180,15 @@ public class VideoPlayer extends SingleInstancePlayer implements
 			this.mMediaPlayer.setOnPreparedListener(this);
 			this.subject.notifyBuffering();
 			this.mMediaPlayer.prepareAsync();
-		}
-		catch(Exception e)
-		{
+		} catch (Exception e) {
 			e.printStackTrace();
 		}
 		this.layout.post(new Runnable() {
 			@Override
 			public void run() {
 				sfView = new SurfaceView(layout.getContext());
-				sfView.setLayoutParams(new LayoutParams(VideoPlayer.this.mVideoWidth, 
+				sfView.setLayoutParams(new LayoutParams(
+						VideoPlayer.this.mVideoWidth,
 						VideoPlayer.this.mVideoHeight));
 				sfHolder = sfView.getHolder();
 				sfHolder.addCallback(VideoPlayer.this);
@@ -219,24 +196,20 @@ public class VideoPlayer extends SingleInstancePlayer implements
 			}
 		});
 	}
-	
+
 	/**
-	 * Seek to the correct portion of the video when the video
-	 * is prepared. 
+	 * Seek to the correct portion of the video when the video is prepared.
 	 */
 	@Override
-	public void onPrepared(MediaPlayer mp)
-	{
+	public void onPrepared(MediaPlayer mp) {
 		this.mMediaPlayer.setOnSeekCompleteListener(this);
-		this.mMediaPlayer.seekTo((int)(this.mOffsetInto * 100));
+		this.mMediaPlayer.seekTo((int) (this.mOffsetInto * 100));
 		Log.w("Video", "Prepared video");
 	}
 
-	
 	/**
-	 * Set the video to display in the surface when it is
-	 * created and notify that we a donebuffering to the 
-	 * arbiter.
+	 * Set the video to display in the surface when it is created and notify
+	 * that we a donebuffering to the arbiter.
 	 */
 	@Override
 	public void surfaceCreated(SurfaceHolder holder) {
@@ -251,36 +224,39 @@ public class VideoPlayer extends SingleInstancePlayer implements
 	 */
 	@Override
 	public void surfaceChanged(SurfaceHolder holder, int format, int width,
-			int height) {}
+			int height) {
+	}
 
 	/**
 	 * Not used
 	 */
 	@Override
-	public void surfaceDestroyed(SurfaceHolder holder) {}
+	public void surfaceDestroyed(SurfaceHolder holder) {
+	}
 
-	
 	/**
 	 * Not used
 	 */
 	@Override
-	public void onCompletion(MediaPlayer mp) {}
+	public void onCompletion(MediaPlayer mp) {
+	}
 
 	/*
-	 * MediaPlayer.onBufferingUpdateListener
-	 * (non-Javadoc)
-	 * @see android.media.MediaPlayer.OnBufferingUpdateListener#onBufferingUpdate(android.media.MediaPlayer, int)
+	 * MediaPlayer.onBufferingUpdateListener (non-Javadoc)
+	 * 
+	 * @see
+	 * android.media.MediaPlayer.OnBufferingUpdateListener#onBufferingUpdate
+	 * (android.media.MediaPlayer, int)
 	 */
 	@Override
-	public void onBufferingUpdate(MediaPlayer mp, int percent) {}
-	
-	
+	public void onBufferingUpdate(MediaPlayer mp, int percent) {
+	}
+
 	/**
 	 * Reset the video for playback
 	 */
 	@Override
-	public void reset()
-	{
+	public void reset() {
 		this.prepare();
 		super.reset();
 	}
@@ -292,5 +268,5 @@ public class VideoPlayer extends SingleInstancePlayer implements
 	public void onSeekComplete(MediaPlayer mp) {
 		this.subject.notifyDoneBuffering();
 	}
-	
+
 }

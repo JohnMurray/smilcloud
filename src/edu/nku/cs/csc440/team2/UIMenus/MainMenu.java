@@ -16,81 +16,84 @@ import android.widget.Button;
 
 /**
  * Display the main menu for the application (post-authentication)
+ * 
  * @author John Murray
  * @version 1.0 4/24/11
- *
+ * 
  */
 public class MainMenu extends Activity {
-	
+
 	/**
-	 * Define and display the interface that launches all of the activites
-	 * in the application (inbox, created messages, compose, edit, watch,
-	 * etc.) and offer them the abiliity to logout of their current user. 
+	 * Define and display the interface that launches all of the activites in
+	 * the application (inbox, created messages, compose, edit, watch, etc.) and
+	 * offer them the abiliity to logout of their current user.
 	 */
 	@Override
-    public void onCreate(Bundle savedInstanceState) {
-    	super.onCreate(savedInstanceState);
-    	setContentView(R.layout.main_menu_screen);
-    	
-    	startService(new Intent(MainMenu.this, SmilService.class));
-    	
-    	Button inbox = (Button)findViewById(R.id.main_menu_inbox);
-    	Button createdMessage = (Button)findViewById(R.id.main_menu_created_messages);
-    	Button composeNew = (Button)findViewById(R.id.main_menu_compose_messages);
-    	Button uploadMedia = (Button)findViewById(R.id.main_menu_upload_media);
-    	Button logout = (Button)findViewById(R.id.main_menu_logout);
-    	Button exit = (Button)findViewById(R.id.main_menu_exit);
-    	
-    	inbox.setOnClickListener(new OnClickListener(){
+	public void onCreate(Bundle savedInstanceState) {
+		super.onCreate(savedInstanceState);
+		setContentView(R.layout.main_menu_screen);
+
+		startService(new Intent(MainMenu.this, SmilService.class));
+
+		Button inbox = (Button) findViewById(R.id.main_menu_inbox);
+		Button createdMessage = (Button) findViewById(R.id.main_menu_created_messages);
+		Button composeNew = (Button) findViewById(R.id.main_menu_compose_messages);
+		Button uploadMedia = (Button) findViewById(R.id.main_menu_upload_media);
+		Button logout = (Button) findViewById(R.id.main_menu_logout);
+		Button exit = (Button) findViewById(R.id.main_menu_exit);
+
+		inbox.setOnClickListener(new OnClickListener() {
 			@Override
 			public void onClick(View v) {
-				MainMenu.this.startActivity(new Intent(
-						MainMenu.this, Inbox.class));
+				MainMenu.this.startActivity(new Intent(MainMenu.this,
+						Inbox.class));
 			}
-    	});
-    	
-    	createdMessage.setOnClickListener(new OnClickListener(){
+		});
+
+		createdMessage.setOnClickListener(new OnClickListener() {
 			@Override
 			public void onClick(View v) {
-				MainMenu.this.startActivity(new Intent(
-						MainMenu.this, CreatedMessages.class));
+				MainMenu.this.startActivity(new Intent(MainMenu.this,
+						CreatedMessages.class));
 			}
-    	});
-    	
-    	composeNew.setOnClickListener(new OnClickListener(){
+		});
+
+		composeNew.setOnClickListener(new OnClickListener() {
 			@Override
 			public void onClick(View v) {
-				((SMILCloud)MainMenu.this.getApplication()).queueDocumentToEdit(null);
-				MainMenu.this.startActivity(new Intent(
-						MainMenu.this, Composer.class));
+				((SMILCloud) MainMenu.this.getApplication())
+						.queueDocumentToEdit(null);
+				MainMenu.this.startActivity(new Intent(MainMenu.this,
+						Composer.class));
 			}
-    	});
-    	
-    	uploadMedia.setOnClickListener(new OnClickListener() {
+		});
+
+		uploadMedia.setOnClickListener(new OnClickListener() {
 			@Override
 			public void onClick(View v) {
 				Intent i = new Intent(MainMenu.this, Uploader.class);
 				MainMenu.this.startActivity(i);
 			}
 		});
-    	
-    	logout.setOnClickListener(new OnClickListener() {
+
+		logout.setOnClickListener(new OnClickListener() {
 			@Override
 			public void onClick(View v) {
-				((SMILCloud)MainMenu.this.getApplication()).setUserId(SMILCloud.NO_USER);
+				((SMILCloud) MainMenu.this.getApplication())
+						.setUserId(SMILCloud.NO_USER);
 				Intent i = new Intent(MainMenu.this, WelcomeScreen.class);
 				i.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
 				MainMenu.this.startActivity(i);
 			}
 		});
-    	
-    	exit.setOnClickListener(new OnClickListener(){
+
+		exit.setOnClickListener(new OnClickListener() {
 			@Override
 			public void onClick(View v) {
 				MainMenu.this.finish();
 			}
-    	});
-    	
+		});
+
 	}
 
 }
