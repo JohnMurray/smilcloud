@@ -61,9 +61,7 @@ public class ImagePlayer extends SingleInstancePlayer
 		Log.w("ImagePlayer", "unrendering");
 		this.layout.post( new Runnable() {
 			public void run() {
-				//layout.removeView(imImage);
-				layout.setVisibility(View.INVISIBLE);
-				layout.getLayoutParams().height = 0;
+				layout.removeView(imImage);
 			}
 		});
 	}
