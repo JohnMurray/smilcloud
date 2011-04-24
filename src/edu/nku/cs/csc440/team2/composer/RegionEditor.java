@@ -3,12 +3,13 @@ package edu.nku.cs.csc440.team2.composer;
 import java.util.Collections;
 import java.util.LinkedList;
 
-import edu.nku.cs.csc440.team2.SMILCloud;
 import edu.nku.cs.csc460.team2.R;
 
 import android.app.Activity;
 import android.content.Context;
+import android.content.Intent;
 import android.graphics.Canvas;
+import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Paint.Style;
 import android.graphics.Rect;
@@ -36,7 +37,7 @@ public class RegionEditor extends Activity {
 	 */
 	public class RegionEditorView extends View implements OnGestureListener {
 		/** The height and width of the handles on each corner of the Region */
-		private final int cornerSize;
+		public static final int CORNER_SIZE = 30;
 		
 		/** Interprets touch-based input to trigger callbacks */
 		private GestureDetector mGestureDetector;
@@ -75,20 +76,18 @@ public class RegionEditor extends Activity {
 		 */
 		public RegionEditorView(Context context) {
 			super(context);
-			cornerSize = context.getResources().getInteger(
-					R.integer.region_corner_size);
 			mTarget = null;
 			mGestureDetector = new GestureDetector(this);
 			mBoxesWithRegions = new LinkedList<Box>();
 			mBounds = mBox.getRegion().getBounds();
-			if (mBounds.width() <= cornerSize
-					|| mBounds.height() <= cornerSize) {
-				mBounds.set(0, 0, 4 * cornerSize, 4 * cornerSize);
+			if (mBounds.width() <= CORNER_SIZE
+					|| mBounds.height() <= CORNER_SIZE) {
+				mBounds.set(0, 0, 4 * CORNER_SIZE, 4 * CORNER_SIZE);
 			}
-			mTopLeft = new Rect(0, 0, cornerSize, cornerSize);
-			mTopRight = new Rect(0, 0, cornerSize, cornerSize);
-			mBottomLeft = new Rect(0, 0, cornerSize, cornerSize);
-			mBottomRight = new Rect(0, 0, cornerSize, cornerSize);
+			mTopLeft = new Rect(0, 0, CORNER_SIZE, CORNER_SIZE);
+			mTopRight = new Rect(0, 0, CORNER_SIZE, CORNER_SIZE);
+			mBottomLeft = new Rect(0, 0, CORNER_SIZE, CORNER_SIZE);
+			mBottomRight = new Rect(0, 0, CORNER_SIZE, CORNER_SIZE);
 			
 			/* Assign bounds to the region's corner rectangles */
 			updateBounds();
@@ -169,7 +168,7 @@ public class RegionEditor extends Activity {
 			
 			/* Draw background */
 			p.setAntiAlias(true);
-			p.setColor(getResources().getColor(R.color.region_editor_bg));
+			p.setColor(Color.argb(255, 0, 0, 0));
 			canvas.drawPaint(p);
 			
 			/* Draw target screen size */
@@ -181,11 +180,11 @@ public class RegionEditor extends Activity {
 				if (mConcurrentBoxes.contains(b) && b.getRegion() != null) {
 					if (b == mBox) {
 						/* Draw region background */
-						p.setColor(getResources().getColor(R.color.region_bg));
+						p.setColor(Color.argb(255, 255, 255, 255));
 						canvas.drawRect(mBounds, p);
 						
 						/* Draw each region corner background */
-						p.setColor(getResources().getColor(R.color.region_corner_bg));
+						p.setColor(Color.argb(255, 255, 153, 51));
 						canvas.drawRect(mTopLeft, p);
 						canvas.drawRect(mTopRight, p);
 						canvas.drawRect(mBottomRight, p);
@@ -194,11 +193,11 @@ public class RegionEditor extends Activity {
 					} else {
 						/* Draw overlapping region background */
 						ComposerRegion r = b.getRegion();
-						p.setColor(getResources().getColor(R.color.region_bgbox_bg));
+						p.setColor(Color.argb(255, 85, 85, 85));
 						canvas.drawRect(r.getBounds(), p);
 						
 						/* Draw overlapping region foreground */
-						p.setColor(getResources().getColor(R.color.region_bgbox_fg));
+						p.setColor(Color.argb(255, 204, 204, 204));
 						p.setStyle(Style.STROKE);
 						canvas.drawRect(r.getBounds(), p);
 						p.setStyle(Style.FILL);
@@ -207,12 +206,12 @@ public class RegionEditor extends Activity {
 			}
 			
 			/* Draw region outline */
-			p.setColor(getResources().getColor(R.color.region_fg));
+			p.setColor(Color.argb(255, 255, 255, 255));
 			p.setStyle(Style.STROKE);
 			canvas.drawRect(mBounds, p);
 
 			/* Draw each corner outline */
-			p.setColor(getResources().getColor(R.color.region_corner_fg));
+			p.setColor(Color.argb(255, 255, 153, 51));
 			canvas.drawRect(mTopLeft, p);
 			canvas.drawRect(mTopRight, p);
 			canvas.drawRect(mBottomRight, p);
@@ -325,10 +324,10 @@ public class RegionEditor extends Activity {
 
 			/* Place the corner grips at the corners of mBounds */
 			mTopLeft.offsetTo(mBounds.left, mBounds.top);
-			mTopRight.offsetTo(mBounds.right - cornerSize, mBounds.top);
-			mBottomRight.offsetTo(mBounds.right - cornerSize, mBounds.bottom
-					- cornerSize);
-			mBottomLeft.offsetTo(mBounds.left, mBounds.bottom - cornerSize);
+			mTopRight.offsetTo(mBounds.right - CORNER_SIZE, mBounds.top);
+			mBottomRight.offsetTo(mBounds.right - CORNER_SIZE, mBounds.bottom
+					- CORNER_SIZE);
+			mBottomLeft.offsetTo(mBounds.left, mBounds.bottom - CORNER_SIZE);
 
 			/* Fix any overlaps between the corner grips */
 			if (Rect.intersects(mTopLeft, mTopRight)) {
@@ -369,8 +368,10 @@ public class RegionEditor extends Activity {
 	
 	@Override
 	public void onBackPressed() {
-		setResult(RESULT_OK);
-		save();
+		Intent i = new Intent();
+		i.putExtra("track_manager", mTrackManager);
+		i.putExtra("box_id", mBox.getId());
+		setResult(RESULT_OK, i);
 		finish();
 	}
 
@@ -378,9 +379,10 @@ public class RegionEditor extends Activity {
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		
-		/* Load from the Application */
-		mTrackManager = ((SMILCloud) getApplication()).getTrackManager();
-		mBox = ((SMILCloud) getApplication()).getSelectedBox();
+		/* Load from Intent */
+		mTrackManager = getIntent().getParcelableExtra("track_manager");
+		String boxId = getIntent().getStringExtra("box_id");
+		mBox = mTrackManager.getBox(boxId);
 		
 		/* Create a region for mBox if we must */
 		if (mBox.getRegion() == null) {
@@ -417,19 +419,6 @@ public class RegionEditor extends Activity {
 		}
 
 		return result;
-	}
-
-	@Override
-	public void onSaveInstanceState(Bundle outState) {
-		save();
-	}
-	
-	/**
-	 * Saves the TrackManager and Box to the Application.
-	 */
-	private void save() {
-		((SMILCloud) getApplication()).setTrackManager(mTrackManager);
-		((SMILCloud) getApplication()).setSelectedBox(mBox);
 	}
 	
 }

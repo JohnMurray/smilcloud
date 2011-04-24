@@ -148,9 +148,10 @@ public class PriceLine
 					 * Get everything we need from and Video object
 					 * and add it to the container instance
 					 */
+					SmilDimension dims = ((Media)b).getRegion().getDimensions();
 					media = new VideoPlayer(((Video) b).getSrc(),
 							b.getBegin(), b.getEnd() - b.getBegin(),
-							((Video)b).getClipBegin());
+							((Video)b).getClipBegin(), dims.getWidth(), dims.getHeight());
 				}
 				
 				/*

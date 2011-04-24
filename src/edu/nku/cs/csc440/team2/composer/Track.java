@@ -1,14 +1,15 @@
 package edu.nku.cs.csc440.team2.composer;
 
 import java.util.LinkedList;
+import java.util.List;
 
-import edu.nku.cs.csc460.team2.R;
-
-import android.content.Context;
 import android.graphics.Canvas;
+import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Paint.Style;
 import android.graphics.Rect;
+import android.os.Parcel;
+import android.os.Parcelable;
 
 /**
  * A Track is the graphical equivalent of a SMIL Sequence player.
@@ -16,15 +17,37 @@ import android.graphics.Rect;
  * @author William Knauer <knauerw1@nku.edu>
  * @version 2011.0421
  */
-public class Track {
-	/** The Context used to get resources */
-	private Context mContext;
+public class Track implements Parcelable {
 
+	public static final int HEIGHT = 2*Box.SPACING + Box.HEIGHT;
 	/** A List of Boxes in this Track */
-	private LinkedList<Box> mBoxes;
+	private List<Box> mBoxes;
 
 	/** The drawing bounds of this Track */
 	private Rect mBounds;
+	
+	public Track(Parcel in) {
+		mBoxes = new LinkedList<Box>();
+		int numBoxes = in.readInt();
+		for (int i = 0; i < numBoxes; i ++) {
+			char type = (char) in.readInt();
+			switch(type) {
+			case AudioBox.TYPE:
+				mBoxes.add((Box) in.readParcelable(AudioBox.class.getClassLoader()));
+				break;
+			case ImageBox.TYPE:
+				mBoxes.add((Box) in.readParcelable(ImageBox.class.getClassLoader()));
+				break;
+			case TextBox.TYPE:
+				mBoxes.add((Box) in.readParcelable(TextBox.class.getClassLoader()));
+				break;
+			case VideoBox.TYPE:
+				mBoxes.add((Box) in.readParcelable(VideoBox.class.getClassLoader()));
+				break;
+			}
+		}
+		mBounds = in.readParcelable(Rect.class.getClassLoader());
+	}
 
 	/**
 	 * Class constructor.
@@ -75,17 +98,15 @@ public class Track {
 	 */
 	public void draw(Canvas canvas) {
 		Paint p = new Paint();
-		int spacing = mContext.getResources().getInteger(R.integer.box_spacing);
-		int height = mContext.getResources().getInteger(R.integer.box_height);
 
 		/* Draw background */
-		p.setColor(mContext.getResources().getColor(R.color.track_bg));
+		p.setColor(Color.argb(255, 85, 85, 85));
 		p.setAntiAlias(true);
 		p.setStyle(Style.FILL);
 		canvas.drawRect(getBounds(), p);
 
 		/* Draw outline */
-		p.setColor(mContext.getResources().getColor(R.color.track_fg));
+		p.setColor(Color.argb(255, 204, 204, 204));
 		p.setAntiAlias(true);
 		p.setStyle(Style.STROKE);
 		p.setStrokeWidth(1.0f);
@@ -95,9 +116,9 @@ public class Track {
 		for (Box b : mBoxes) {
 			b.setBounds(
 					Composer.secToPx(((double) b.getBegin()) / 10.0),
-					getBounds().top + spacing,
+					getBounds().top + Box.SPACING,
 					Composer.secToPx(((double) b.getEnd()) / 10.0),
-					getBounds().top + spacing + height);
+					getBounds().top + Box.SPACING + Box.HEIGHT);
 			b.draw(canvas);
 		}
 	}
@@ -217,15 +238,35 @@ public class Track {
 		mBounds.set(left, top, right, bottom);
 	}
 
-	/**
-	 * @param context
-	 *            The Context to set.
-	 */
-	public void setContext(Context context) {
-		mContext = context;
-		for (Box b : mBoxes) {
-			b.setContext(mContext);
-		}
+	@Override
+	public int describeContents() {
+		// TODO Auto-generated method stub
+		return 0;
 	}
+
+	@Override
+	public void writeToParcel(Parcel dest, int flags) {
+		dest.writeInt(mBoxes.size());
+		for (Box b : mBoxes) {
+			dest.writeInt(b.getType());
+			dest.writeParcelable((Parcelable) b, 0);
+		}
+		dest.writeParcelable(mBounds, 0);
+	}
+	
+	/** Used to generate instances of this class from a Parcel */
+	public static final Parcelable.Creator<Track> CREATOR = new Parcelable.Creator<Track>() {
+
+		@Override
+		public Track createFromParcel(Parcel source) {
+			return new Track(source);
+		}
+
+		@Override
+		public Track[] newArray(int size) {
+			return new Track[size];
+		}
+
+	};
 
 }

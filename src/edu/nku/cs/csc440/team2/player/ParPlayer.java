@@ -58,16 +58,8 @@ public class ParPlayer extends ContainerPlayer
 		return this.duration;
 	}
 	
-	//TODO: EXTRA -- implement seek forward sometime
-	public void seekForward()
-	{
-		
-	}
-	
-	//TODO: EXTRA -- implement seek backward sometime
-	public void seekBackward()
-	{
-		
-	}
+	//not implemented at the moment (perhaps in version 2)
+	public void seekForward(){}
+	public void seekBackward(){}
 	
 }

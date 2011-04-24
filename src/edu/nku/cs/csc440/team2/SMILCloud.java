@@ -10,53 +10,55 @@ import edu.nku.cs.csc440.team2.mediaCloud.MessageLite;
 public class SMILCloud extends Application {
 	
 	public final static int NO_USER = -1;
+	public final static int UPDATE_INTERVAL_MILLISEC = 15000;
 
 	private ArrayList<MessageLite> messages;
-	private TrackManager trackManager;
-	private Box selectedBox;
+	private String previewMessageId;
 	private String queuedDocumentToPlayID = null;
 	private String queueDocumentToEditID = null;
-	private int userID = NO_USER;
+	private Box selectedBox;
 	private String shareMessageID = null;
+	private TrackManager trackManager;
+	private int userID = NO_USER;
 
-	public void setTrackManager(TrackManager t) {
+	public synchronized void setTrackManager(TrackManager t) {
 		this.trackManager = t;
 	}
 
-	public TrackManager getTrackManager() {
+	public synchronized TrackManager getTrackManager() {
 		TrackManager t = this.trackManager;
 		this.trackManager = null;
 		return t;
 	}
 
-	public void setSelectedBox(Box b) {
+	public synchronized void setSelectedBox(Box b) {
 		this.selectedBox = b;
 	}
 
-	public Box getSelectedBox() {
+	public synchronized Box getSelectedBox() {
 		Box b = this.selectedBox;
 		this.selectedBox = null;
 		return b;
 	}
 
-	public void queueDocumentToPlay(String id) {
+	public synchronized void queueDocumentToPlay(String id) {
 		this.queuedDocumentToPlayID = id;
 	}
 
-	public String getQueuedDocumentForPlayback() {
+	public synchronized String getQueuedDocumentForPlayback() {
 		return this.queuedDocumentToPlayID;
 	}
 
-	public void queueDocumentToEdit(String id) {
+	public synchronized void queueDocumentToEdit(String id) {
 		this.queueDocumentToEditID = id;
 	}
 
-	public String getQueuedDocumentForEditing() {
+	public synchronized String getQueuedDocumentForEditing() {
 		return this.queueDocumentToEditID;
 	}
 
-	public synchronized void addMessage(MessageLite message) {
-		this.messages.add(message);
+	public synchronized void setMessages(ArrayList<MessageLite> a) {
+		this.messages = a;
 	}
 
 	public synchronized ArrayList<MessageLite> getMessages() {
@@ -79,5 +81,15 @@ public class SMILCloud extends Application {
 	public synchronized void setSharedMessageId(String s)
 	{
 		this.shareMessageID = s;
+	}
+	
+	public synchronized void setPreviewDocumentId(String s)
+	{
+		this.previewMessageId = s;
+	}
+	
+	public synchronized String getPreviewDocumentId()
+	{
+		return this.previewMessageId;
 	}
 }

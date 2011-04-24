@@ -9,6 +9,7 @@ import edu.nku.cs.csc460.team2.R;
 import android.app.Activity;
 import android.content.Intent;
 import android.graphics.Canvas;
+import android.graphics.Color;
 import android.graphics.Rect;
 import android.os.Bundle;
 import android.view.GestureDetector;
@@ -76,10 +77,7 @@ public class Composer extends Activity {
 			
 			/* Create the trackManager */
 			setTrackManager(TrackManager.Factory.create(messageId, userId));
-			mTrackManager.setContext(getApplicationContext());
-			mTimeline = new Timeline(
-					getResources().getColor(R.color.timeline_bg),
-					getResources().getColor(R.color.timeline_fg));
+			mTimeline = new Timeline();
 		}
 
 		TrackManager getTrackManager() {
@@ -88,15 +86,8 @@ public class Composer extends Activity {
 
 		void load(Bundle bundle) {
 			mBounds = bundle.getParcelable("mBounds");
-			if (mTrackManager == null) {
-				mTrackManager = ((SMILCloud) getApplication()).getTrackManager();
-				((SMILCloud) getApplication()).getSelectedBox(); // nullify
-			}
-			mTrackManager.setContext(getApplicationContext());
 			mTrackManager.maintain();
-			mTimeline = new Timeline(
-					getResources().getColor(R.color.timeline_bg),
-					getResources().getColor(R.color.timeline_fg));
+			mTimeline = new Timeline();
 			invalidate();
 		}
 
@@ -116,7 +107,7 @@ public class Composer extends Activity {
 		@Override
 		protected void onDraw(Canvas canvas) {
 			/* Repaint our background */
-			canvas.drawColor(getResources().getColor(R.color.composer_bg));
+			canvas.drawColor(Color.argb(255, 0, 0, 0));
 			
 			/* Reset our bounds */
 			mBounds.set(
@@ -157,17 +148,13 @@ public class Composer extends Activity {
 			Box target = mTrackManager.getBox(x, y);
 			if (target != null) {
 				if (target instanceof AudioBox) {
-					((SMILCloud) getApplication()).setSelectedBox(target);
-					launchAudioBoxProperties();
+					launchAudioProperties(target.getId());
 				} else if (target instanceof ImageBox) {
-					((SMILCloud) getApplication()).setSelectedBox(target);
-					launchImageBoxProperties();
+					launchImageProperties(target.getId());
 				} else if (target instanceof TextBox) {
-					((SMILCloud) getApplication()).setSelectedBox(target);
-					launchTextBoxProperties();
+					launchTextProperties(target.getId());
 				} else if (target instanceof VideoBox) {
-					((SMILCloud) getApplication()).setSelectedBox(target);
-					launchVideoBoxProperties();
+					launchVideoProperties(target.getId());
 				}
 			}
 
@@ -234,7 +221,6 @@ public class Composer extends Activity {
 
 		void setTrackManager(TrackManager tm) {
 			mTrackManager = tm;
-			mTrackManager.setContext(getApplicationContext());
 			mTrackManager.maintain();
 			invalidate();
 		}
@@ -296,23 +282,31 @@ public class Composer extends Activity {
 
 	private ComposerView mComposerView;
 	
-	public void launchAudioBoxProperties() {
+	public void launchAudioProperties(String id) {
 		Intent i = new Intent(this, AudioProperties.class);
+		i.putExtra("track_manager", mComposerView.getTrackManager());
+		i.putExtra("box_id", id);
 		startActivityForResult(i, REQ_PROPERTIES);
 	}
 	
-	public void launchImageBoxProperties() {
+	public void launchImageProperties(String id) {
 		Intent i = new Intent(this, ImageProperties.class);
+		i.putExtra("track_manager", mComposerView.getTrackManager());
+		i.putExtra("box_id", id);
 		startActivityForResult(i, REQ_PROPERTIES);
 	}
 	
-	public void launchTextBoxProperties() {
+	public void launchTextProperties(String id) {
 		Intent i = new Intent(this, TextProperties.class);
+		i.putExtra("track_manager", mComposerView.getTrackManager());
+		i.putExtra("box_id", id);
 		startActivityForResult(i, REQ_PROPERTIES);
 	}
 	
-	public void launchVideoBoxProperties() {
+	public void launchVideoProperties(String id) {
 		Intent i = new Intent(this, VideoProperties.class);
+		i.putExtra("track_manager", mComposerView.getTrackManager());
+		i.putExtra("box_id", id);
 		startActivityForResult(i, REQ_PROPERTIES);
 	}
 
@@ -320,7 +314,9 @@ public class Composer extends Activity {
 	public void onActivityResult(int requestCode, int resultCode, Intent data) {
 		if (requestCode == REQ_PROPERTIES) {
 			if (resultCode == RESULT_OK) {
-				// do nothing
+				TrackManager t =
+					(TrackManager) data.getParcelableExtra("track_manager");
+				mComposerView.setTrackManager(t);
 			} else if (resultCode == RESULT_CANCELED) {
 				// do nothing
 			}
@@ -351,16 +347,16 @@ public class Composer extends Activity {
 	public boolean onOptionsItemSelected(MenuItem item) {
 		switch (item.getItemId()) {
 		case R.id.add_audio:
-			launchAudioBoxProperties();
+			launchAudioProperties(null);
 			return true;
 		case R.id.add_image:
-			launchImageBoxProperties();
+			launchImageProperties(null);
 			return true;
 		case R.id.add_text:
-			launchTextBoxProperties();
+			launchTextProperties(null);
 			return true;
 		case R.id.add_video:
-			launchVideoBoxProperties();
+			launchVideoProperties(null);
 			return true;
 		case R.id.preview:
 			previewMessage();
@@ -383,6 +379,7 @@ public class Composer extends Activity {
 		
 		/* Add message to play queue */
 		app.queueDocumentToPlay(messageId);
+		app.setPreviewDocumentId(messageId);
 		
 		/* Start the player */
 		Intent i = new Intent(this, SMILPlayer.class);
@@ -397,12 +394,24 @@ public class Composer extends Activity {
 	}
 
 	private String saveMessage() {
+		/* Set message provider */
+		MessageProvider mp = new MessageProvider();
+		
+		/* Check to see if an old message exists, and if so
+		 * delete it before previewing again.
+		 */
+		SMILCloud app = (SMILCloud) getApplication();
+		if( app.getPreviewDocumentId() != null )
+		{
+			mp.deleteMessage(app.getPreviewDocumentId());
+			app.setPreviewDocumentId(null);
+		}
+		
 		// TODO Open activity to insert message title and return
 		Message m = mComposerView.getTrackManager().toMessage();
 		int userId = mComposerView.getTrackManager().getUserId();
 		String title = java.util.UUID.randomUUID().toString();
 		
-		MessageProvider mp = new MessageProvider();
 		String messageId = mp.saveMessage(userId, title, m);
 		return messageId;
 	}

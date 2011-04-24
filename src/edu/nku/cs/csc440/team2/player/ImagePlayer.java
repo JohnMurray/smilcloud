@@ -75,8 +75,8 @@ public class ImagePlayer extends SingleInstancePlayer
 		this.layout.post(new Runnable() {
 			public void run() {
 				imImage = new ImageView(layout.getContext());
-				imImage.setScaleType(ImageView.ScaleType.FIT_CENTER);
-				imImage.setAdjustViewBounds(true);
+				imImage.setScaleType(ImageView.ScaleType.FIT_XY);
+				imImage.setAdjustViewBounds(false);
 				imImage.setMaxHeight(layout.getHeight());
 				imImage.setMaxWidth(layout.getHeight());
 				

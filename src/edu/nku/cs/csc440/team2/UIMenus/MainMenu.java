@@ -4,6 +4,7 @@ import edu.nku.cs.csc440.team2.SMILCloud;
 import edu.nku.cs.csc440.team2.composer.Composer;
 import edu.nku.cs.csc440.team2.inbox.CreatedMessages;
 import edu.nku.cs.csc440.team2.inbox.Inbox;
+import edu.nku.cs.csc440.team2.service.SmilService;
 import edu.nku.cs.csc440.team2.uploader.Uploader;
 import edu.nku.cs.csc460.team2.R;
 import android.app.Activity;
@@ -19,6 +20,8 @@ public class MainMenu extends Activity {
     public void onCreate(Bundle savedInstanceState) {
     	super.onCreate(savedInstanceState);
     	setContentView(R.layout.main_menu_screen);
+    	
+    	startService(new Intent(MainMenu.this, SmilService.class));
     	
     	Button inbox = (Button)findViewById(R.id.main_menu_inbox);
     	Button createdMessage = (Button)findViewById(R.id.main_menu_created_messages);

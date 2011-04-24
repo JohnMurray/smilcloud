@@ -1,6 +1,5 @@
 package edu.nku.cs.csc440.team2.composer;
 
-import edu.nku.cs.csc440.team2.SMILCloud;
 import edu.nku.cs.csc460.team2.R;
 import android.app.Activity;
 import android.content.Intent;
@@ -43,7 +42,12 @@ public class TextProperties extends Activity {
 
 			@Override
 			public void onClick(View v) {
+				/* Commit the EditText contents to the TextBox */
+				mBox.setName(mEditText.getText().toString());
+				
 				Intent i = new Intent(getBaseContext(), RegionEditor.class);
+				i.putExtra("track_manager", mTrackManager);
+				i.putExtra("box_id", mBox.getId());
 				startActivityForResult(i, 0);
 			}
 
@@ -56,11 +60,11 @@ public class TextProperties extends Activity {
 			public void onClick(View v) {
 				/* Delete the media from the data structure */
 				mTrackManager.removeBox(mBox);
-				mBox = null;
 
 				/* Return the data structure and deletion status */
-				setResult(RESULT_OK);
-				save();
+				Intent i = new Intent();
+				i.putExtra("track_manager", mTrackManager);
+				setResult(RESULT_OK, i);
 				finish();
 			}
 
@@ -69,23 +73,26 @@ public class TextProperties extends Activity {
 
 	@Override
 	protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-		// do nothing
+		mTrackManager = data.getParcelableExtra("track_manager");
+		String boxId = data.getStringExtra("box_id");
+		mBox = (TextBox) mTrackManager.getBox(boxId);
 	}
 
 	@Override
 	public void onBackPressed() {
+		/* Commit the EditText contents to the TextBox */
+		mBox.setName(mEditText.getText().toString());
+		
 		/* If all required fields are filled in */
-		if (mBox.getName() != null && mBox.getRegion() != null) {
+		if (mBox.getRegion() != null) {
 			/* Return OK status */
-			setResult(RESULT_OK);
+			Intent i = new Intent();
+			i.putExtra("track_manager", mTrackManager);
+			setResult(RESULT_OK, i);
 		} else {
-			/* Return canceled status */
-			mTrackManager.removeBox(mBox);
-			mBox = null;
 			setResult(RESULT_CANCELED);
 		}
 		
-		save();
 		finish();
 	}
 
@@ -94,46 +101,28 @@ public class TextProperties extends Activity {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.text_properties);
 		loadWidgetsFromView();
-	}
-
-	@Override
-	protected void onSaveInstanceState(Bundle outState) {
-		save();
-	}
-	
-	@Override
-	protected void onStart() {
-		super.onStart();
 		
-		/* Load from Application */
-		mTrackManager = ((SMILCloud) getApplication()).getTrackManager();
-		mBox = (TextBox) ((SMILCloud) getApplication()).getSelectedBox();
+		/* Load from Intent */
+		mTrackManager = getIntent().getParcelableExtra("track_manager");
+		String boxId = getIntent().getStringExtra("box_id");
+		mBox = (TextBox) mTrackManager.getBox(boxId);
 		
 		if (mBox == null) {
 			/* Media must be created */
 			mBox = new TextBox(null, 0, 10, null);
 			mTrackManager.addBox(mBox, mBox.getBegin());
 		}
+	}
+	
+	@Override
+	protected void onStart() {
+		super.onStart();
 		
 		/* Set the EditText's text if possible */
 		if (mBox.getName() != null) {
 			mEditText.setText(mBox.getName());
 			mEditText.setSelection(mEditText.getText().length());
 		}
-	}
-	
-	/**
-	 * Saves the TrackManager and Box to the Application.
-	 */
-	private void save() {
-		/* Save text */
-		if (mBox != null) {
-			mBox.setName(mEditText.getText().toString());
-		}
-		
-		/* Save to Application */
-		((SMILCloud) getApplication()).setTrackManager(mTrackManager);
-		((SMILCloud) getApplication()).setSelectedBox(mBox);
 	}
 
 }

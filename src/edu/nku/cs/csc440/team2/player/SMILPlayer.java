@@ -3,9 +3,9 @@ package edu.nku.cs.csc440.team2.player;
 import java.util.concurrent.Callable;
 
 import android.app.Activity;
+import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
-import android.graphics.Color;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -35,6 +35,7 @@ import edu.nku.cs.csc460.team2.R;
  */
 public class SMILPlayer extends Activity {
     
+	public static final String DONE_PLAYING = "Done playing SMIL message.";
 	public static final String NO_MEDIA_TO_PLAY = "No media was selected to play.";
 	public static final String MEDIA_NOT_FOUND = "The media  you requested was not found.";
 	public static final String WTF_HAPPENED_MESSAGE = "Whoops, can't play this.";
@@ -49,6 +50,23 @@ public class SMILPlayer extends Activity {
 	private SeqPlayer root;
 	private RelativeLayout rootView;
 	
+	private ProgressDialog mProgressDialog;
+	
+	private Runnable mDismissProgressDialog = new Runnable() {
+		@Override
+		public void run() {
+			SMILPlayer.this.mProgressDialog.dismiss();
+		}
+	};
+	
+	private Runnable mDonePlaying = new Runnable() {
+		@Override
+		public void run() {
+			Toast.makeText(SMILPlayer.this, SMILPlayer.DONE_PLAYING, 
+					Toast.LENGTH_SHORT).show();
+		}
+	};
+	
 	/**
      * @param savedInstanceState
      * @return void
@@ -56,7 +74,7 @@ public class SMILPlayer extends Activity {
      * 
      * Call when Activity is first created
      */
-    @Override
+	@Override
     public void onCreate(Bundle savedInstanceState) {
     	/*
     	 * create the main instance and get the root View
@@ -64,6 +82,9 @@ public class SMILPlayer extends Activity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.player_main);
         this.rootView = (RelativeLayout)findViewById(R.id.player_root_layout);
+        
+        this.mProgressDialog = ProgressDialog.show(this, "Please wait...", 
+        		"Preparing your video...");
         
         RelativeLayout videoContainer = this.loadVideoContainer();
         
@@ -86,6 +107,7 @@ public class SMILPlayer extends Activity {
         	if( message == null )
         	{
         		//Document was not found... should display a message and not continue
+        		this.mProgressDialog.dismiss();
         		Context context = getApplicationContext();
         		String toastMessage = SMILPlayer.MEDIA_NOT_FOUND;
         		Toast.makeText(context, toastMessage, Toast.LENGTH_LONG).show();
@@ -111,6 +133,7 @@ public class SMILPlayer extends Activity {
         			 * all is going pretty good even though at this point it's really
         			 * not going that well
         			 */
+        			this.mProgressDialog.dismiss();
         			Context context = getApplicationContext();
         			String toastMessage = SMILPlayer.WTF_HAPPENED_MESSAGE;
         			Toast.makeText(context, toastMessage, Toast.LENGTH_LONG);
@@ -125,6 +148,7 @@ public class SMILPlayer extends Activity {
         	 * and not do anything. However, I'm not sure how they got to this
         	 * point. (Scratch head... shrug... dont' think about it anymore)
         	 */
+        	this.mProgressDialog.dismiss();
         	Context context = getApplicationContext();
         	String message = SMILPlayer.NO_MEDIA_TO_PLAY;
         	Toast.makeText(context, message, Toast.LENGTH_LONG).show();
@@ -137,36 +161,6 @@ public class SMILPlayer extends Activity {
          * at least a little control over things. 
          */
         this.addControls();
-        
-        
-        
-        
-        /*
-         * TEST CODE:				DON'T REMOVE YET, IT'S A GOOD REFERENCE
-         * 		to load a smil message locally and play it. This only uses
-         * 		the TestMedia instance now, no actual text, video, etc. 
-         */
-        /*
-		File f = new File(Environment.getExternalStorageDirectory() +
-				"/image_only_message.smil");
-		
-		Message message = null;
-		try 
-		{
-			message = new Message(f);
-		} 
-		catch (Exception e) 
-		{
-			e.printStackTrace();
-		}
-		
-		PriceLine pl = new PriceLine(message, this, videoContainer);
-		pl.negotiateBigDeal();
-		this.root = (SeqPlayer)pl.getDocumentAndNameYourOwnPrice();
-		this.preparePlayer();
-		
-		this.startPlayback();
-		*/
     }
     
     
@@ -189,9 +183,12 @@ public class SMILPlayer extends Activity {
 					e1.printStackTrace();
 				}
 				
+				/*
+				 * Wait for any initial buffering. This is excluded from the
+				 * main loop so that we can dismiss the ProgressDialog once.
+				 */
 				if( ! subject.isBufferQueueEmpty() )
 				{
-					/* TODO update the UI to display the buffering info*/
 					while( ! subject.isBufferQueueEmpty() )
 					{
 						try {
@@ -201,6 +198,7 @@ public class SMILPlayer extends Activity {
 						}
 					}
 				}
+				runOnUiThread(SMILPlayer.this.mDismissProgressDialog);
 				/*
     			 * Initialize the progress bar to its max value for updating later on
     			 */
@@ -240,13 +238,14 @@ public class SMILPlayer extends Activity {
 					if( root.getTimePlayed() >= root.getDuration() )
 					{
 						root.unRenderAll();
+						runOnUiThread(SMILPlayer.this.mDonePlaying);
 						break;
 					}
 					if( playbackReset )
 					{
 						root.pause();
 						root.reset();
-						root.getSubject().reset();
+						subject.reset();
 						if( !playerControlPause ) { root.play(); }
 						playbackReset = false;
 					}
@@ -262,8 +261,6 @@ public class SMILPlayer extends Activity {
      * preparation of the data-structure is done... we might
      * want to display some type of wait-thing on the UI thread,
      * but I guess that will come later.
-     * 
-     * TODO: add waiting bar/loader thing to the UI while preparing
      */
     private void preparePlayer()
     {
@@ -287,7 +284,6 @@ public class SMILPlayer extends Activity {
         		RelativeLayout.LayoutParams.MATCH_PARENT);
         lp.setMargins(0, 0, 0, 0);
         videoContainer.setLayoutParams(lp);
-        videoContainer.setBackgroundColor(Color.CYAN);
         this.rootView.addView(videoContainer);
         return videoContainer;
     }
