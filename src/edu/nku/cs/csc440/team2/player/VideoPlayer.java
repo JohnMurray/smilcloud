@@ -9,7 +9,7 @@ import android.view.ViewGroup.LayoutParams;
 public class VideoPlayer extends SingleInstancePlayer implements
 		MediaPlayer.OnPreparedListener, SurfaceHolder.Callback,
 		MediaPlayer.OnBufferingUpdateListener, 
-		MediaPlayer.OnCompletionListener
+		MediaPlayer.OnCompletionListener, MediaPlayer.OnSeekCompleteListener
 {
 	private MediaPlayer mMediaPlayer;
 	private double mOffsetInto;
@@ -145,8 +145,8 @@ public class VideoPlayer extends SingleInstancePlayer implements
 	@Override
 	public void onPrepared(MediaPlayer mp)
 	{
+		this.mMediaPlayer.setOnSeekCompleteListener(this);
 		this.mMediaPlayer.seekTo((int)(this.mOffsetInto * 100));
-		this.subject.notifyDoneBuffering();
 		Log.w("Video", "Prepared video");
 	}
 
@@ -197,6 +197,11 @@ public class VideoPlayer extends SingleInstancePlayer implements
 	{
 		this.prepare();
 		super.reset();
+	}
+
+	@Override
+	public void onSeekComplete(MediaPlayer mp) {
+		this.subject.notifyDoneBuffering();
 	}
 	
 }
