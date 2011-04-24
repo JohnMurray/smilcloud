@@ -255,6 +255,7 @@ public class Inbox extends Activity
     	{
     		msgs = (new MessageProvider()).getAllMessage(
     				((SMILCloud)getApplication()).getUserId());
+    		app.setMessages(msgs);
     	}
     	
     	/* if we still don't have any messages, then just set it to
