@@ -28,35 +28,12 @@ public class Arbiter
 		this.rootSeq.play();
 	}
 	
-	private void pauseAllForBuffer()
-	{
-		this.rootSeq.pause();
-	}
-	
-	public void notifyBuffering()
-	{
-		if( this.waitForBuffer.empty() )
-		{
-			this.pauseAllForBuffer();
-		}
-		this.waitForBuffer.push(true);
-	}
-	
-	public void notifyBufferingWithoutPause() 
+	public void notifyBuffering() 
 	{
 		this.waitForBuffer.push(true);
 	}
 	
 	public void notifyDoneBuffering()
-	{
-		this.waitForBuffer.pop();
-		if( this.waitForBuffer.empty() )
-		{
-			this.playAll();
-		}
-	}
-	
-	public void notifyDoneBufferingWithoutRestart()
 	{
 		if( ! this.waitForBuffer.empty() )
 		{

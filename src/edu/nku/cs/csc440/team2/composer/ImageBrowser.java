@@ -74,7 +74,7 @@ public class ImageBrowser extends ListActivity {
 				ImageView thumb = (ImageView) view
 						.findViewById(R.id.image_browser_row_thumb);
 				if (thumb != null) {
-					thumb.setImageBitmap(mProvider.getImage(m.getMediaUrl()));
+					thumb.setImageBitmap(mProvider.getImage(m.getThumbUrl()));
 				}
 			}
 			return view;

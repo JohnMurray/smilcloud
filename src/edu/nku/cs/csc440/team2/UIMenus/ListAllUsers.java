@@ -2,20 +2,19 @@ package edu.nku.cs.csc440.team2.UIMenus;
 
 import java.util.ArrayList;
 
-import edu.nku.cs.csc440.team2.SMILCloud;
-import edu.nku.cs.csc440.team2.provider.MessageProvider;
-import edu.nku.cs.csc440.team2.provider.UserProvider;
-import edu.nku.cs.csc460.team2.R;
 import android.app.ListActivity;
 import android.os.Bundle;
-import edu.nku.cs.csc440.team2.mediaCloud.Pair;
 import android.view.View;
-import android.view.View.OnClickListener;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
 import android.widget.Toast;
+import edu.nku.cs.csc440.team2.SMILCloud;
+import edu.nku.cs.csc440.team2.mediaCloud.Pair;
+import edu.nku.cs.csc440.team2.provider.MessageProvider;
+import edu.nku.cs.csc440.team2.provider.UserProvider;
+import edu.nku.cs.csc460.team2.R;
 
 public class ListAllUsers extends ListActivity {
 	

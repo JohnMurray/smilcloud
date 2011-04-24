@@ -17,9 +17,9 @@ public class UserProvider {
 
 	public UserProvider(){}
 	
-	public int login(String userName, String password){
+	public Integer login(String userName, String password){
 		
-		int userId = -1;
+		Integer userId = null;
 		
 		List<NameValuePair> data = new ArrayList<NameValuePair>();
 		

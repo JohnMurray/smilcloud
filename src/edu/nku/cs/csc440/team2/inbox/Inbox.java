@@ -30,6 +30,9 @@ import edu.nku.cs.csc460.team2.R;
 public class Inbox extends Activity 
 {
 	private ArrayList<MessageLite> messages;
+	private NewQAAdapter adapter;
+	private ListView mList;
+	private String [] data;
 
 	/**
      * @param savedInstanceState
@@ -47,7 +50,7 @@ public class Inbox extends Activity
     	 * Get the list of messages and put the names into a string
     	 */
     	this.messages = this.getMessages();
-    	final String [] data = new String[this.messages.size()];
+    	this.data = new String[this.messages.size()];
     	if( this.messages != null )
     	{
 	    	for( int i = 0; i < this.messages.size(); i++ )
@@ -61,8 +64,8 @@ public class Inbox extends Activity
     	 * Define the list view and adapter and set the data that we
     	 * collected in the section above
     	 */
-    	ListView mList = (ListView) findViewById(R.id.l_list);
-    	NewQAAdapter adapter = new NewQAAdapter(this);
+    	mList = (ListView) findViewById(R.id.l_list);
+    	adapter = new NewQAAdapter(this);
     	
     	adapter.setData(data);
         mList.setAdapter(adapter);
@@ -96,7 +99,7 @@ public class Inbox extends Activity
 				
 				final ImageView mMoreImage 		= (ImageView) view.findViewById(R.id.i_more);
 				
-				final String text				= data[position];
+				final String text				= Inbox.this.data[position];
 				
 				String tempId = null;
 				for( MessageLite ml : Inbox.this.messages )
@@ -144,14 +147,19 @@ public class Inbox extends Activity
 				delAction.setOnClickListener(new OnClickListener() {
 					@Override
 					public void onClick(View v) {
-						Toast.makeText(Inbox.this, text + " deleted.", Toast.LENGTH_SHORT).show();
+						Toast.makeText(Inbox.this, "Deleted " + text, Toast.LENGTH_SHORT).show();
 						mQuickAction.dismiss();
 						//TODO: call provider to delete this message
 						new Thread(new Runnable() {
-							
 							@Override
 							public void run() {
-								
+								(new MessageProvider()).deleteMessage(messageId);
+								runOnUiThread(new Runnable() {
+									@Override
+									public void run() {
+										Inbox.this.resetData();
+									}
+								});
 							}
 						}).start();
 					}
@@ -174,6 +182,21 @@ public class Inbox extends Activity
 			}
 		});
     	
+    }
+    
+    private void resetData()
+    {
+    	this.messages = this.getMessages();
+    	this.data = new String[this.messages.size()];
+    	if( this.messages != null )
+    	{
+	    	for( int i = 0; i < this.messages.size(); i++ )
+	    	{
+	    		data[i] = this.messages.get(i).getName();
+	    	}
+    	}
+    	this.adapter.setData(data);
+    	mList.setAdapter(adapter);
     }
     
     
