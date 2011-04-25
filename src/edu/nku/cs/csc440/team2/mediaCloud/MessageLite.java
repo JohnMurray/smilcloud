@@ -1,4 +1,4 @@
-package edu.nku.cs.csc440.team2.mediaCloud;
+package mediaCloud;
 
 import java.sql.Connection;
 import java.sql.ResultSet;
@@ -12,9 +12,6 @@ public class MessageLite {
 	private String sender;
 	private String date;
 	private String uniqueId;
-	
-	public MessageLite() {}
-	
 	
 	MessageLite(String name, String sender, String date, String uniqueId) {
 		this.name = name;
@@ -88,15 +85,6 @@ public class MessageLite {
 		
 		MessageLite[] inboxArray = new MessageLite[inbox.size()];
 		return inbox.toArray(inboxArray);
-	}
-	
-	public boolean equals(Object other)
-	{
-		MessageLite m = (MessageLite) other;
-		return (m.getName().equals(this.name) &&
-				m.getUniqueId().equals(this.uniqueId) &&
-				m.getSender().equals(this.sender) &&
-				m.getDate().equals(this.date) );
 	}
 
 }
