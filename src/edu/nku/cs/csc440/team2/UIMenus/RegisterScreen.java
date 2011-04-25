@@ -78,7 +78,8 @@ public class RegisterScreen extends Activity {
 					toast.show();
 				} else {
 					((SMILCloud) getApplication()).setUserId(newUser);
-					// launch the "Main Menu" activity
+					// launch the "Main Menu" activity and let them know they're registered
+					Toast.makeText(RegisterScreen.this, "Successfully Registered!", Toast.LENGTH_LONG);
 					Intent i = new Intent(RegisterScreen.this, MainMenu.class);
 					i.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
 					startActivity(i);
