@@ -33,13 +33,14 @@ import android.media.MediaPlayer;
 import android.os.Environment;
 
 public class MediaProvider {
-	
-	private String cacheFolder = Environment.getExternalStorageDirectory() + "/smilcache";
+
+	private String cacheFolder = Environment.getExternalStorageDirectory()
+			+ "/smilcache";
 
 	public MediaProvider() {
 
 		File folder = new File(cacheFolder);
-		if(!folder.exists())
+		if (!folder.exists())
 			folder.mkdir();
 	}
 
@@ -107,16 +108,16 @@ public class MediaProvider {
 		Bitmap image = null;
 
 		try {
-			
+
 			// Try to find cache
 			File cache = getCacheFile(url);
-			if(cache != null){
-				
+			if (cache != null) {
+
 				// From cache
 				image = BitmapFactory.decodeFile(cache.getPath());
-				
-			}else{
-				
+
+			} else {
+
 				URL filePath = new URL(url);
 
 				HttpURLConnection conn = (HttpURLConnection) filePath
@@ -129,13 +130,10 @@ public class MediaProvider {
 
 				// Bitmap
 				image = BitmapFactory.decodeStream(is);
-				
+
 				// Cache
 				cacheBitmap(image, getFileName(url));
 			}
-			
-			
-			
 
 		} catch (MalformedURLException e) {
 			// TODO Auto-generated catch block
@@ -156,31 +154,31 @@ public class MediaProvider {
 	public String getText(String url) {
 
 		String text = "";
-		
+
 		File cache = getCacheFile(url);
-		
+
 		try {
 			// Check cache
-			if(cache != null){
-				
+			if (cache != null) {
+
 				// From cache
 				StringBuilder sb = new StringBuilder();
 
-			    BufferedReader br = new BufferedReader(new FileReader(cache));
-			    String line;
+				BufferedReader br = new BufferedReader(new FileReader(cache));
+				String line;
 
-			    while ((line = br.readLine()) != null) {
-			        sb.append(line);
-			        sb.append('\n');
-			    }
-			    
-			    text = sb.toString();
-			
-			}else{
-				
+				while ((line = br.readLine()) != null) {
+					sb.append(line);
+					sb.append('\n');
+				}
+
+				text = sb.toString();
+
+			} else {
+
 				// From Cloud
 				text = RequestHelper.makeHttpGetRequest(url);
-				
+
 				// Cache new file
 				cacheText(text, getFileName(url));
 			}
@@ -192,15 +190,18 @@ public class MediaProvider {
 
 		return text;
 	}
-	
+
 	/**
 	 * Delete Media by ID
+	 * 
 	 * @param mediaId
 	 */
-	public void deleteMedia(int mediaId){
-		
+	public void deleteMedia(int mediaId) {
+
 		try {
-			RequestHelper.makeHttpGetRequest("http://nkucloud.dyndns.org:8080/mediacloud/deleteMedia.jsp?mediaId=" + mediaId);
+			RequestHelper
+					.makeHttpGetRequest("http://nkucloud.dyndns.org:8080/mediacloud/deleteMedia.jsp?mediaId="
+							+ mediaId);
 
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
@@ -212,9 +213,10 @@ public class MediaProvider {
 	 * Save Image/Audio/Video
 	 * 
 	 * @param localPath
-	 * @return 
+	 * @return
 	 */
-	public String saveMedia(String localPath, String type, int userId, String mediaName) {
+	public String saveMedia(String localPath, String type, int userId,
+			String mediaName, boolean useMediaName) {
 
 		String returnedUrl = null;
 		File file = new File(localPath);
@@ -227,16 +229,20 @@ public class MediaProvider {
 			MultipartEntity entity = new MultipartEntity();
 
 			entity.addPart("user", new StringBody(userId + ""));
-			entity.addPart("name", new StringBody(mediaName));
+			if (useMediaName) {
+				entity.addPart("name", new StringBody(mediaName));
+			} else {
+				entity.addPart("name", new StringBody(file.getName()));
+			}
 			entity.addPart("type", new StringBody(type));
 			entity.addPart("file", new FileBody(file));
 			httppost.setEntity(entity);
-			
+
 			HttpResponse response = httpclient.execute(httppost);
-			
+
 			// Get url
-			BufferedReader in = new BufferedReader(new InputStreamReader(response.getEntity()
-					.getContent()));
+			BufferedReader in = new BufferedReader(new InputStreamReader(
+					response.getEntity().getContent()));
 			StringBuffer sb = new StringBuffer("");
 			String line = "";
 			String NL = System.getProperty("line.separator");
@@ -245,56 +251,54 @@ public class MediaProvider {
 			}
 			in.close();
 			returnedUrl = sb.toString().trim();
-			
+
 			int i = 0;
 		} catch (ClientProtocolException e) {
 		} catch (IOException e) {
 		}
-		
+
 		return returnedUrl;
 	}
-	
-	private void removeCache(){
-		
+
+	private void removeCache() {
+
 		// TODO: Check size and remove stale cache
 	}
-	
-	private File getCacheFile(String url){
-		
+
+	private File getCacheFile(String url) {
+
 		String fileName = getFileName(url);
-		
+
 		File file = new File(cacheFolder + "/" + fileName);
-		
-		if(file.exists())
+
+		if (file.exists())
 			return file;
-		
+
 		return null;
 	}
-	
+
 	//
 	// Cache Bitmap
-	private void cacheBitmap(Bitmap bitmap, String fileName){
-		
+	private void cacheBitmap(Bitmap bitmap, String fileName) {
+
 		File file = new File(cacheFolder, fileName);
-		
-		
-		
+
 		OutputStream outStream = null;
-		
+
 		Bitmap.CompressFormat format = CompressFormat.JPEG;
-		
+
 		String ext = fileName.substring(fileName.lastIndexOf(".") + 1);
-		
-		if(ext.compareToIgnoreCase("png") == 0)
+
+		if (ext.compareToIgnoreCase("png") == 0)
 			format = CompressFormat.PNG;
-		
+
 		try {
-			if(!file.exists())
+			if (!file.exists())
 				file.createNewFile();
 			outStream = new FileOutputStream(file);
 			bitmap.compress(format, 100, outStream);
-		    outStream.flush();
-		    outStream.close();
+			outStream.flush();
+			outStream.close();
 		} catch (FileNotFoundException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -303,31 +307,29 @@ public class MediaProvider {
 			e.printStackTrace();
 		}
 
-		
 	}
-	
-	
+
 	// Cache Text File
-	private void cacheText(String str, String fileName){
-		
+	private void cacheText(String str, String fileName) {
+
 		File file = new File(cacheFolder + "/" + fileName);
-		
+
 		try {
 			FileWriter writer = new FileWriter(file);
-			
+
 			writer.append(str);
 			writer.flush();
 			writer.close();
-			
+
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		
+
 	}
-	
-	private String getFileName(String fullpath){
-		
+
+	private String getFileName(String fullpath) {
+
 		return fullpath.substring(fullpath.lastIndexOf("/") + 1);
 	}
 }

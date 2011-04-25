@@ -77,7 +77,7 @@ public class Uploader extends Activity {
 			} else {
 				String mediaUrl = (new MediaProvider()).saveMedia(fileLocation,
 						type, ((SMILCloud) Uploader.this.getApplication())
-								.getUserId(), mediaNameText);
+								.getUserId(), mediaNameText, false);
 				if (mediaUrl == null) {
 					Uploader.this.dismissAndNotify(Uploader.FAILED_UPLOAD);
 				} else {

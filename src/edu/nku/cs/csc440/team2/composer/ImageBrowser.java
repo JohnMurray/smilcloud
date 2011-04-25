@@ -33,7 +33,7 @@ import android.widget.Toast;
  * http://softwarepassion.com/android-series-custom-listview-items-and-adapters
  * 
  * @author William Knauer <knauerw1@nku.edu>
- * @version 2011.0420
+ * @version 2011.0424
  */
 public class ImageBrowser extends ListActivity {
 	/**
@@ -63,8 +63,7 @@ public class ImageBrowser extends ListActivity {
 		public View getView(int position, View convertView, ViewGroup parent) {
 			View view = convertView;
 			if (view == null) {
-				LayoutInflater inflater = (LayoutInflater)
-						getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+				LayoutInflater inflater = (LayoutInflater) getSystemService(Context.LAYOUT_INFLATER_SERVICE);
 				view = inflater.inflate(R.layout.image_browser_row, null);
 			}
 			Media m = mItems.get(position);
@@ -93,7 +92,7 @@ public class ImageBrowser extends ListActivity {
 
 	/** The adapter for displaying image Media in a ListActivity */
 	private ImageListAdapter mImageListAdapter;
-	
+
 	/** Flag for whether or not media was successfully retrieved */
 	private boolean mServerDown;
 
@@ -124,8 +123,8 @@ public class ImageBrowser extends ListActivity {
 			mProgressDialog.dismiss();
 			if (mServerDown) {
 				Toast.makeText(getBaseContext(),
-						"Unable to connect to server.",
-						Toast.LENGTH_LONG).show();
+						"Unable to connect to server.", Toast.LENGTH_LONG)
+						.show();
 			}
 		}
 
@@ -135,12 +134,12 @@ public class ImageBrowser extends ListActivity {
 	 * Retrieves the Media from the cloud and stores it in mMedia.
 	 */
 	public void getMedia() {
-		Media[] media = mProvider.getAllMedia(
-				((SMILCloud) getApplication()).getUserId());
-		
+		Media[] media = mProvider.getAllMedia(((SMILCloud) getApplication())
+				.getUserId());
+
 		/* Keep program from crashing if cloud is not accessible */
 		if (media != null) {
-			for (int i = 0; i < media.length; i ++) {
+			for (int i = 0; i < media.length; i++) {
 				if (media[i].getType().equalsIgnoreCase("image")) {
 					mMedia.add(media[i]);
 				}
@@ -149,7 +148,7 @@ public class ImageBrowser extends ListActivity {
 		} else {
 			mServerDown = true;
 		}
-		
+
 		runOnUiThread(finishMediaRetrieval);
 	}
 
@@ -158,6 +157,18 @@ public class ImageBrowser extends ListActivity {
 		/* Return that we canceled */
 		setResult(RESULT_CANCELED);
 		finish();
+	}
+
+	@Override
+	public boolean onContextItemSelected(MenuItem item) {
+		AdapterView.AdapterContextMenuInfo info = (AdapterView.AdapterContextMenuInfo) item
+				.getMenuInfo();
+		Media m = (Media) getListAdapter().getItem(info.position);
+		MediaProvider mp = new MediaProvider();
+		mp.deleteMedia(Integer.parseInt(m.getMediaId()));
+		mMedia.remove(m);
+		mImageListAdapter.notifyDataSetChanged();
+		return true;
 	}
 
 	@Override
@@ -183,24 +194,12 @@ public class ImageBrowser extends ListActivity {
 	}
 
 	@Override
-	public void onCreateContextMenu (ContextMenu menu, View v,
+	public void onCreateContextMenu(ContextMenu menu, View v,
 			ContextMenu.ContextMenuInfo menuInfo) {
 		menu.setHeaderTitle("Media Options");
 		menu.add(0, v.getId(), 0, "Delete");
 	}
-	
-	@Override
-	public boolean onContextItemSelected (MenuItem item) {
-		AdapterView.AdapterContextMenuInfo info
-				= (AdapterView.AdapterContextMenuInfo) item.getMenuInfo();
-		Media m = (Media) getListAdapter().getItem(info.position);
-		MediaProvider mp = new MediaProvider();
-		mp.deleteMedia(Integer.parseInt(m.getMediaId()));
-		mMedia.remove(m);
-		mImageListAdapter.notifyDataSetChanged();
-		return true;
-	}
-	
+
 	@Override
 	protected void onListItemClick(ListView l, View v, int position, long id) {
 		Media m = (Media) l.getItemAtPosition(position);
@@ -216,5 +215,5 @@ public class ImageBrowser extends ListActivity {
 		setResult(RESULT_OK, i);
 		finish();
 	}
-	
+
 }

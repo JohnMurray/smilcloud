@@ -16,39 +16,39 @@ import android.widget.TextView;
  * VideoBox. The begin and duration for playback cannot be changed from here.
  * 
  * @author William Knauer <knauerw1@nku.edu>
- * @version 2011.0420
+ * @version 2011.0424
  */
 public class VideoProperties extends Activity {
 	/** Request code for launching ImageBrowser */
 	private static final int REQ_SOURCE = 1;
-	
+
 	/** Request code for launching RegionEditor */
 	private static final int REQ_REGION = 2;
-	
+
 	/** Handle for the button that sets the media source. */
 	private Button mSetSourceButton;
-	
+
 	/** Handle for the SeekBar that sets the media's clipBegin time. */
 	private SeekBar mClipOffsetBar;
-	
+
 	/** Handle for the label that shows the clipBegin time. */
 	private TextView mClipBeginLabel;
-	
+
 	/** Handle for the label that shows the clipEnd time. */
 	private TextView mClipEndLabel;
-	
+
 	/** Handle for the button that opens the RegionEditor */
 	private Button mRegionEditButton;
-	
+
 	/** Handle for the button that deletes the media from the composer. */
 	private Button mDeleteButton;
-	
+
 	/** The data structure that contains the message. */
 	private TrackManager mTrackManager;
-	
+
 	/** The media being edited/created. */
 	private VideoBox mBox;
-	
+
 	/**
 	 * Assigns local handles and callbacks for widgets in the UI.
 	 */
@@ -75,12 +75,10 @@ public class VideoProperties extends Activity {
 						int maxClipBegin = mBox.getClipDuration()
 								- mBox.getDuration();
 						mBox.setClipBegin((int) (progress
-								* (1.0 / mClipOffsetBar.getMax())
-								* maxClipBegin));
-						
+								* (1.0 / mClipOffsetBar.getMax()) * maxClipBegin));
+
 						/* Update UI labels */
-						mClipBeginLabel.setText(
-								"Clip Begin: "
+						mClipBeginLabel.setText("Clip Begin: "
 								+ AudioVideoBox.formatTime(mBox.getClipBegin()));
 						mClipEndLabel.setText("Clip End: "
 								+ AudioVideoBox.formatTime(mBox.getClipEnd()));
@@ -139,13 +137,12 @@ public class VideoProperties extends Activity {
 				mBox.setName(data.getStringExtra("name"));
 				mBox.setClipDuration(data.getIntExtra("length", 10));
 				mBox.setSource(data.getStringExtra("source"));
-	
 			} else if (requestCode == REQ_REGION) {
 				mTrackManager = data.getParcelableExtra("track_manager");
 				String boxId = data.getStringExtra("box_id");
 				mBox = (VideoBox) mTrackManager.getBox(boxId);
 			}
-			
+
 			/* Disallow editing of the media's source if it's already set */
 			if (mBox.getSource() != null) {
 				mSetSourceButton.setEnabled(false);
@@ -165,7 +162,7 @@ public class VideoProperties extends Activity {
 		} else {
 			setResult(RESULT_CANCELED);
 		}
-		
+
 		finish();
 	}
 
@@ -174,33 +171,33 @@ public class VideoProperties extends Activity {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.video_properties);
 		loadWidgetsFromView();
-		
+
 		/* Load from Intent */
 		mTrackManager = getIntent().getParcelableExtra("track_manager");
 		String boxId = getIntent().getStringExtra("box_id");
 		mBox = (VideoBox) mTrackManager.getBox(boxId);
-		
+
 		if (mBox == null) {
 			/* Media must be created */
 			mBox = new VideoBox(null, 0, 10, 10, null);
 			mTrackManager.addBox(mBox, mBox.getBegin());
 		}
 	}
-	
+
 	@Override
 	protected void onStart() {
 		super.onStart();
-		
+
 		/* Initialize the SeekBar */
 		int range = mBox.getClipDuration() - mBox.getDuration();
 		double val = ((double) mBox.getClipBegin()) / range;
 		mClipOffsetBar.setProgress((int) (val * mClipOffsetBar.getMax()));
-		
+
 		/* Disallow editing of the media's source if it's already set */
 		if (mBox.getSource() != null) {
 			mSetSourceButton.setEnabled(false);
 			mSetSourceButton.setText(mBox.getName());
 		}
 	}
-	
+
 }

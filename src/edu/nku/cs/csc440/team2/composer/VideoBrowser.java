@@ -33,7 +33,7 @@ import android.widget.Toast;
  * http://softwarepassion.com/android-series-custom-listview-items-and-adapters
  * 
  * @author William Knauer <knauerw1@nku.edu>
- * @version 2011.0420
+ * @version 2011.0424
  */
 public class VideoBrowser extends ListActivity {
 	/**
@@ -63,8 +63,8 @@ public class VideoBrowser extends ListActivity {
 		public View getView(int position, View convertView, ViewGroup parent) {
 			View view = convertView;
 			if (view == null) {
-				LayoutInflater inflater = (LayoutInflater)
-						getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+				LayoutInflater inflater = (LayoutInflater) getSystemService(
+						Context.LAYOUT_INFLATER_SERVICE);
 				view = inflater.inflate(R.layout.video_browser_row, null);
 			}
 			Media m = mItems.get(position);
@@ -74,11 +74,13 @@ public class VideoBrowser extends ListActivity {
 				if (name != null) {
 					name.setText(m.getName());
 				}
-				TextView time = (TextView) view.findViewById(R.id.video_browser_row_time);
+				TextView time = (TextView) view
+						.findViewById(R.id.video_browser_row_time);
 				if (time != null) {
 					time.setText(m.getDuration());
 				}
-				ImageView thumb = (ImageView) view.findViewById(R.id.video_browser_row_thumb);
+				ImageView thumb = (ImageView) view
+						.findViewById(R.id.video_browser_row_thumb);
 				if (thumb != null) {
 					thumb.setImageBitmap(mProvider.getImage(m.getThumbUrl()));
 				}
@@ -96,7 +98,7 @@ public class VideoBrowser extends ListActivity {
 
 	/** The adapter for displaying video Media in a ListActivity */
 	private VideoListAdapter mVideoListAdapter;
-	
+
 	/** Flag for whether or not media was successfully retrieved */
 	private boolean mServerDown;
 
@@ -127,8 +129,8 @@ public class VideoBrowser extends ListActivity {
 			mProgressDialog.dismiss();
 			if (mServerDown) {
 				Toast.makeText(getBaseContext(),
-						"Unable to connect to server.",
-						Toast.LENGTH_LONG).show();
+						"Unable to connect to server.", Toast.LENGTH_LONG)
+						.show();
 			}
 		}
 
@@ -138,12 +140,12 @@ public class VideoBrowser extends ListActivity {
 	 * Retrieves the Media from the cloud and stores it in mMedia.
 	 */
 	public void getMedia() {
-		Media[] media = mProvider.getAllMedia(
-				((SMILCloud) getApplication()).getUserId());
-		
+		Media[] media = mProvider.getAllMedia(((SMILCloud) getApplication())
+				.getUserId());
+
 		/* Keep program from crashing if cloud is not accessible */
 		if (media != null) {
-			for (int i = 0; i < media.length; i ++) {
+			for (int i = 0; i < media.length; i++) {
 				if (media[i].getType().equalsIgnoreCase("video")) {
 					mMedia.add(media[i]);
 				}
@@ -152,8 +154,49 @@ public class VideoBrowser extends ListActivity {
 		} else {
 			mServerDown = true;
 		}
-		
+
 		runOnUiThread(finishMediaRetrieval);
+	}
+
+	/**
+	 * Converts a media duration String from the cloud to an integer that can be
+	 * used by a Box.
+	 * 
+	 * @param mediaDuration
+	 *            The duration String to convert.
+	 * @return The converted duration.
+	 */
+	private int getMediaDuration(String mediaDuration) {
+		/* Split by delimiters */
+		String[] firstSplit = mediaDuration.split(":");
+		if (firstSplit[2].contains(".")) {
+			String[] secondSplit = firstSplit[2].split(".");
+
+			/* Parse integers from splits */
+			int tenths = Integer.parseInt(secondSplit[1]);
+			int seconds = Integer.parseInt(secondSplit[0]);
+			int minutes = Integer.parseInt(firstSplit[1]);
+			int hours = Integer.parseInt(firstSplit[0]);
+
+			/* Determine total time in tenth-seconds */
+			minutes += hours * 60;
+			seconds += minutes * 60;
+			tenths += seconds * 10;
+
+			return tenths;
+		} else {
+			int tenths = 0;
+			int seconds = Integer.parseInt(firstSplit[2]);
+			int minutes = Integer.parseInt(firstSplit[1]);
+			int hours = Integer.parseInt(firstSplit[0]);
+
+			/* Determine total time in tenth-seconds */
+			minutes += hours * 60;
+			seconds += minutes * 60;
+			tenths += seconds * 10;
+
+			return tenths;
+		}
 	}
 
 	@Override
@@ -161,6 +204,18 @@ public class VideoBrowser extends ListActivity {
 		/* Return that we canceled */
 		setResult(RESULT_CANCELED);
 		finish();
+	}
+
+	@Override
+	public boolean onContextItemSelected(MenuItem item) {
+		AdapterView.AdapterContextMenuInfo info = (AdapterView.AdapterContextMenuInfo) item
+				.getMenuInfo();
+		Media m = (Media) getListAdapter().getItem(info.position);
+		MediaProvider mp = new MediaProvider();
+		mp.deleteMedia(Integer.parseInt(m.getMediaId()));
+		mMedia.remove(m);
+		mVideoListAdapter.notifyDataSetChanged();
+		return true;
 	}
 
 	@Override
@@ -184,24 +239,12 @@ public class VideoBrowser extends ListActivity {
 		mProgressDialog = ProgressDialog.show(VideoBrowser.this,
 				"Please wait...", "Retrieving list...", true);
 	}
-	
+
 	@Override
-	public void onCreateContextMenu (ContextMenu menu, View v,
+	public void onCreateContextMenu(ContextMenu menu, View v,
 			ContextMenu.ContextMenuInfo menuInfo) {
 		menu.setHeaderTitle("Media Options");
 		menu.add(0, v.getId(), 0, "Delete");
-	}
-	
-	@Override
-	public boolean onContextItemSelected (MenuItem item) {
-		AdapterView.AdapterContextMenuInfo info
-				= (AdapterView.AdapterContextMenuInfo) item.getMenuInfo();
-		Media m = (Media) getListAdapter().getItem(info.position);
-		MediaProvider mp = new MediaProvider();
-		mp.deleteMedia(Integer.parseInt(m.getMediaId()));
-		mMedia.remove(m);
-		mVideoListAdapter.notifyDataSetChanged();
-		return true;
 	}
 
 	@Override
@@ -209,7 +252,7 @@ public class VideoBrowser extends ListActivity {
 		Media m = (Media) l.getItemAtPosition(position);
 
 		int duration = getMediaDuration(m.getDuration());
-		
+
 		/* Dump data into intent */
 		Intent i = new Intent();
 		i.putExtra("name", m.getName());
@@ -221,38 +264,5 @@ public class VideoBrowser extends ListActivity {
 		/* Return result and finish */
 		setResult(RESULT_OK, i);
 		finish();
-	}
-	
-	private int getMediaDuration(String mediaDuration) {
-		/* Split by delimiters */
-		String[] firstSplit = mediaDuration.split(":");
-		if (firstSplit[2].contains(".")) {
-			String[] secondSplit = firstSplit[2].split(".");
-			
-			/* Parse integers from splits */
-			int tenths = Integer.parseInt(secondSplit[1]);
-			int seconds = Integer.parseInt(secondSplit[0]);
-			int minutes = Integer.parseInt(firstSplit[1]);
-			int hours = Integer.parseInt(firstSplit[0]);
-			
-			/* Determine total time in tenth-seconds */
-			minutes += hours * 60;
-			seconds += minutes * 60;
-			tenths += seconds * 10;
-			
-			return tenths;
-		} else {
-			int tenths = 0;
-			int seconds = Integer.parseInt(firstSplit[2]);
-			int minutes = Integer.parseInt(firstSplit[1]);
-			int hours = Integer.parseInt(firstSplit[0]);
-			
-			/* Determine total time in tenth-seconds */
-			minutes += hours * 60;
-			seconds += minutes * 60;
-			tenths += seconds * 10;
-			
-			return tenths;
-		}
 	}
 }
