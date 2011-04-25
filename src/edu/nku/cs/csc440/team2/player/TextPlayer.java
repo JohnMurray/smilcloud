@@ -101,4 +101,10 @@ public class TextPlayer extends SingleInstancePlayer {
 		this.text = (new MediaProvider()).getText(this.resourceURL);
 	}
 
+	@Override
+	public void reset() {
+		super.reset();
+		this.unRender();
+	}
+
 }

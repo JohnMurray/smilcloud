@@ -8,7 +8,9 @@ import edu.nku.cs.csc440.team2.service.SmilService;
 import edu.nku.cs.csc440.team2.uploader.Uploader;
 import edu.nku.cs.csc460.team2.R;
 import android.app.Activity;
+import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -81,6 +83,11 @@ public class MainMenu extends Activity {
 			public void onClick(View v) {
 				((SMILCloud) MainMenu.this.getApplication())
 						.setUserId(SMILCloud.NO_USER);
+				SharedPreferences settings = getSharedPreferences(SMILCloud.PREFS_NAME, 
+						Context.MODE_PRIVATE);
+				SharedPreferences.Editor setEditor = settings.edit();
+				setEditor.putInt("userId", SMILCloud.NO_USER);
+				setEditor.commit();
 				Intent i = new Intent(MainMenu.this, WelcomeScreen.class);
 				i.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
 				MainMenu.this.startActivity(i);
