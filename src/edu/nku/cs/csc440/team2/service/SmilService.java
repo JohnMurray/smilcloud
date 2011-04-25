@@ -47,6 +47,9 @@ public class SmilService extends Service {
 		super.onDestroy();
 	}
 
+	/**
+	 * Check for new messages and create notifications
+	 */
 	private void showNotification() {
 
 		/*

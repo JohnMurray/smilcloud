@@ -44,6 +44,11 @@ public class MediaProvider {
 			folder.mkdir();
 	}
 
+	/**
+	 * Get a list of media
+	 * @param userId
+	 * @return
+	 */
 	public Media[] getAllMedia(int userId) {
 
 		try {

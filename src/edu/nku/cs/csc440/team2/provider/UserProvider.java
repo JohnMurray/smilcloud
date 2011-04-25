@@ -17,6 +17,12 @@ public class UserProvider {
 
 	public UserProvider(){}
 	
+	/**
+	 * Authorize a user
+	 * @param userName
+	 * @param password
+	 * @return
+	 */
 	public Integer login(String userName, String password){
 		
 		Integer userId = null;
@@ -66,6 +72,14 @@ public class UserProvider {
 		
 	}
 	
+	/**
+	 * Add User
+	 * @param userName
+	 * @param password
+	 * @param firstName
+	 * @param lastName
+	 * @return ID of the new user when success
+	 */
 	public int addUser(String userName, String password, String firstName, String lastName){
 		
 		int userId = -1;
