@@ -2,7 +2,9 @@ package edu.nku.cs.csc440.team2.UIMenus;
 
 import android.app.Activity;
 import android.app.ProgressDialog;
+import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -132,12 +134,20 @@ public class AuthenticateScreen extends Activity {
 		@Override
 		public void run() {
 			AuthenticateScreen.this.mProgressDialog.dismiss();
-			((SMILCloud) getApplication())
-					.setUserId(AuthenticateScreen.this.userId);
+			
+			//store their session in the login
+			SharedPreferences settings = getSharedPreferences(SMILCloud.PREFS_NAME, 
+					Context.MODE_PRIVATE);
+			SharedPreferences.Editor setEditor = settings.edit();
+			setEditor.putInt("userId", AuthenticateScreen.this.userId);
+			setEditor.commit();
+			((SMILCloud) getApplication()).setUserId(AuthenticateScreen.this.userId);
+			
 			// launch the "Main Menu" activity
 			Intent i = new Intent(AuthenticateScreen.this, MainMenu.class);
 			i.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
 			startActivity(i);
+			AuthenticateScreen.this.finish();
 		}
 	};
 

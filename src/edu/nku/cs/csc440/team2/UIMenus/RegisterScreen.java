@@ -3,6 +3,7 @@ package edu.nku.cs.csc440.team2.UIMenus;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -77,12 +78,20 @@ public class RegisterScreen extends Activity {
 							Toast.LENGTH_LONG);
 					toast.show();
 				} else {
+					//store their session in the login
+					SharedPreferences settings = getSharedPreferences(SMILCloud.PREFS_NAME, 
+							Context.MODE_PRIVATE);
+					SharedPreferences.Editor setEditor = settings.edit();
+					setEditor.putInt("userId", newUser);
+					setEditor.commit();
 					((SMILCloud) getApplication()).setUserId(newUser);
+					
 					// launch the "Main Menu" activity and let them know they're registered
 					Toast.makeText(RegisterScreen.this, "Successfully Registered!", Toast.LENGTH_LONG);
 					Intent i = new Intent(RegisterScreen.this, MainMenu.class);
 					i.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
 					startActivity(i);
+					RegisterScreen.this.finish();
 				}
 			}
 

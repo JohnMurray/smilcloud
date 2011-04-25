@@ -1,7 +1,9 @@
 package edu.nku.cs.csc440.team2.UIMenus;
 
 import android.app.Activity;
+import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -24,13 +26,18 @@ public class WelcomeScreen extends Activity {
 	 */
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
-
-		SMILCloud smilCloud = (SMILCloud) getApplication();
-		if (smilCloud.getUserId() != SMILCloud.NO_USER) {
+		
+		SharedPreferences settings = getSharedPreferences(SMILCloud.PREFS_NAME, 
+				Context.MODE_PRIVATE);
+		int userId = settings.getInt("userId", SMILCloud.NO_USER);
+		if (userId != SMILCloud.NO_USER) {
+			SMILCloud smilCloud = (SMILCloud) getApplication();
+			smilCloud.setUserId(userId);
 			Intent i = new Intent(this, MainMenu.class);
 			startActivity(i);
 			this.finish();
 		}
+		
 
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.welcome_screen);

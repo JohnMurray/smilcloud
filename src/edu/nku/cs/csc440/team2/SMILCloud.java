@@ -16,6 +16,11 @@ import edu.nku.cs.csc440.team2.mediaCloud.MessageLite;
 public class SMILCloud extends Application {
 
 	/**
+	 * Name of stored preferences for the application
+	 */
+	public final static String PREFS_NAME = "SMILCloud_Preferences";
+	
+	/**
 	 * User ID that is indicative of no user.
 	 */
 	public final static int NO_USER = -1;
