@@ -136,8 +136,8 @@ public class AuthenticateScreen extends Activity {
 					.setUserId(AuthenticateScreen.this.userId);
 			// launch the "Main Menu" activity
 			Intent i = new Intent(AuthenticateScreen.this, MainMenu.class);
+			i.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
 			startActivity(i);
-			AuthenticateScreen.this.finish();
 		}
 	};
 

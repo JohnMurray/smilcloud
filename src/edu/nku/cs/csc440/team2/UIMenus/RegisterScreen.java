@@ -80,8 +80,8 @@ public class RegisterScreen extends Activity {
 					((SMILCloud) getApplication()).setUserId(newUser);
 					// launch the "Main Menu" activity
 					Intent i = new Intent(RegisterScreen.this, MainMenu.class);
+					i.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
 					startActivity(i);
-					RegisterScreen.this.finish();
 				}
 			}
 
