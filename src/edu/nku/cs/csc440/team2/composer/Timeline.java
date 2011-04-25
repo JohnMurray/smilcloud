@@ -7,8 +7,8 @@ import android.graphics.Paint.Align;
 import android.graphics.Rect;
 
 /**
- * A Timeline is a Drawable that contains tick marks and numerals that measure
- * time across the x-axis.
+ * A Timeline contains tick marks and numerals that measure time across the
+ * x-axis.
  * 
  * @author William Knauer <knauerw1@nku.edu>
  * @version 2011.0321
@@ -27,9 +27,15 @@ public class Timeline {
 		mBounds = new Rect();
 	}
 
+	/**
+	 * Draws this Timeline onto a given Canvas.
+	 * 
+	 * @param canvas
+	 *            the Canvas to draw on.
+	 */
 	public void draw(Canvas canvas) {
 		Paint p = new Paint();
-		
+
 		/* Draw background */
 		p.setAntiAlias(true);
 		p.setColor(Color.argb(255, 247, 233, 142));
@@ -119,10 +125,25 @@ public class Timeline {
 						+ getBounds().height() * 0.667f, p);
 	}
 
+	/**
+	 * @return The drawing bounds.
+	 */
 	public Rect getBounds() {
 		return mBounds;
 	}
 
+	/**
+	 * Sets the drawing bounds of this Timeline.
+	 * 
+	 * @param left
+	 *            The left bound.
+	 * @param top
+	 *            The top bound.
+	 * @param right
+	 *            The right bound.
+	 * @param bottom
+	 *            The bottom bound.
+	 */
 	public void setBounds(int left, int top, int right, int bottom) {
 		mBounds.set(left, top, right, bottom);
 	}

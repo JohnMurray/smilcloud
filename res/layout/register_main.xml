@@ -1,11 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
 	android:id="@+id/scrollView1" 
-	android:layout_width="match_parent" 
-	android:layout_height="match_parent">
+	android:layout_width="300dip" 
+	android:layout_height="match_parent"
+	android:layout_gravity="center" >
 	<LinearLayout android:orientation="vertical"
-	    android:layout_width="fill_parent"
-	    android:layout_height="fill_parent">
+	    android:layout_width="match_parent"
+	    android:layout_height="match_parent">
 	    
 	    <TextView android:text="Welcome to SMILCloud!" 
 	    	android:layout_width="match_parent" 
@@ -24,12 +25,13 @@
 	            	android:id="@+id/textView1" 
 	            	android:layout_width="wrap_content" 
 	            	android:layout_height="wrap_content"
-	            	android:textSize="16px">
+	            	android:textSize="16px"
+	            	android:paddingRight="10dip">
 	            </TextView>
 	            <EditText android:text="" 
 	            	android:id="@+id/register_first_name"
 	            	android:layout_height="wrap_content"
-	            	android:layout_width="350dip">
+	            	android:layout_width="200dip">
 	            </EditText>
 	            
 	        </TableRow>
@@ -41,7 +43,8 @@
 	            	android:id="@+id/textView1" 
 	            	android:layout_width="wrap_content" 
 	            	android:layout_height="wrap_content"
-	            	android:textSize="16px">
+	            	android:textSize="16px"
+	            	android:paddingRight="10dip">
 	            </TextView>
 	            <EditText android:text="" 
 	            	android:id="@+id/register_last_name" 
@@ -58,7 +61,8 @@
 	            	android:id="@+id/textView1" 
 	            	android:layout_width="wrap_content" 
 	            	android:layout_height="wrap_content"
-	            	android:textSize="16px">
+	            	android:textSize="16px"
+	            	android:paddingRight="10dip">
 	            </TextView>
 	            <EditText android:text="" 
 	            	android:id="@+id/register_username" 
@@ -75,7 +79,8 @@
 	            	android:id="@+id/textView1" 
 	            	android:layout_width="wrap_content" 
 	            	android:layout_height="wrap_content"
-	            	android:textSize="16px">
+	            	android:textSize="16px"
+	            	android:paddingRight="10dip">
 	            </TextView>
 	            <EditText android:text="" 
 	            	android:id="@+id/register_password" 

@@ -16,30 +16,30 @@ import android.widget.TextView;
  * AudioBox. The begin and duration for playback cannot be changed from here.
  * 
  * @author William Knauer <knauerw1@nku.edu>
- * @version 2011.0420
+ * @version 2011.0424
  */
 public class AudioProperties extends Activity {
 	/** Handle for the button that sets the media source. */
 	private Button mSetSourceButton;
-	
+
 	/** Handle for the SeekBar that sets the media's clipBegin time. */
 	private SeekBar mClipOffsetBar;
-	
+
 	/** Handle for the label that shows the clipBegin time. */
 	private TextView mClipBeginLabel;
-	
+
 	/** Handle for the label that shows the clipEnd time. */
 	private TextView mClipEndLabel;
-	
+
 	/** Handle for the button that deletes the media from the composer. */
 	private Button mDeleteButton;
-	
+
 	/** The data structure that contains the message. */
 	private TrackManager mTrackManager;
-	
+
 	/** The media being edited/created. */
 	private AudioBox mBox;
-	
+
 	/**
 	 * Assigns local handles and callbacks for widgets in the UI.
 	 */
@@ -66,12 +66,10 @@ public class AudioProperties extends Activity {
 						int maxClipBegin = mBox.getClipDuration()
 								- mBox.getDuration();
 						mBox.setClipBegin((int) (progress
-								* (1.0 / mClipOffsetBar.getMax())
-								* maxClipBegin));
-						
+								* (1.0 / mClipOffsetBar.getMax()) * maxClipBegin));
+
 						/* Update UI labels */
-						mClipBeginLabel.setText(
-								"Clip Begin: "
+						mClipBeginLabel.setText("Clip Begin: "
 								+ AudioVideoBox.formatTime(mBox.getClipBegin()));
 						mClipEndLabel.setText("Clip End: "
 								+ AudioVideoBox.formatTime(mBox.getClipEnd()));
@@ -108,16 +106,15 @@ public class AudioProperties extends Activity {
 
 		});
 	}
-	
+
 	@Override
-	protected void onActivityResult (int requestCode,
-			int resultCode, Intent data) {
+	protected void onActivityResult(int requestCode, int resultCode, Intent data) {
 		if (resultCode == RESULT_OK) {
 			/* Media was successfully chosen */
 			mBox.setName(data.getStringExtra("name"));
 			mBox.setClipDuration(data.getIntExtra("length", 10));
 			mBox.setSource(data.getStringExtra("source"));
-			
+
 			/* Disallow editing of the media's source if it's already set */
 			if (mBox.getSource() != null) {
 				mSetSourceButton.setEnabled(false);
@@ -125,7 +122,7 @@ public class AudioProperties extends Activity {
 			}
 		}
 	}
-	
+
 	@Override
 	public void onBackPressed() {
 		/* If all required fields are filled in */
@@ -137,7 +134,7 @@ public class AudioProperties extends Activity {
 		} else {
 			setResult(RESULT_CANCELED);
 		}
-		
+
 		finish();
 	}
 
@@ -146,28 +143,28 @@ public class AudioProperties extends Activity {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.audio_properties);
 		loadWidgetsFromView();
-		
+
 		/* Load from Intent */
 		mTrackManager = getIntent().getParcelableExtra("track_manager");
 		String boxId = getIntent().getStringExtra("box_id");
 		mBox = (AudioBox) mTrackManager.getBox(boxId);
-		
+
 		if (mBox == null) {
 			/* Media must be created */
 			mBox = new AudioBox(null, 0, 10, 10);
 			mTrackManager.addBox(mBox, mBox.getBegin());
 		}
 	}
-	
+
 	@Override
 	protected void onStart() {
 		super.onStart();
-		
+
 		/* Initialize the SeekBar */
 		int range = mBox.getClipDuration() - mBox.getDuration();
 		double val = ((double) mBox.getClipBegin()) / range;
 		mClipOffsetBar.setProgress((int) (val * mClipOffsetBar.getMax()));
-		
+
 		/* Disallow editing of the media's source if it's already set */
 		if (mBox.getSource() != null) {
 			mSetSourceButton.setEnabled(false);

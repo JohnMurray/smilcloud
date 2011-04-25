@@ -7,21 +7,22 @@ import android.os.Parcel;
 import android.os.Parcelable;
 
 /**
- * A ParcelableRegion mimics the functionality of message.Region but can be
- * saved to and restored from a Parcel.
+ * A ComposerRegion mimics the functionality of message.Region but can be saved
+ * to and restored from a Parcel.
  * 
  * @author William Knauer <knauerw1@nku.edu>
- * @version 2011.0416
+ * @version 2011.0424
  */
 public class ComposerRegion implements Parcelable {
-	/** The Region's bounds */
+	/** The region's bounds */
 	Rect mBounds;
-	
-	/** The Region's z-index relative to other Regions */
+
+	/** The region's z-index relative to other regions */
 	int mZindex;
 
 	/** Used to generate instances of this class from a Parcel */
-	public static final Parcelable.Creator<ComposerRegion> CREATOR = new Parcelable.Creator<ComposerRegion>() {
+	public static final Parcelable.Creator<ComposerRegion> CREATOR
+			= new Parcelable.Creator<ComposerRegion>() {
 
 		@Override
 		public ComposerRegion createFromParcel(Parcel source) {
@@ -36,43 +37,54 @@ public class ComposerRegion implements Parcelable {
 	};
 
 	/**
-	 * Class constructor. (No-arg)
+	 * Class constructor.
 	 */
-	public ComposerRegion() {
+	ComposerRegion() {
 		mBounds = new Rect();
-		mZindex = 999;
+		mZindex = Integer.MAX_VALUE;
 	}
 
 	/**
 	 * Class constructor.
 	 * 
-	 * @param l The left bound of in px
-	 * @param t The top bound of in px
-	 * @param r The right bound in px
-	 * @param b The bottom bound in px
-	 * @param zIndex The relative z-index
+	 * @param l
+	 *            The left bound.
+	 * @param t
+	 *            The top bound.
+	 * @param r
+	 *            The right bound.
+	 * @param b
+	 *            The bottom bound.
+	 * @param zIndex
+	 *            The relative z-index.
 	 */
-	public ComposerRegion(int l, int t, int r, int b, int zIndex) {
+	ComposerRegion(int l, int t, int r, int b, int zIndex) {
 		mBounds = new Rect(l, t, r, b);
-		mZindex = 999;
+		mZindex = Integer.MAX_VALUE;
 	}
 
 	/**
 	 * Class constructor for creating from a Parcel.
 	 * 
-	 * @param in The Parcel to construct from.
+	 * @param in
+	 *            The Parcel to construct from.
 	 */
-	public ComposerRegion(Parcel in) {
+	ComposerRegion(Parcel in) {
 		mBounds = in.readParcelable(Rect.class.getClassLoader());
 		mZindex = in.readInt();
 	}
-	
-	public ComposerRegion(Region r) {
-		mBounds = new Rect(
-				r.getOrigin().getWidth(),
-				r.getOrigin().getHeight(),
-				r.getOrigin().getWidth() + r.getDimensions().getWidth(),
-				r.getOrigin().getHeight() + r.getDimensions().getHeight());
+
+	/**
+	 * Class constructor for creating from a Region.
+	 * 
+	 * @param r
+	 *            The Region to create from.
+	 */
+	ComposerRegion(Region r) {
+		mBounds = new Rect(r.getOrigin().getWidth(), r.getOrigin().getHeight(),
+				r.getOrigin().getWidth() + r.getDimensions().getWidth(), r
+						.getOrigin().getHeight()
+						+ r.getDimensions().getHeight());
 		setZindex(r.getZindex());
 	}
 
@@ -81,32 +93,45 @@ public class ComposerRegion implements Parcelable {
 		return 0;
 	}
 
-	public Rect getBounds() {
+	/**
+	 * @return The bounds of this region.
+	 */
+	Rect getBounds() {
 		return mBounds;
 	}
 
-	public int getZindex() {
+	/**
+	 * @return The relative z-index of this region.
+	 */
+	int getZindex() {
 		return mZindex;
 	}
 
-	public void setBounds(Rect r) {
+	/**
+	 * @param r
+	 *            The bounds of this region.
+	 */
+	void setBounds(Rect r) {
 		mBounds.set(r);
 	}
 
-	public void setZindex(int zindex) {
+	/**
+	 * @param zindex
+	 *            The relative z-index of this region.
+	 */
+	void setZindex(int zindex) {
 		mZindex = zindex;
 	}
 
 	/**
-	 * Generates a Region from this ParcelableRegion
+	 * Generates a Region from this ComposerRegion
 	 * 
-	 * @return Returns the generated Region.
+	 * @return The generated Region.
 	 */
-	public Region toRegion() {
-		Region result = new Region(
-				new SmilDimension(getBounds().width(), getBounds().height()));
-		result.setOrigin(
-				new SmilDimension(getBounds().left, getBounds().top));
+	Region toRegion() {
+		Region result = new Region(new SmilDimension(getBounds().width(),
+				getBounds().height()));
+		result.setOrigin(new SmilDimension(getBounds().left, getBounds().top));
 		result.setZindex(getZindex());
 		return result;
 	}

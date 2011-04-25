@@ -25,11 +25,300 @@ import android.os.Parcel;
 import android.os.Parcelable;
 
 /**
+ * A TrackManager is the primary data structure used by the composer package. It
+ * is the graphical equivalent of a message.Message. A TrackManager stores
+ * Tracks, which in turn store Boxes; so a single instance of this class stores
+ * the contents of an entire SMIL document, and can be used to generate a
+ * message.Message object. A TrackManager can be drawn if the drawing bounds are
+ * set using setBounds(). Then draw() will draw it onto a given Canvas.
+ * 
  * @author William Knauer <knauerw1@nku.edu>
- * @version 2011.0421
+ * @version 2011.0424
  */
 public class TrackManager implements Parcelable {
-	
+
+	/**
+	 * Generates TrackManager objects.
+	 */
+	public static class Factory {
+
+		/** The TrackManager being created */
+		private static TrackManager mTrackManager = null;
+
+		/** The Media available to the user */
+		private static edu.nku.cs.csc440.team2.mediaCloud.Media[] mMedia = null;
+
+		/**
+		 * Adds an Audio element to the TrackManager.
+		 * 
+		 * @param audio
+		 *            The Audio element to add.
+		 */
+		private static void addAudio(Audio audio) {
+			/* Get the Audio's source url */
+			String source = audio.getSrc();
+
+			/* Find the associated Media in mMedia */
+			edu.nku.cs.csc440.team2.mediaCloud.Media m = find(source);
+
+			/* If the media exists and is accessible to the user */
+			if (m != null) {
+				/* Determine the Box's parameters */
+				int begin = (int) Math.round(audio.getBegin() * 10);
+				int end = (int) Math.round(audio.getEnd() * 10);
+				int duration = end - begin;
+				int clipDuration = parseMediaDuration(m.getDuration());
+				String name = m.getName();
+
+				/* Create the Box */
+				AudioBox box = new AudioBox(source, begin, duration,
+						clipDuration);
+
+				/* Set the Box's name */
+				box.setName(name);
+
+				/* Add the Box to the TrackManager */
+				mTrackManager.addBox(box, begin);
+			}
+		}
+
+		/**
+		 * Adds a Body element to the TrackManager.
+		 * 
+		 * @param source
+		 *            The Body element to add.
+		 */
+		private static void addElement(Body source) {
+			/* Determine what to do with the Body source */
+			if (source instanceof Sequence) {
+				/* Recursively call this method for every body source has */
+				for (Body b : ((Sequence) source).getBody()) {
+					addElement(b);
+				}
+			} else if (source instanceof Parallel) {
+				/* Recursively call this method for every body source has */
+				for (Body b : ((Parallel) source).getBody()) {
+					addElement(b);
+				}
+			} else if (source instanceof Media) {
+				/* Add a Box representing source to mTrackManager */
+				if (source instanceof Audio) {
+					addAudio((Audio) source);
+				} else if (source instanceof Image) {
+					addImage((Image) source);
+				} else if (source instanceof Text) {
+					addText((Text) source);
+				} else if (source instanceof Video) {
+					addVideo((Video) source);
+				}
+			}
+		}
+
+		/**
+		 * Adds an Image element to the TrackManager.
+		 * 
+		 * @param image
+		 *            The Image element to add.
+		 */
+		private static void addImage(Image image) {
+			/* Get the Image's source url */
+			String source = image.getSrc();
+
+			/* Find the associated Media in mMedia */
+			edu.nku.cs.csc440.team2.mediaCloud.Media m = find(source);
+
+			/* If the media exists and is accessible to the user */
+			if (m != null) {
+				/* Determine the Box's parameters */
+				int begin = (int) Math.round(image.getBegin() * 10);
+				int end = (int) Math.round(image.getEnd() * 10);
+				int duration = end - begin;
+				ComposerRegion region = new ComposerRegion(image.getRegion());
+				String name = m.getName();
+
+				/* Create the Box */
+				ImageBox box = new ImageBox(source, begin, duration, region);
+
+				/* Set the Box's name */
+				box.setName(name);
+
+				/* Add the Box to the TrackManager */
+				mTrackManager.addBox(box, begin);
+			}
+		}
+
+		/**
+		 * Adds a Text element to the TrackManager.
+		 * 
+		 * @param text
+		 *            The Text element to add.
+		 */
+		private static void addText(Text text) {
+			/* Get the Text's source url */
+			String source = text.getSrc();
+
+			/* Find the associated Media in mMedia */
+			edu.nku.cs.csc440.team2.mediaCloud.Media m = find(source);
+
+			/* If the media exists and is accessible to the user */
+			if (m != null) {
+				/* Determine the Box's parameters */
+				int begin = (int) Math.round(text.getBegin() * 10);
+				int end = (int) Math.round(text.getEnd() * 10);
+				int duration = end - begin;
+				ComposerRegion region = new ComposerRegion(text.getRegion());
+				String name = m.getName().trim();
+
+				/* Create the Box */
+				TextBox box = new TextBox(source, begin, duration, region);
+
+				/* Set the TextBox's name (text) */
+				box.setName(name);
+
+				/* Add the Box to the TrackManager */
+				mTrackManager.addBox(box, begin);
+			}
+		}
+
+		/**
+		 * Adds a Video element to the TrackManager.
+		 * 
+		 * @param video
+		 *            The Video element to add.
+		 */
+		private static void addVideo(Video video) {
+			/* Get the Video's source url */
+			String source = video.getSrc();
+
+			/* Find the associated Media in mMedia */
+			edu.nku.cs.csc440.team2.mediaCloud.Media m = find(source);
+
+			/* If the media exists and is accessible to the user */
+			if (m != null) {
+				/* Determine the Box's parameters */
+				int begin = (int) Math.round(video.getBegin() * 10);
+				int end = (int) Math.round(video.getEnd() * 10);
+				int duration = end - begin;
+				int clipDuration = parseMediaDuration(m.getDuration());
+				ComposerRegion region = new ComposerRegion(video.getRegion());
+				String name = m.getName();
+
+				/* Create the Box */
+				VideoBox box = new VideoBox(source, begin, duration,
+						clipDuration, region);
+
+				/* Set the Box's name */
+				box.setName(name);
+
+				/* Add the Box to the TrackManager */
+				mTrackManager.addBox(box, begin);
+			}
+		}
+
+		/**
+		 * Creates a TrackManager from a given Message.
+		 * 
+		 * @param messageId
+		 *            The id of the Message to create from.
+		 * @param userId
+		 *            The user id for cloud interaction.
+		 * @return The newly created TrackManager.
+		 */
+		public static TrackManager create(String messageId, int userId) {
+			/* Set up a new TrackManager */
+			mTrackManager = new TrackManager(messageId, userId);
+
+			if (messageId != null) {
+				/* Get the Message from network */
+				Message m = new MessageProvider().getMessageById(messageId);
+
+				/* Get listing of available media from network */
+				MediaProvider mediaProvider = new MediaProvider();
+				mMedia = mediaProvider.getAllMedia(userId);
+
+				/* Set each text-type media's name to its associated text */
+				for (int i = 0; i < mMedia.length; i++) {
+					if (mMedia[i].getType().equalsIgnoreCase("text")) {
+						String url = mMedia[i].getMediaUrl();
+						String text = mediaProvider.getText(url);
+						mMedia[i].setName(text);
+					}
+				}
+
+				/* Add everything from the Message to the TrackManager */
+				for (Body b : m.getBody()) {
+					addElement(b);
+				}
+			}
+
+			/* Clean up and return */
+			TrackManager result = mTrackManager;
+			mTrackManager = null;
+			mMedia = null;
+			return result;
+		}
+
+		/**
+		 * Finds a Media object in mMedia by the source url.
+		 * 
+		 * @param source
+		 *            The source url to search with.
+		 * @return The Media object whose source matches the given source. Null
+		 *         if none was found.
+		 */
+		private static edu.nku.cs.csc440.team2.mediaCloud.Media find(
+				String source) {
+			for (int i = 0; i < mMedia.length; i++) {
+				if (mMedia[i].getMediaUrl().equals(source)) {
+					return mMedia[i];
+				}
+			}
+			return null;
+		}
+
+		/**
+		 * Converts a media duration String from the cloud to an integer to be
+		 * used by a Box.
+		 * 
+		 * @param mediaDuration
+		 *            The String duration to convert.
+		 * @return The converted duration.
+		 */
+		private static int parseMediaDuration(String mediaDuration) {
+			/* Split by delimiters */
+			String[] firstSplit = mediaDuration.split(":");
+			if (firstSplit[2].contains(".")) {
+				String[] secondSplit = firstSplit[2].split(".");
+
+				/* Parse integers from splits */
+				int tenths = Integer.parseInt(secondSplit[1]);
+				int seconds = Integer.parseInt(secondSplit[0]);
+				int minutes = Integer.parseInt(firstSplit[1]);
+				int hours = Integer.parseInt(firstSplit[0]);
+
+				/* Determine total time in tenth-seconds */
+				minutes += hours * 60;
+				seconds += minutes * 60;
+				tenths += seconds * 10;
+
+				return tenths;
+			} else {
+				int tenths = 0;
+				int seconds = Integer.parseInt(firstSplit[2]);
+				int minutes = Integer.parseInt(firstSplit[1]);
+				int hours = Integer.parseInt(firstSplit[0]);
+
+				/* Determine total time in tenth-seconds */
+				minutes += hours * 60;
+				seconds += minutes * 60;
+				tenths += seconds * 10;
+
+				return tenths;
+			}
+		}
+
+	}
+
 	/**
 	 * A MoveManager helps to facilitate the moving of a Box from one Track to
 	 * another or from one location in a Track to another within the same Track.
@@ -56,7 +345,7 @@ public class TrackManager implements Parcelable {
 		/**
 		 * Class constructor.
 		 */
-		public MoveManager() {
+		MoveManager() {
 			reset();
 		}
 
@@ -66,7 +355,7 @@ public class TrackManager implements Parcelable {
 		 * @param canvas
 		 *            The canvas to draw on.
 		 */
-		public void draw(Canvas canvas) {
+		void draw(Canvas canvas) {
 			if (mBox != null) {
 				mBox.draw(canvas);
 			}
@@ -76,7 +365,7 @@ public class TrackManager implements Parcelable {
 		 * Commits the move if possible. Resets the Box to its old location if
 		 * it is not possible.
 		 */
-		public void finish() {
+		void finish() {
 			if (mFitsTarget) {
 				mTargetTrack.addBox(mBox, mTargetBegin);
 				maintain();
@@ -91,7 +380,7 @@ public class TrackManager implements Parcelable {
 		/**
 		 * @return Returns the drawing bounds of the Box being moved.
 		 */
-		public Rect getBounds() {
+		Rect getBounds() {
 			Rect result = null;
 			if (mBox != null) {
 				result = mBox.getBounds();
@@ -102,7 +391,7 @@ public class TrackManager implements Parcelable {
 		/**
 		 * @return Returns true if a move is in progress.
 		 */
-		public boolean isMoving() {
+		boolean isMoving() {
 			return (mBox != null);
 		}
 
@@ -114,19 +403,16 @@ public class TrackManager implements Parcelable {
 		 * @param dy
 		 *            The vertical distance to offset.
 		 */
-		public void offset(int dx, int dy) {
+		void offset(int dx, int dy) {
 			/* Offset mBox by (dx, dy) */
-			mBox.setBounds(
-					mBox.getBounds().left + dx,
-					mBox.getBounds().top + dy,
-					mBox.getBounds().right + dx,
-					mBox.getBounds().bottom + dy);
+			mBox.setBounds(mBox.getBounds().left + dx, mBox.getBounds().top
+					+ dy, mBox.getBounds().right + dx, mBox.getBounds().bottom
+					+ dy);
 
 			/* Figure out where mBox is now */
-			int begin = (int)(Composer.pxToSec(mBox.getBounds().left) * 10);
-			Track track = getTrack(
-					mBox.getBounds().centerX(),
-					mBox.getBounds().centerY());
+			int begin = (int) (Composer.pxToSec(mBox.getBounds().left) * 10);
+			Track track = getTrack(mBox.getBounds().centerX(), mBox.getBounds()
+					.centerY());
 
 			/* Figure out if mBox fits where it is now */
 			if (track != null && track.fits(mBox, begin)) {
@@ -141,7 +427,7 @@ public class TrackManager implements Parcelable {
 		/**
 		 * Resets all local variables to their starting state.
 		 */
-		private void reset() {
+		void reset() {
 			mFitsTarget = false;
 			mBox = null;
 			mOldTrack = null;
@@ -158,7 +444,7 @@ public class TrackManager implements Parcelable {
 		 * @param y
 		 *            The y-coordinate.
 		 */
-		public void start(int x, int y) {
+		void start(int x, int y) {
 			mBox = getBox(x, y);
 			if (mBox != null) {
 				mOldTrack = getTrack(x, y);
@@ -189,28 +475,28 @@ public class TrackManager implements Parcelable {
 		/**
 		 * Class constructor.
 		 */
-		public ResizeManager() {
+		ResizeManager() {
 			reset();
 		}
 
 		/**
 		 * Finishes the resize by resetting the ResizeManager.
 		 */
-		public void finish() {
+		void finish() {
 			reset();
 		}
 
 		/**
 		 * @return Returns true if a resize is in progress.
 		 */
-		public boolean isResizing() {
+		boolean isResizing() {
 			return (mBox != null);
 		}
 
 		/**
 		 * Resets the local variables to their starting state.
 		 */
-		private void reset() {
+		void reset() {
 			mBox = null;
 			mTrack = null;
 			mStartX = -1;
@@ -223,7 +509,7 @@ public class TrackManager implements Parcelable {
 		 * @param x
 		 *            The pointer's current x-coordinate.
 		 */
-		public void resize(int x) {
+		void resize(int x) {
 			/* Determine the desired duration */
 			int delta = (int) (Composer.pxToSec(x - mStartX) * 10);
 			int duration = mStartDuration + delta;
@@ -273,9 +559,9 @@ public class TrackManager implements Parcelable {
 		 *            The x-coordinate.
 		 * @param y
 		 *            The y-coordinate.
-		 * @return Returns true if a resize was initiated.
+		 * @return True if a resize was initiated.
 		 */
-		public boolean start(int x, int y) {
+		boolean start(int x, int y) {
 			/* Get the box that was touched */
 			Box b = getBox(x, y);
 			if (b != null) {
@@ -306,11 +592,33 @@ public class TrackManager implements Parcelable {
 
 	/** The global identifier for the represented Message */
 	private String mId;
-	
+
 	/** The userId for cloud interaction */
 	private int mUserId;
-	
-	public TrackManager(Parcel in) {
+
+	/** Used to generate instances of this class from a Parcel */
+	public static final Parcelable.Creator<TrackManager> CREATOR
+			= new Parcelable.Creator<TrackManager>() {
+
+		@Override
+		public TrackManager createFromParcel(Parcel source) {
+			return new TrackManager(source);
+		}
+
+		@Override
+		public TrackManager[] newArray(int size) {
+			return new TrackManager[size];
+		}
+
+	};
+
+	/**
+	 * Class constructor for creating from a Parcel.
+	 * 
+	 * @param in
+	 *            The parcel to create from.
+	 */
+	TrackManager(Parcel in) {
 		mTracks = new LinkedList<Track>();
 		in.readTypedList(mTracks, Track.CREATOR);
 		mMoveManager = new MoveManager();
@@ -323,15 +631,13 @@ public class TrackManager implements Parcelable {
 	/**
 	 * Class constructor.
 	 */
-	public TrackManager(String id, int userId) {
+	TrackManager(String id, int userId) {
 		mBounds = new Rect();
 		mMoveManager = new MoveManager();
 		mResizeManager = new ResizeManager();
 		mTracks = new LinkedList<Track>();
 		setId(id);
 		setUserId(userId);
-		
-		
 		maintain();
 	}
 
@@ -343,7 +649,7 @@ public class TrackManager implements Parcelable {
 	 * @param begin
 	 *            The time to add the Box.
 	 */
-	public void addBox(Box elt, int begin) {
+	void addBox(Box elt, int begin) {
 		boolean added = false;
 		for (Track t : mTracks) {
 			if (!added) {
@@ -353,13 +659,18 @@ public class TrackManager implements Parcelable {
 		maintain();
 	}
 
+	@Override
+	public int describeContents() {
+		return 0;
+	}
+
 	/**
 	 * Draws all Tracks onto the given Canvas.
 	 * 
 	 * @param canvas
 	 *            The Canvas to draw on.
 	 */
-	public void draw(Canvas canvas) {
+	void draw(Canvas canvas) {
 		/* Draw tracks */
 		int y = getBounds().top;
 		for (Track t : mTracks) {
@@ -373,10 +684,10 @@ public class TrackManager implements Parcelable {
 	}
 
 	/**
-	 * @return Returns a List containing all the Boxes contained by all the
-	 *         Tracks in this TrackManager.
+	 * @return A List containing all the Boxes contained by all the Tracks in
+	 *         this TrackManager.
 	 */
-	public LinkedList<Box> getAllBoxes() {
+	LinkedList<Box> getAllBoxes() {
 		LinkedList<Box> boxes = new LinkedList<Box>();
 		for (Track t : mTracks) {
 			for (Box b : t.getAllBoxes()) {
@@ -386,7 +697,10 @@ public class TrackManager implements Parcelable {
 		return boxes;
 	}
 
-	public Rect getBounds() {
+	/**
+	 * @return The drawing bounds of this TrackManager.
+	 */
+	Rect getBounds() {
 		return mBounds;
 	}
 
@@ -397,10 +711,10 @@ public class TrackManager implements Parcelable {
 	 *            The x-coordinate.
 	 * @param targetY
 	 *            The y-coordinate.
-	 * @return Returns the Box at the set of coordinates. Returns null if no
-	 *         such Box is found.
+	 * @return The Box at the set of coordinates. Returns null if no such Box is
+	 *         found.
 	 */
-	public Box getBox(int targetX, int targetY) {
+	Box getBox(int targetX, int targetY) {
 		Box result = null;
 		Track t = getTrack(targetX, targetY);
 		if (t != null) {
@@ -408,8 +722,15 @@ public class TrackManager implements Parcelable {
 		}
 		return result;
 	}
-	
-	public Box getBox(String id) {
+
+	/**
+	 * Gets a Box by its id.
+	 * 
+	 * @param id
+	 *            The id to search for.
+	 * @return The box whose id matches the supplied id.
+	 */
+	Box getBox(String id) {
 		for (Box b : getAllBoxes()) {
 			if (b.getId().equals(id)) {
 				return b;
@@ -418,10 +739,6 @@ public class TrackManager implements Parcelable {
 		return null;
 	}
 
-	public String getId() {
-		return mId;
-	}
-	
 	/**
 	 * Finds all the Boxes whose playback times overlap with a given Box.
 	 * 
@@ -430,7 +747,7 @@ public class TrackManager implements Parcelable {
 	 * @return Returns a list of all the Boxes whose playback times overlap with
 	 *         a given Box.
 	 */
-	public LinkedList<Box> getConcurrentBoxes(Box box) {
+	LinkedList<Box> getConcurrentBoxes(Box box) {
 		LinkedList<Box> concurrent = new LinkedList<Box>();
 		double begin = box.getBegin();
 		double end = box.getEnd();
@@ -451,14 +768,21 @@ public class TrackManager implements Parcelable {
 	}
 
 	/**
+	 * @return The id of the Message associated with this TrackManager.
+	 */
+	String getId() {
+		return mId;
+	}
+
+	/**
 	 * @return Returns the farthest x-coordinate where this TrackManager needs
 	 *         to draw.
 	 */
-	public int getMaxX() {
+	int getMaxX() {
 		int result = 0;
 		for (Box b : getAllBoxes()) {
-			if (Composer.secToPx(((double) b.getEnd()) / 10.0) > result) {
-				result = Composer.secToPx(((double) b.getEnd()) / 10.0);
+			if (Composer.secToPx((b.getEnd()) / 10.0) > result) {
+				result = Composer.secToPx((b.getEnd()) / 10.0);
 			}
 		}
 		if (mMoveManager.isMoving()) {
@@ -473,7 +797,7 @@ public class TrackManager implements Parcelable {
 	 * @return Returns the furthest y-coordinate where this TrackManager needs
 	 *         to draw.
 	 */
-	public int getMaxY() {
+	int getMaxY() {
 		int result = 0;
 		for (Track t : mTracks) {
 			if (t.getBounds().bottom > result) {
@@ -483,11 +807,11 @@ public class TrackManager implements Parcelable {
 		return result;
 	}
 
-	public MoveManager getMoveManager() {
+	MoveManager getMoveManager() {
 		return mMoveManager;
 	}
 
-	public ResizeManager getResizeManager() {
+	ResizeManager getResizeManager() {
 		return mResizeManager;
 	}
 
@@ -510,16 +834,19 @@ public class TrackManager implements Parcelable {
 		}
 		return result;
 	}
-	
-	public int getUserId() {
+
+	/**
+	 * @return The user id for cloud interaction.
+	 */
+	int getUserId() {
 		return mUserId;
 	}
-	
+
 	/**
 	 * Ensures that there is precisely one empty Track at the bottom of this
 	 * TrackManager.
 	 */
-	public void maintain() {
+	void maintain() {
 		if (mTracks.isEmpty() || !mTracks.getLast().isEmpty()) {
 			Track t = new Track();
 			mTracks.addLast(t);
@@ -544,8 +871,8 @@ public class TrackManager implements Parcelable {
 	 * 
 	 * @return Returns the estimated height.
 	 */
-	public int measureHeight() {
-		return Track.HEIGHT*mTracks.size() + 2*Box.SPACING; 
+	int measureHeight() {
+		return Track.HEIGHT * mTracks.size() + 2 * Box.SPACING;
 	}
 
 	/**
@@ -554,7 +881,7 @@ public class TrackManager implements Parcelable {
 	 * @param b
 	 *            The Box to remove.
 	 */
-	public void removeBox(Box b) {
+	void removeBox(Box b) {
 		for (Track t : mTracks) {
 			if (t.contains(b)) {
 				t.removeBox(b.getBegin());
@@ -574,18 +901,39 @@ public class TrackManager implements Parcelable {
 	 * @param b
 	 *            The bottom bound.
 	 */
-	public void setBounds(int l, int t, int r, int b) {
+	void setBounds(int l, int t, int r, int b) {
 		mBounds.set(l, t, r, b);
 	}
-	
-	public void setId(String id) {
+
+	/**
+	 * @param id
+	 *            The id of the Message associated with this TrackManager.
+	 */
+	void setId(String id) {
 		mId = id;
 	}
-	
-	public Message toMessage() {
+
+	/**
+	 * @param userId
+	 *            The user id for cloud interaction.
+	 */
+	void setUserId(int userId) {
+		mUserId = userId;
+	}
+
+	/**
+	 * Generates a message.Message object from this TrackManager.
+	 * 
+	 * @return The generated Message;
+	 */
+	Message toMessage() {
+		/* Create the message */
 		Message m = new Message(getId());
-		
+
+		/* Create the root element */
 		Parallel p = new Parallel();
+
+		/* Put all Boxes in the Parallel */
 		int maxTime = -1;
 		for (Box b : getAllBoxes()) {
 			if (b instanceof TextBox) {
@@ -597,263 +945,43 @@ public class TrackManager implements Parcelable {
 			p.addElement(b.toMedia());
 		}
 		p.setBegin(0);
-		p.setEnd(((double) maxTime) / 10.0);
+		p.setEnd((maxTime) / 10.0);
+
+		/* Put the Parallel in the Message */
 		m.addElement(p);
+
 		return m;
 	}
-	
-	public void setUserId(int userId) {
-		mUserId = userId;
-	}
-	
-	public String uploadText(String text, int userId) {
+
+	/**
+	 * Uploads a String as a text file to the cloud.
+	 * 
+	 * @param text
+	 *            The text to upload.
+	 * @param userId
+	 *            The user id for cloud interaction.
+	 * @return The url where the text can be found.
+	 */
+	String uploadText(String text, int userId) {
 		String path = Environment.getExternalStorageDirectory() + "/smilcache/";
 		path += java.util.UUID.randomUUID().toString() + ".txt";
-		
+
 		try {
 			/* Make a file from the text */
 			FileOutputStream fos = new FileOutputStream(new File(path));
 			fos.write(text.getBytes());
 			fos.flush();
 			fos.close();
-			
+
 			/* Send the file to the network */
 			MediaProvider mp = new MediaProvider();
-			path = mp.saveMedia(path, "text", userId);
-			
+			path = mp.saveMedia(path, "text", userId, null, true);
 		} catch (FileNotFoundException e) {
-			// do nothing. fail. i don't really care at this point.
+			// do nothing.
 		} catch (IOException e) {
-			// do nothing again.
+			// do nothing.
 		}
 		return path;
-	}
-	
-	public static class Factory {
-		
-		private static TrackManager mTrackManager = null;
-		private static edu.nku.cs.csc440.team2.mediaCloud.Media[] mMedia = null;
-		
-		public static TrackManager create(String messageId, int userId) {
-			/* Set up a new TrackManager */
-			mTrackManager = new TrackManager(messageId, userId);
-			
-			if (messageId != null) {
-				/* Get the Message from network */
-				Message m = new MessageProvider().getMessageById(messageId);
-				
-				/* Get listing of available media from network */
-				MediaProvider mediaProvider = new MediaProvider();
-				mMedia = mediaProvider.getAllMedia(userId);
-				
-				/* Set each text-type media's name to its associated text */
-				for (int i = 0; i < mMedia.length; i ++) {
-					if (mMedia[i].getType().equalsIgnoreCase("text")) {
-						String url = mMedia[i].getMediaUrl();
-						String text = mediaProvider.getText(url);
-						mMedia[i].setName(text);
-					}
-				}
-			
-				/* Add everything from the Message to the TrackManager */
-				for (Body b : m.getBody()) {
-					addElement(b);
-				}
-			}
-			
-			/* Clean up and return */
-			TrackManager result = mTrackManager;
-			mTrackManager = null;
-			mMedia = null;
-			return result;
-		}
-		
-		private static void addElement(Body source) {
-			/* Determine what to do with the Body source */
-			if (source instanceof Sequence) {
-				/* Recursively call this method for every body source has */
-				for (Body b : ((Sequence) source).getBody()) {
-					addElement(b);
-				}
-			} else if (source instanceof Parallel) {
-				/* Recursively call this method for every body source has */
-				for (Body b : ((Parallel) source).getBody()) {
-					addElement(b);
-				}
-			} else if (source instanceof Media) {
-				/* Add a Box representing source to mTrackManager */
-				if (source instanceof Audio) {
-					addAudio((Audio) source);
-				} else if (source instanceof Image) {
-					addImage((Image) source);
-				} else if (source instanceof Text) {
-					addText((Text) source);
-				} else if (source instanceof Video) {
-					addVideo((Video) source);
-				}
-			}
-		}
-		
-		private static void addAudio(Audio audio) {
-			/* Get the Audio's source url */
-			String source = audio.getSrc();
-			
-			/* Find the associated Media in mMedia */
-			edu.nku.cs.csc440.team2.mediaCloud.Media m = find(source);
-			
-			/* If the media exists and is accessible to the user */
-			if (m != null) {
-				/* Determine the Box's parameters */
-				int begin = (int) Math.round(audio.getBegin() * 10);
-				int end = (int) Math.round(audio.getEnd() * 10);
-				int duration = end - begin;
-				int clipDuration = parseMediaDuration(m.getDuration());
-				String name = m.getName();
-				
-				/* Create the Box */
-				AudioBox box = new AudioBox(source,
-						begin, duration, clipDuration);
-				
-				/* Set the Box's name */
-				box.setName(name);
-				
-				/* Add the Box to the TrackManager */
-				mTrackManager.addBox(box, begin);
-			}
-		}
-		
-		private static void addImage(Image image) {
-			/* Get the Image's source url */
-			String source = image.getSrc();
-			
-			/* Find the associated Media in mMedia */
-			edu.nku.cs.csc440.team2.mediaCloud.Media m = find(source);
-			
-			/* If the media exists and is accessible to the user */
-			if (m != null) {
-				/* Determine the Box's parameters */
-				int begin = (int) Math.round(image.getBegin() * 10);
-				int end = (int) Math.round(image.getEnd() * 10);
-				int duration = end - begin;
-				ComposerRegion region = new ComposerRegion(image.getRegion());
-				String name = m.getName();
-				
-				/* Create the Box */
-				ImageBox box = new ImageBox(source, begin, duration, region);
-				
-				/* Set the Box's name */
-				box.setName(name);
-				
-				/* Add the Box to the TrackManager */
-				mTrackManager.addBox(box, begin);
-			}
-		}
-		
-		private static void addText(Text text) {
-			/* Get the Text's source url */
-			String source = text.getSrc();
-			
-			/* Find the associated Media in mMedia */
-			edu.nku.cs.csc440.team2.mediaCloud.Media m = find(source);
-			
-			/* If the media exists and is accessible to the user */
-			if (m != null) {
-				/* Determine the Box's parameters */
-				int begin = (int) Math.round(text.getBegin() * 10);
-				int end = (int) Math.round(text.getEnd() * 10);
-				int duration = end - begin;
-				ComposerRegion region = new ComposerRegion(text.getRegion());
-				String name = m.getName().trim();
-				
-				/* Create the Box */
-				TextBox box = new TextBox(source, begin, duration, region);
-				
-				/* Set the TextBox's name (text) */
-				box.setName(name);
-				
-				/* Add the Box to the TrackManager */
-				mTrackManager.addBox(box, begin);
-			}
-		}
-		
-		private static void addVideo(Video video) {
-			/* Get the Video's source url */
-			String source = video.getSrc();
-			
-			/* Find the associated Media in mMedia */
-			edu.nku.cs.csc440.team2.mediaCloud.Media m = find(source);
-			
-			/* If the media exists and is accessible to the user */
-			if (m != null) {
-				/* Determine the Box's parameters */
-				int begin = (int) Math.round(video.getBegin() * 10);
-				int end = (int) Math.round(video.getEnd() * 10);
-				int duration = end - begin;
-				int clipDuration = parseMediaDuration(m.getDuration());
-				ComposerRegion region = new ComposerRegion(video.getRegion());
-				String name = m.getName();
-				
-				/* Create the Box */
-				VideoBox box = new VideoBox(source, begin, duration,
-						clipDuration, region);
-				
-				/* Set the Box's name */
-				box.setName(name);
-				
-				/* Add the Box to the TrackManager */
-				mTrackManager.addBox(box, begin);
-			}
-		}
-		
-		private static int parseMediaDuration(String mediaDuration) {
-			/* Split by delimiters */
-			String[] firstSplit = mediaDuration.split(":");
-			if (firstSplit[2].contains(".")) {
-				String[] secondSplit = firstSplit[2].split(".");
-				
-				/* Parse integers from splits */
-				int tenths = Integer.parseInt(secondSplit[1]);
-				int seconds = Integer.parseInt(secondSplit[0]);
-				int minutes = Integer.parseInt(firstSplit[1]);
-				int hours = Integer.parseInt(firstSplit[0]);
-				
-				/* Determine total time in tenth-seconds */
-				minutes += hours * 60;
-				seconds += minutes * 60;
-				tenths += seconds * 10;
-				
-				return tenths;
-			} else {
-				int tenths = 0;
-				int seconds = Integer.parseInt(firstSplit[2]);
-				int minutes = Integer.parseInt(firstSplit[1]);
-				int hours = Integer.parseInt(firstSplit[0]);
-				
-				/* Determine total time in tenth-seconds */
-				minutes += hours * 60;
-				seconds += minutes * 60;
-				tenths += seconds * 10;
-				
-				return tenths;
-			}
-		}
-		
-		private static edu.nku.cs.csc440.team2.mediaCloud.Media find(
-				String source) {
-			for (int i = 0; i < mMedia.length; i ++) {
-				if (mMedia[i].getMediaUrl().equals(source)) {
-					return mMedia[i];
-				}
-			}
-			return null;
-		}
-		
-	}
-
-	@Override
-	public int describeContents() {
-		// TODO Auto-generated method stub
-		return 0;
 	}
 
 	@Override
@@ -863,20 +991,5 @@ public class TrackManager implements Parcelable {
 		dest.writeString(mId);
 		dest.writeInt(mUserId);
 	}
-	
-	/** Used to generate instances of this class from a Parcel */
-	public static final Parcelable.Creator<TrackManager> CREATOR = new Parcelable.Creator<TrackManager>() {
 
-		@Override
-		public TrackManager createFromParcel(Parcel source) {
-			return new TrackManager(source);
-		}
-
-		@Override
-		public TrackManager[] newArray(int size) {
-			return new TrackManager[size];
-		}
-
-	};
-	
 }
