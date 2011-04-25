@@ -31,7 +31,11 @@ public class MessageProvider {
 			folder.mkdir();
 	}
 	
-	// Saved Messages
+	/**
+	 * Get list of saved messaged
+	 * @param userId
+	 * @return
+	 */
 	public ArrayList<MessageLite> getSavedMessages(int userId){
 		
 		String url = "http://nkucloud.dyndns.org:8080/mediacloud/getSavedMessageList.jsp?user=" + userId;
@@ -39,7 +43,11 @@ public class MessageProvider {
 		return getRemoteMessageLites(url);
 	}
 
-	// List of Messages
+	/**
+	 * Get list of message sent from other users by userId
+	 * @param userId
+	 * @return ArrayList of MessageLites 
+	 */
 	public ArrayList<MessageLite> getAllMessage(int userId) {
 
 		String url = "http://nkucloud.dyndns.org:8080/mediacloud/getMessageList.jsp?user=" + userId;
@@ -108,7 +116,10 @@ public class MessageProvider {
 		return msg;
 	}
 	
-	
+	/**
+	 * Delete message on the cloud
+	 * @param messageId
+	 */
 	public void deleteMessage(String messageId){
 		
 		try {
@@ -120,6 +131,13 @@ public class MessageProvider {
 		}
 	}
 	
+	/**
+	 * Save SMIL message on the cloud
+	 * @param userId
+	 * @param messageTitle
+	 * @param msg
+	 * @return Message ID
+	 */
 	public String saveMessage(int userId, String messageTitle, Message msg) {
 		
 		String result = "";
@@ -188,7 +206,7 @@ public class MessageProvider {
 	 */
 	public void sendMessageById(int senderId, int recipientId, String messageId){
 		
-String url = "http://nkucloud.dyndns.org:8080/mediacloud/sendMessageById.jsp";
+		String url = "http://nkucloud.dyndns.org:8080/mediacloud/sendMessageById.jsp";
 		
 		List<NameValuePair> data = new ArrayList<NameValuePair>();
 		
@@ -207,7 +225,7 @@ String url = "http://nkucloud.dyndns.org:8080/mediacloud/sendMessageById.jsp";
 		}
 	}
 	
-	
+
 	private String getSmil(Message msg){
 		
 		String xml = "";

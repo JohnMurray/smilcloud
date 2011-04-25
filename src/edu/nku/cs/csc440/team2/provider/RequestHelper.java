@@ -16,7 +16,12 @@ import org.apache.http.impl.client.DefaultHttpClient;
 
 public class RequestHelper {
 
-	// Simple GET Request
+	/**
+	 * Simple GET request
+	 * @param url
+	 * @return Response text
+	 * @throws Exception
+	 */
 	public static String makeHttpGetRequest(String url) throws Exception {
 
 		BufferedReader in = null;
@@ -53,7 +58,13 @@ public class RequestHelper {
 		return result;
 	}
 
-	// POST Request
+	/**
+	 * Make POST request and return plain response
+	 * @param url
+	 * @param pairs
+	 * @return Plain text response
+	 * @throws Exception
+	 */
 	public static String makeHttpPostRequest(String url,
 			List<NameValuePair> pairs) throws Exception {
 		BufferedReader in = null;
