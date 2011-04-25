@@ -214,7 +214,7 @@ public class MediaProvider {
 	 * @param localPath
 	 * @return 
 	 */
-	public String saveMedia(String localPath, String type, int userId) {
+	public String saveMedia(String localPath, String type, int userId, String mediaName) {
 
 		String returnedUrl = null;
 		File file = new File(localPath);
@@ -227,7 +227,7 @@ public class MediaProvider {
 			MultipartEntity entity = new MultipartEntity();
 
 			entity.addPart("user", new StringBody(userId + ""));
-			entity.addPart("name", new StringBody(file.getName()));
+			entity.addPart("name", new StringBody(mediaName));
 			entity.addPart("type", new StringBody(type));
 			entity.addPart("file", new FileBody(file));
 			httppost.setEntity(entity);

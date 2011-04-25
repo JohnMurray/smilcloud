@@ -619,7 +619,7 @@ public class TrackManager implements Parcelable {
 			
 			/* Send the file to the network */
 			MediaProvider mp = new MediaProvider();
-			path = mp.saveMedia(path, "text", userId);
+			path = mp.saveMedia(path, "text", userId, path);
 			
 		} catch (FileNotFoundException e) {
 			// do nothing. fail. i don't really care at this point.

@@ -12,6 +12,7 @@ import android.widget.EditText;
 import android.widget.Toast;
 import edu.nku.cs.csc440.team2.SMILCloud;
 import edu.nku.cs.csc440.team2.provider.MediaProvider;
+import edu.nku.cs.csc440.team2.provider.UserProvider;
 import edu.nku.cs.csc460.team2.R;
 
 /**
@@ -49,6 +50,14 @@ public class Uploader extends Activity {
 	 */
 	private String fileLocationText;
 	/**
+	 * the textbox that contains the media name
+	 */
+	private EditText mediaName;
+	/**
+	 * The text contained with the mediaName
+	 */
+	private String mediaNameText;
+	/**
 	 * The progress dialog to show when uploading media
 	 */
 	private ProgressDialog mProgressDialog;
@@ -68,7 +77,7 @@ public class Uploader extends Activity {
 			} else {
 				String mediaUrl = (new MediaProvider()).saveMedia(fileLocation,
 						type, ((SMILCloud) Uploader.this.getApplication())
-								.getUserId());
+								.getUserId(), mediaNameText);
 				if (mediaUrl == null) {
 					Uploader.this.dismissAndNotify(Uploader.FAILED_UPLOAD);
 				} else {
@@ -108,6 +117,7 @@ public class Uploader extends Activity {
 		setContentView(R.layout.uploader_main);
 
 		fileLocation = (EditText) findViewById(R.id.uploader_edit_text);
+		mediaName = (EditText) findViewById(R.id.uploader_edit_name);
 		Button findMedia = (Button) findViewById(R.id.uploader_select_file_button);
 		Button upload = (Button) findViewById(R.id.uploader_upload_file_button);
 
@@ -127,6 +137,8 @@ public class Uploader extends Activity {
 						true);
 				Uploader.this.fileLocationText = Uploader.this.fileLocation
 						.getText().toString();
+				Uploader.this.mediaNameText = Uploader.this.mediaName.getText()
+						.toString();
 				(new Thread(null, Uploader.this.mUploadMedia, "Upload Media"))
 						.start();
 			}
