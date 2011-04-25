@@ -119,5 +119,12 @@ public class ImagePlayer extends SingleInstancePlayer {
 		});
 
 	}
+	
+	@Override
+	public void reset()
+	{
+		super.reset();
+		this.unRender();
+	}
 
 }
