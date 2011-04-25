@@ -23,12 +23,12 @@ import android.view.MotionEvent;
 import android.view.View;
 
 /**
- * A RegionEditor allows a user to graphically modify a Region using
- * touch-based input. It supports setting z-indices of Regions and guarantees
- * that every z-index in a Message is unique.
+ * A RegionEditor allows a user to graphically modify a Region using touch-based
+ * input. It supports setting z-indices of Regions and guarantees that every
+ * z-index in a Message is unique.
  * 
  * @author William Knauer <knauerw1@nku.edu>
- * @version 2011.0420
+ * @version 2011.0424
  */
 public class RegionEditor extends Activity {
 	/**
@@ -38,31 +38,31 @@ public class RegionEditor extends Activity {
 	public class RegionEditorView extends View implements OnGestureListener {
 		/** The height and width of the handles on each corner of the Region */
 		public static final int CORNER_SIZE = 30;
-		
+
 		/** Interprets touch-based input to trigger callbacks */
 		private GestureDetector mGestureDetector;
-		
+
 		/** List of Boxes that have non-null Regions */
 		private LinkedList<Box> mBoxesWithRegions;
-		
-		/** 
+
+		/**
 		 * List of Boxes whose playback overlaps with the Box whose Region is
 		 * being edited.
 		 */
 		private LinkedList<Box> mConcurrentBoxes;
-		
+
 		/** The bounds of this Region */
 		private Rect mBounds;
-		
+
 		/** The bounds of the top-left corner grip within mBounds */
 		private Rect mTopLeft;
-		
+
 		/** The bounds of the top-right corner grip within mBounds */
 		private Rect mTopRight;
-		
+
 		/** The bounds of the bottom-left corner grip within mBounds */
 		private Rect mBottomLeft;
-		
+
 		/** The bounds of the bottom-right corner grip within mBounds */
 		private Rect mBottomRight;
 
@@ -72,7 +72,8 @@ public class RegionEditor extends Activity {
 		/**
 		 * Class constructor.
 		 * 
-		 * @param context The context used to construct this view.
+		 * @param context
+		 *            The context used to construct this view.
 		 */
 		public RegionEditorView(Context context) {
 			super(context);
@@ -88,23 +89,23 @@ public class RegionEditor extends Activity {
 			mTopRight = new Rect(0, 0, CORNER_SIZE, CORNER_SIZE);
 			mBottomLeft = new Rect(0, 0, CORNER_SIZE, CORNER_SIZE);
 			mBottomRight = new Rect(0, 0, CORNER_SIZE, CORNER_SIZE);
-			
+
 			/* Assign bounds to the region's corner rectangles */
 			updateBounds();
-			
+
 			/* Populate mBoxesWithRegions */
 			for (Box b : mTrackManager.getAllBoxes()) {
 				if (b.getRegion() != null) {
 					mBoxesWithRegions.add(b);
 				}
 			}
-			
+
 			/* Sort mBoxesWithRegions by z-index ascending */
 			Collections.sort(mBoxesWithRegions);
-			
+
 			/* Set the z-indices of mBoxesWithRegions to their List indices */
 			commitZindices();
-			
+
 			/* Populate mConcurrentBoxes */
 			mConcurrentBoxes = mTrackManager.getConcurrentBoxes(mBox);
 		}
@@ -118,7 +119,7 @@ public class RegionEditor extends Activity {
 			while (!done && mBoxesWithRegions.getLast() != mBox) {
 				/* Get the index of the next element in the list */
 				int next = mBoxesWithRegions.indexOf(mBox) + 1;
-				
+
 				/* Stop if the next element's playback overlaps with mBox */
 				done = mConcurrentBoxes.contains(mBoxesWithRegions.get(next));
 
@@ -131,8 +132,8 @@ public class RegionEditor extends Activity {
 		}
 
 		/**
-		 * Sets the z-index of each Box in mBoxesWithRegions to its index
-		 * within mBoxesWithRegions.
+		 * Sets the z-index of each Box in mBoxesWithRegions to its index within
+		 * mBoxesWithRegions.
 		 */
 		public void commitZindices() {
 			for (int i = 0; i < mBoxesWithRegions.size(); i++) {
@@ -165,15 +166,12 @@ public class RegionEditor extends Activity {
 		@Override
 		public void onDraw(Canvas canvas) {
 			Paint p = new Paint();
-			
+
 			/* Draw background */
 			p.setAntiAlias(true);
 			p.setColor(Color.argb(255, 0, 0, 0));
 			canvas.drawPaint(p);
-			
-			/* Draw target screen size */
-			// TODO set target screen size // p.setColor(getResources().getColor(R.color.));
-			
+
 			/* Draw all overlapping regions */
 			for (int i = 0; i < mBoxesWithRegions.size(); i++) {
 				Box b = mBoxesWithRegions.get(i);
@@ -182,7 +180,7 @@ public class RegionEditor extends Activity {
 						/* Draw region background */
 						p.setColor(Color.argb(255, 255, 255, 255));
 						canvas.drawRect(mBounds, p);
-						
+
 						/* Draw each region corner background */
 						p.setColor(Color.argb(255, 255, 153, 51));
 						canvas.drawRect(mTopLeft, p);
@@ -195,7 +193,7 @@ public class RegionEditor extends Activity {
 						ComposerRegion r = b.getRegion();
 						p.setColor(Color.argb(255, 85, 85, 85));
 						canvas.drawRect(r.getBounds(), p);
-						
+
 						/* Draw overlapping region foreground */
 						p.setColor(Color.argb(255, 204, 204, 204));
 						p.setStyle(Style.STROKE);
@@ -204,7 +202,7 @@ public class RegionEditor extends Activity {
 					}
 				}
 			}
-			
+
 			/* Draw region outline */
 			p.setColor(Color.argb(255, 255, 255, 255));
 			p.setStyle(Style.STROKE);
@@ -225,14 +223,14 @@ public class RegionEditor extends Activity {
 		}
 
 		@Override
-		public void onLongPress(MotionEvent arg0) {}
+		public void onLongPress(MotionEvent arg0) {
+		}
 
 		@Override
 		public boolean onScroll(MotionEvent e1, MotionEvent e2, float distX,
 				float distY) {
 			/*
-			 *  Resize the Region based on the distance the touch pointer
-			 *  moves.
+			 * Resize the Region based on the distance the touch pointer moves.
 			 */
 			if (mTarget != null) {
 				if (mTarget == mBounds) {
@@ -256,7 +254,8 @@ public class RegionEditor extends Activity {
 		}
 
 		@Override
-		public void onShowPress(MotionEvent arg0) {}
+		public void onShowPress(MotionEvent arg0) {
+		}
 
 		@Override
 		public boolean onSingleTapUp(MotionEvent arg0) {
@@ -267,7 +266,7 @@ public class RegionEditor extends Activity {
 		public boolean onTouchEvent(MotionEvent ev) {
 			/* Pass touch event to the GestureDetector */
 			mGestureDetector.onTouchEvent(ev);
-			
+
 			if (ev.getAction() == MotionEvent.ACTION_UP) {
 				onUp(ev);
 			}
@@ -275,10 +274,11 @@ public class RegionEditor extends Activity {
 		}
 
 		/**
-		 * Actions to be performed whenever the user lifts their finger from
-		 * the touch screen.
+		 * Actions to be performed whenever the user lifts their finger from the
+		 * touch screen.
 		 * 
-		 * @param ev The MotionEvent that triggered the function call.
+		 * @param ev
+		 *            The MotionEvent that triggered the function call.
 		 */
 		public void onUp(MotionEvent ev) {
 			mTarget = null;
@@ -293,7 +293,7 @@ public class RegionEditor extends Activity {
 			while (!done && mBoxesWithRegions.getFirst() != mBox) {
 				/* Get the index of the previous element in the list */
 				int prev = mBoxesWithRegions.indexOf(mBox) - 1;
-				
+
 				/* Stop if the next element's playback overlaps with mBox */
 				done = mConcurrentBoxes.contains(mBoxesWithRegions.get(prev));
 
@@ -306,8 +306,8 @@ public class RegionEditor extends Activity {
 		}
 
 		/**
-		 * Updates the bounds of the corner grips so they are actually at
-		 * the corners of the Region's bounds.
+		 * Updates the bounds of the corner grips so they are actually at the
+		 * corners of the Region's bounds.
 		 */
 		public void updateBounds() {
 			/* Correct if the user somehow inverted mBounds */
@@ -354,18 +354,18 @@ public class RegionEditor extends Activity {
 			}
 			invalidate();
 		}
-		
+
 	}
 
 	/** The TrackManager that contains all the Boxes we are working with */
 	private TrackManager mTrackManager;
-	
+
 	/** The Box within the mTrackManager whose Region we are editing */
 	private Box mBox;
-	
+
 	/** The view that facilitates the graphical editing of the Region */
 	private RegionEditorView mView;
-	
+
 	@Override
 	public void onBackPressed() {
 		Intent i = new Intent();
@@ -378,17 +378,17 @@ public class RegionEditor extends Activity {
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		
+
 		/* Load from Intent */
 		mTrackManager = getIntent().getParcelableExtra("track_manager");
 		String boxId = getIntent().getStringExtra("box_id");
 		mBox = mTrackManager.getBox(boxId);
-		
+
 		/* Create a region for mBox if we must */
 		if (mBox.getRegion() == null) {
 			mBox.setRegion(new ComposerRegion());
 		}
-		
+
 		mView = new RegionEditorView(this);
 		setContentView(mView);
 	}
@@ -420,5 +420,5 @@ public class RegionEditor extends Activity {
 
 		return result;
 	}
-	
+
 }

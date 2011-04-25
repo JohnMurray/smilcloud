@@ -13,7 +13,7 @@ import android.widget.Button;
  * ImageBox. The begin and duration for playback cannot be changed from here.
  * 
  * @author William Knauer <knauerw1@nku.edu>
- * @version 2011.0420
+ * @version 2011.0424
  */
 public class ImageProperties extends Activity {
 	/** Request code for launching ImageBrowser */
@@ -84,20 +84,18 @@ public class ImageProperties extends Activity {
 	}
 
 	@Override
-	protected void onActivityResult(int requestCode,
-			int resultCode, Intent data) {
+	protected void onActivityResult(int requestCode, int resultCode, Intent data) {
 		if (resultCode == RESULT_OK) {
 			if (requestCode == REQ_SOURCE) {
 				/* Set Box info from intent */
 				mBox.setName(data.getStringExtra("name"));
 				mBox.setSource(data.getStringExtra("source"));
-	
 			} else if (requestCode == REQ_REGION) {
 				mTrackManager = data.getParcelableExtra("track_manager");
 				String boxId = data.getStringExtra("box_id");
 				mBox = (ImageBox) mTrackManager.getBox(boxId);
 			}
-			
+
 			/* Disallow editing of the media's source if it's already set */
 			if (mBox.getSource() != null) {
 				mSetSourceButton.setEnabled(false);
@@ -117,7 +115,7 @@ public class ImageProperties extends Activity {
 		} else {
 			setResult(RESULT_CANCELED);
 		}
-		
+
 		finish();
 	}
 
@@ -126,7 +124,7 @@ public class ImageProperties extends Activity {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.image_properties);
 		loadWidgetsFromView();
-		
+
 		/* Load from Intent */
 		mTrackManager = getIntent().getParcelableExtra("track_manager");
 		String boxId = getIntent().getStringExtra("box_id");
