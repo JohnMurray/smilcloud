@@ -77,7 +77,7 @@ public class Uploader extends Activity {
 			} else {
 				String mediaUrl = (new MediaProvider()).saveMedia(fileLocation,
 						type, ((SMILCloud) Uploader.this.getApplication())
-								.getUserId(), mediaNameText, false);
+								.getUserId(), mediaNameText, true);
 				if (mediaUrl == null) {
 					Uploader.this.dismissAndNotify(Uploader.FAILED_UPLOAD);
 				} else {
@@ -175,7 +175,7 @@ public class Uploader extends Activity {
 		} else if (ext.equals("jpg") || ext.equals("gif") || ext.equals("png")
 				|| ext.equals("bmp")) {
 			type = "image";
-		} else if (ext.equals("3gp") || ext.equals("mp4")) {
+		} else if (ext.equals("3gp") || ext.equals("mp4") || ext.equals("m4v") ) {
 			type = "video";
 		}
 
