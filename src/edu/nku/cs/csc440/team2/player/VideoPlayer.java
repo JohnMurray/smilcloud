@@ -257,6 +257,9 @@ public class VideoPlayer extends SingleInstancePlayer implements
 	 */
 	@Override
 	public void reset() {
+		this.unRender();
+		this.videoRendered = false;
+		this.surfaceRendered = false;
 		this.prepare();
 		super.reset();
 	}

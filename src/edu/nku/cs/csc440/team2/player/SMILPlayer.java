@@ -116,6 +116,11 @@ public class SMILPlayer extends Activity {
 					Toast.LENGTH_SHORT).show();
 		}
 	};
+	
+	/**
+	 * Flag to set when the user leaves (finishes) the application
+	 */
+	private boolean finishedWatching;
 
 	/**
 	 * Call when Activity is first created
@@ -289,6 +294,13 @@ public class SMILPlayer extends Activity {
 							root.play();
 						}
 						playbackReset = false;
+					}
+					if( SMILPlayer.this.finishedWatching )
+					{
+						SMILPlayer.this.finishedWatching = false;
+						root.pause();
+						root.unRenderAll();
+						break;
 					}
 				}
 			}
@@ -554,11 +566,7 @@ public class SMILPlayer extends Activity {
 	 */
 	@Override
 	public void finish() {
-		if (this.playbackThread != null) {
-			this.playbackThread.stop();
-			this.root.pause();
-			this.root.unRenderAll();
-		}
+		this.finishedWatching = true;
 		super.finish();
 	}
 }
